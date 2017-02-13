@@ -1,0 +1,9 @@
+c:\users\s-good\documents\visual studio 2015\Projects\GTASARadioExternal\GTASARadioExternal\bin\Debug\GTASARadioExternal.exe.config
+c:\users\s-good\documents\visual studio 2015\Projects\GTASARadioExternal\GTASARadioExternal\bin\Debug\GTASARadioExternal.exe
+c:\users\s-good\documents\visual studio 2015\Projects\GTASARadioExternal\GTASARadioExternal\bin\Debug\GTASARadioExternal.pdb
+c:\users\s-good\documents\visual studio 2015\Projects\GTASARadioExternal\GTASARadioExternal\obj\Debug\GTASARadioExternal.csprojResolveAssemblyReference.cache
+c:\users\s-good\documents\visual studio 2015\Projects\GTASARadioExternal\GTASARadioExternal\obj\Debug\GTASARadioExternal.Form1.resources
+c:\users\s-good\documents\visual studio 2015\Projects\GTASARadioExternal\GTASARadioExternal\obj\Debug\GTASARadioExternal.Properties.Resources.resources
+c:\users\s-good\documents\visual studio 2015\Projects\GTASARadioExternal\GTASARadioExternal\obj\Debug\GTASARadioExternal.csproj.GenerateResource.Cache
+c:\users\s-good\documents\visual studio 2015\Projects\GTASARadioExternal\GTASARadioExternal\obj\Debug\GTASARadioExternal.exe
+c:\users\s-good\documents\visual studio 2015\Projects\GTASARadioExternal\GTASARadioExternal\obj\Debug\GTASARadioExternal.pdb
