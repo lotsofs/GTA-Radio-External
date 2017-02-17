@@ -69,6 +69,7 @@ namespace GTASARadioExternal {
                         keybd_event(0xAF, 0, 1, IntPtr.Zero);   // Volume up
                         volumeStatus = checkMP3PlayerStatus();
                     }
+                    keybd_event(0xAF , 0, 2, IntPtr.Zero);
                 }
                 else if (radioStatus == 7 && volumeStatus > 0) {
                     // radio is supposed to be off but the volume is not at 0
@@ -76,6 +77,7 @@ namespace GTASARadioExternal {
                         keybd_event(0xAE, 0, 1, IntPtr.Zero);   // Volume down
                         volumeStatus = checkMP3PlayerStatus();
                     }
+                    keybd_event(0xAE, 0, 2, IntPtr.Zero);
                 }
                 else if (volumeStatus == -1) {
                     radioStatus = -1;       // winamp not running
