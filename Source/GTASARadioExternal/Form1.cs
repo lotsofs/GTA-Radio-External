@@ -13,20 +13,89 @@ namespace GTASARadioExternal {
     public partial class Form1 : Form {
 
         Timer timer2;
-        int displayedText;
 
-        public Form1() {
+		public enum displayedTexts { Unitialized, Shutdown, Running, Unrecognized, Unconfirmed, NoMusicPlayer }
+		displayedTexts displayedText = displayedTexts.Unitialized;
+
+		public static ReadMemory readMemory = new ReadMemory();
+
+
+		public Form1() {
             InitializeComponent();
-            Program.InitTimer();        // run the timer that checks for updates
+
+			label1.Text = "Tool not configured";
+
+			readMemory.InitTimer();        // run the timer that checks for updates
             WindowTimer();              // run the timer that prints these updates
         }
 
-        private void label1_Click(object sender, EventArgs e) {
-            // Unused but removing it throws an error :D
-        }
+		void CheckGame() {
+			// Check if the game still exists
+			if (radioButtonSA.Checked) {
+				readMemory.DetermineGameVersionSA();
+			}
+
+			// Check if the music player still exists
+			if (radioButtonWinamp.Checked) {
+				readMemory.DeterminePlayerVersionWinamp();
+			}
+			else if (radioButtonOther.Checked) {
+				readMemory.DeterminePlayerVersionOther();
+			}
+		}
+
+
+		void UpdateWindow() {
+			if (readMemory.actionToTake == ReadMemory.actions.None) {
+				label1.Text = "Tool not configured";
+				displayedText = displayedTexts.Unitialized;
+			}
+			else if (readMemory.playerStatus == ReadMemory.statuses.Shutdown) {
+				label1.Text = "Music player not running";
+				displayedText = displayedTexts.NoMusicPlayer;
+			}
+			else if (readMemory.gameStatus == ReadMemory.statuses.Shutdown && displayedText != displayedTexts.Shutdown) {
+				label1.Text = "Game not running";
+				displayedText = displayedTexts.Shutdown;
+			}
+			else if (readMemory.gameStatus == ReadMemory.statuses.Unrecognized && displayedText != displayedTexts.Unrecognized) {
+				label1.Text = "Unable to detect game version";
+				displayedText = displayedTexts.Unrecognized;
+			}
+			else if (readMemory.gameStatus == ReadMemory.statuses.Unconfirmed) {
+				if (readMemory.radioStatus == 2) {
+					label1.Text = "radio ON (or at least it should be)";
+					//displayedText = displayedTexts.Unconfirmed;
+				}
+				else if (readMemory.radioStatus == 7) {
+					label1.Text = "radio OFF (or at least it should be)";
+					//displayedText = displayedTexts.Unconfirmed;
+				}
+				else {
+					label1.Text = "Whoopsee, something went wrong. Here's a number: " + readMemory.radioStatus;
+				}
+			}
+			else if (readMemory.gameStatus == ReadMemory.statuses.Running) {
+				if (readMemory.radioStatus == 2) {
+					label1.Text = "radio ON";
+					//displayedText = displayedTexts.Running;
+				}
+				else if (readMemory.radioStatus == 7) {
+					label1.Text = "radio OFF";
+					//displayedText = displayedTexts.Running;
+				}
+			}
+			if (radioButtonWinamp.Checked) {
+				labelVolume.Text = "Volume: " + readMemory.maxVolume;
+			}
+			else {
+				labelVolume.Text = null;
+			}
+			label2.Text = "V" + readMemory.major + ".0" + readMemory.minor + " " + readMemory.region;
+		}
 
         // print some status stuff
-        void updateWindow() {
+        /*void UpdateWindowOld() {
             if (Program.radioStatus == 2) {
                 label1.Text = "Radio ON with volume " + Program.volumeStatus;
                 label2.Text = Program.volumeStatus.ToString();
@@ -44,7 +113,7 @@ namespace GTASARadioExternal {
                 label1.Text = "GTASA not running";
                 displayedText = -2;
             }
-        }
+        }*/
 
         // timer that checks every second for updates to be made to the printed info on the window
         public void WindowTimer() {
@@ -55,34 +124,43 @@ namespace GTASARadioExternal {
         }
 
         void timer2Tick(object sender, EventArgs e) {
-            updateWindow();
+            UpdateWindow();
+			CheckGame();
         }
 
-        // pointless feature I added where you could enter the max volume in a box, but then made it controllable via winamp itself anyway
-        private void button1_Click(object sender, EventArgs e) {
-            /*int outThingIDontNeed;
-            if (Int32.TryParse(textBox1.Text, out outThingIDontNeed)) {
-                if (Int32.Parse(textBox1.Text) <= 255 && Int32.Parse(textBox1.Text) > 0) {
-                    Program.maxVolume = Int32.Parse(textBox1.Text);
-                    label2.Text = Int32.Parse(textBox1.Text).ToString();
-                }
-            }*/
-        }
+		private void checkBox1_CheckedChanged(object sender, EventArgs e) {
+			readMemory.quickVolume = checkBox1.Checked;
+		}
 
-        private void textBox1_TextChanged(object sender, EventArgs e) {
-            // Unused but removing it throws an error :D
-        }
+		private void radioButtonVolume_CheckedChanged(object sender, EventArgs e) {
+			readMemory.actionToTake = ReadMemory.actions.Volume;
+			checkBox1.Enabled = radioButtonVolume.Checked;
+		}
 
-        private void label2_Click(object sender, EventArgs e) {
-            // Unused but removing it throws an error :D
-        }
+		private void radioButtonPause_CheckedChanged(object sender, EventArgs e) {
+			if (radioButtonPause.Checked) {
+				readMemory.actionToTake = ReadMemory.actions.Pause;
+			}
+		}
 
-        private void Form1_Load(object sender, EventArgs e) {
-            // Unused but removing it throws an error :D
-        }
+		private void radioButtonOther_CheckedChanged(object sender, EventArgs e) {
+			radioButtonVolume.Enabled = !radioButtonOther.Checked;
+			radioButtonMute.Enabled = !radioButtonOther.Checked;
+			radioButtonPause.Enabled = radioButtonOther.Checked;
+		}
 
-        private void label3_Click(object sender, EventArgs e) {
-            // Unused but removing it throws an error :D
-        }
-    }
+		private void radioButtonWinamp_CheckedChanged(object sender, EventArgs e) {
+			radioButtonVolume.Enabled = radioButtonWinamp.Checked;
+			radioButtonMute.Enabled = !radioButtonWinamp.Checked;
+			radioButtonPause.Enabled = radioButtonWinamp.Checked;
+		}
+
+		private void radioButtonVolume_EnabledChanged(object sender, EventArgs e) {
+			if (radioButtonVolume.Checked) {
+				radioButtonVolume.Checked = false;
+				readMemory.actionToTake = ReadMemory.actions.None;
+				radioButtonPause.Checked = true;
+			}
+		}
+	}
 }

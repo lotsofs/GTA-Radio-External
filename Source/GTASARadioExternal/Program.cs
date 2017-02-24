@@ -14,13 +14,13 @@ using System.Text;
 namespace GTASARadioExternal {
     static class Program {
 
-        static Timer timer1;
+        /*static Timer timer1;
         public static int radioStatus = 9;        // 7 = inaudible , 2 = audible , everything else can be ignored
         public static int prevRadioStatus = 9;
         public static int volumeStatus;        // 0 - 255 because I couldnt find a way to reliably mute stuff that I could understand
         public static int maxVolume = 20;
 
-
+		
 
         // We need to read memory from GTA so we need to import some code from this DLL.
         const int PROCESS_WM_READ = 0x0010;
@@ -33,7 +33,7 @@ namespace GTASARadioExternal {
         [DllImport("user32.dll")]
         public static extern void keybd_event(byte virtualKey, byte scanCode, uint flags, IntPtr extraInfo);
 
-
+		*/
 
 
         // Application launched
@@ -43,6 +43,20 @@ namespace GTASARadioExternal {
             Application.SetCompatibleTextRenderingDefault(false);
             Application.Run(new Form1());
         }
+
+		/*// Determine the version of GTASA
+		public static void determineGameVersion() {
+			Process[] p = Process.GetProcessesByName("gta-sa");
+			if (p.Length == 0) {
+				p = Process.GetProcessesByName("gta_sa");
+			}
+			if (p.Length == 0) {
+				radioStatus = -2;
+				// error, game not running
+			}
+			
+			//int aaaa = ReadInt32(p[0].Handle, add_volume);
+		}
 
 
         private static void checkRadioStatus() {
@@ -72,11 +86,14 @@ namespace GTASARadioExternal {
                     keybd_event(0xAF , 0, 2, IntPtr.Zero);
                 }
                 else if (radioStatus == 7 && volumeStatus > 0) {
-                    // radio is supposed to be off but the volume is not at 0
-                    while (volumeStatus > 0) {
-                        keybd_event(0xAE, 0, 1, IntPtr.Zero);   // Volume down
-                        volumeStatus = checkMP3PlayerStatus();
-                    }
+					// radio is supposed to be off but the volume is not at 0
+					for (int i = 0; i < 50; i++) {
+						keybd_event(0xAE, 0, 1, IntPtr.Zero); // volume down
+						volumeStatus = checkMP3PlayerStatus();
+						if (volumeStatus >= checkMP3PlayerStatus()) {
+							i = 255;
+						}
+					}
                     keybd_event(0xAE, 0, 2, IntPtr.Zero);
                 }
                 else if (volumeStatus == -1) {
@@ -152,8 +169,8 @@ namespace GTASARadioExternal {
         }
 
         static void timer1Tick(object sender, EventArgs e) {
-            checkRadioStatus();
-        }
+			checkRadioStatus();
+        }*/
 
     }
 }
