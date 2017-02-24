@@ -1,6 +1,6 @@
 # GTASA-x-Winamp-Radio-Tool
-A tool that mutes/unmutes winamp depending on whether the radio would play in GTASA
+A tool that mutes/unmutes winamp depending on whether the radio would play in GTASA. Also supports pausing/unpausing it and other players.
 
-Probably only works with the V3.0 version of GTASA and God I dont even know how to describe which version of Winamp it works on. (probably the last release before they went bankrupt)
+Should work with the most common versions of GTASA. Versions of winamp other than 5.666 not supported, but might work.
 
-I'll add support for other versions if there's demand, but I primarily made this for myself so yeah. Just go into the mess of a source code (this is the first C# tool I made) and edit the corresponding memory values yourself :D
+I'll add support for other versions/games/tools if there's demand.
