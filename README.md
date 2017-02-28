@@ -9,5 +9,9 @@ Features:
 To add:  
 -Log settings to file so the tool doesn't need configuring every time it's booted  
 -Proper muting rather than jury rigging it with volume control.  
+-Custom hotkey support  
 -Cool stuff  
  
+Notes:  
+All this program does is read memory values from the game and the music player, then sends appropriate media controls (volume up/down, pause/play). It does not directly write to the music player or the game.  
+Foobar will need its volume up/down controls bound manually to these buttons, as it does not support them natively (play/pause IS supported natively)
