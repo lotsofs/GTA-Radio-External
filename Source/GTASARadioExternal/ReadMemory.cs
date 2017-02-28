@@ -13,16 +13,21 @@ namespace GTASARadioExternal {
 
 		public int major = 0;
 		public int minor = 0;
-		public enum regionTypes { US, Europe, Unknown };
-		public regionTypes region = regionTypes.Unknown;
+		public enum regionTypes { Unknown_Region, US, Europe, Japan, Steam };
+		public regionTypes region = regionTypes.Unknown_Region;
 		public enum statuses { Unitialized, Shutdown, Running, Unrecognized, Unconfirmed, Playing, Silent }
 		public statuses gameStatus = statuses.Unitialized;
+		public enum games { None, III, VC, SA }
+		public games game = games.None;
+		public enum musicPlayers { None, Winamp, Foobar, Other }
+		public musicPlayers musicP = musicPlayers.None;
 		public statuses playerStatus = statuses.Unitialized;
 		public Process[] p;
 		public Process[] q;
 		public int address_radio = 0x0;     // The address of the int that changes depending on radio status
 		public int address_volume = 0x0;    // The address of the int that reads the volume of the music player
 		public int address_running = 0x0;   // The address of the int that reads whether the music player is on or not
+		public int address_base = 0x0;
 		Timer timer1;
 		public bool maxVolumeWriteable = true;
 		public bool quickVolume = false;
@@ -34,6 +39,13 @@ namespace GTASARadioExternal {
 		public int radioStatus;
 		public int prevRadioStatus;
 		public int maxVolume;
+		public bool radioActive = false;
+
+		//public int radioLowerBoundary = 0;
+		//public int radioUpperBoundary = 10;
+		public bool radioPlayDuringPauseMenu;
+		public bool radioPlayDuringRadio;
+		public bool radioPlayDuringEmergency;
 
 		// Dont know what this does
 		const int PROCESS_WM_READ = 0x0010;
@@ -51,6 +63,60 @@ namespace GTASARadioExternal {
 					* Game Detection
 		* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
 
+		// Determine the version of GTA3
+		public void DetermineGameVersionIII() {
+			p = Process.GetProcessesByName("gta3");
+			if (p.Length != 0) {
+				if (ReadValue(p[0].Handle, 0x5C1E70, false) == 1407551829) {        // 1.0
+					major = 1; minor = 0; region = regionTypes.Unknown_Region; gameStatus = statuses.Running;
+					address_radio = 0x8F3A1B; gameStatus = statuses.Unconfirmed;
+				}
+				else if (ReadValue(p[0].Handle, 0x5C2130, false) == 1407551829) {   // 1.1
+					major = 1; minor = 1; region = regionTypes.Unknown_Region; gameStatus = statuses.Running;
+					address_radio = 0x8F3A1B; 
+				}
+				else if (ReadValue(p[0].Handle, 0x5C6FD0, false) == 1407551829) {       // 1.1 Steam
+					major = 1; minor = 1; region = regionTypes.Steam; gameStatus = statuses.Running;
+					address_radio = 0x903B5C; ;
+				}
+				else {
+					gameStatus = statuses.Unrecognized;
+				}
+			}
+			else {
+				gameStatus = statuses.Shutdown;
+			}
+		}
+
+		// Determine the version of GTAVC
+		public void DetermineGameVersionVC() {
+			p = Process.GetProcessesByName("gta-vc");
+			if (p.Length != 0) {
+				if (ReadValue(p[0].Handle, 0x667BF0, false) == 1407551829) {        // 1.0
+					major = 1; minor = 0; region = regionTypes.Unknown_Region; gameStatus = statuses.Running;
+					address_radio = 0x9839C0;
+				}
+				else if (ReadValue(p[0].Handle, 0x667C40, false) == 1407551829) {   // 1.1
+					major = 1; minor = 1; region = regionTypes.Unknown_Region; gameStatus = statuses.Running;
+					address_radio = 0x9839C0; gameStatus = statuses.Unconfirmed;
+				}
+				else if (ReadValue(p[0].Handle, 0xA402ED, false) == 1448235347) {       // 1.1 Steam
+					major = 1; minor = 1; region = regionTypes.Steam; gameStatus = statuses.Running;
+					address_radio = 0x9829C8;;
+				}
+				else if (ReadValue(p[0].Handle, 0xACD0A2, false) == 1793887061) {       // 1.1 JP
+					major = 1; minor = 1; region = regionTypes.Japan; gameStatus = statuses.Running;
+					address_radio = 0x9809D0;
+				}
+				else {
+					gameStatus = statuses.Unrecognized;
+				}
+			}
+			else {
+				gameStatus = statuses.Shutdown;
+			}
+		}
+		
 		// Determine the version of GTASA
 		public void DetermineGameVersionSA() {
 			p = Process.GetProcessesByName("gta-sa");
@@ -58,24 +124,24 @@ namespace GTASARadioExternal {
 				p = Process.GetProcessesByName("gta_sa");
 			}
 			if (p.Length != 0) {
-				if (ReadInt32(p[0].Handle, 0x82457C) == 38079) {        // 1.0 US
+				if (ReadValue(p[0].Handle, 0x82457C, false) == 38079) {        // 1.0 US
 					major = 1; minor = 0; region = regionTypes.US; gameStatus = statuses.Running;
 					address_radio = 0x008CB760;
 				}
-				else if (ReadInt32(p[0].Handle, 0x8245BC) == 38079) {   // 1.0 EU
+				else if (ReadValue(p[0].Handle, 0x8245BC, false) == 38079) {   // 1.0 EU
 					major = 1; minor = 0; region = regionTypes.Europe; gameStatus = statuses.Running;
 					address_radio = 0x008CB760;
 				}
-				else if (ReadInt32(p[0].Handle, 0x8252FC) == 38079) {       // 1.1 US
+				else if (ReadValue(p[0].Handle, 0x8252FC, false) == 38079) {       // 1.1 US
 					major = 1; minor = 1; region = regionTypes.US; gameStatus = statuses.Running;
 					address_radio = 0x008CCFE8; gameStatus = statuses.Unconfirmed;
 				}
-				else if (ReadInt32(p[0].Handle, 0x82533C) == 38079) {       // 1.1 EU
+				else if (ReadValue(p[0].Handle, 0x82533C, false) == 38079) {       // 1.1 EU
 					major = 1; minor = 1; region = regionTypes.Europe; gameStatus = statuses.Running;
 					address_radio = 0x008CCFE8; gameStatus = statuses.Unconfirmed;
 				}
-				else if (ReadInt32(p[0].Handle, 0x85EC4A) == 38079) {       // 3.0 Steam
-					major = 3; minor = 0; region = regionTypes.Unknown; gameStatus = statuses.Running;
+				else if (ReadValue(p[0].Handle, 0x85EC4A, false) == 38079) {       // 3.0 Steam
+					major = 3; minor = 0; region = regionTypes.Steam; gameStatus = statuses.Running;
 					address_radio = 0x0093AB68;
 				}
 				else {
@@ -104,6 +170,20 @@ namespace GTASARadioExternal {
 			}
 		}
 
+		// Determine the version of Foobar
+		public void DeterminePlayerVersionFoobar() {
+			q = Process.GetProcessesByName("foobar2000");
+			if (q.Length != 0) {
+				playerStatus = statuses.Running;
+				address_base = q[0].MainModule.BaseAddress.ToInt32();
+				address_volume = address_base + 0x18C438;
+				address_running = address_base + 0x18B1F0;
+			}
+			else {
+				playerStatus = statuses.Shutdown;
+			}
+		}
+
 		// This isn't actually going to detect anything
 		public void DeterminePlayerVersionOther() {
 			playerStatus = statuses.Running;
@@ -114,63 +194,307 @@ namespace GTASARadioExternal {
 					* Radio Status Detection
 		* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
 
-
-		public void CheckRadioStatus() {
+		public void CheckRadioStatusIII() {
 			if (playerStatus != statuses.Running) {
 				return;
 			}
 
 			if (actionToTake == actions.Pause) {
-				if (gameStatus == statuses.Running) {
+				if (gameStatus == statuses.Running || gameStatus == statuses.Unconfirmed) {
+					#region try catch radiostatus
 					try {
-						radioStatus = ReadInt32(p[0].Handle, address_radio);
+						radioStatus = ReadValue(p[0].Handle, address_radio, false);
 					}
 					catch (InvalidOperationException) {
-						Debug.WriteLine("It should write this line, but for some reason it doesn't. Ah well, at least the unhandled exception doesn't show up anymore");
+						Debug.WriteLine("InvalidOperationException A");
+						gameStatus = statuses.Shutdown;
 						return;
 					}
-					if (radioStatus == 2 && isPaused == true) {
-						isPaused = false;
-						RadioChangerPause();
+					catch (NullReferenceException) {
+						Debug.WriteLine("NullReferenceException A");
+						gameStatus = statuses.Shutdown;
+						return;
 					}
-					else if (radioStatus == 7 && isPaused == false) {
+					catch (IndexOutOfRangeException) {
+						Debug.WriteLine("IndexOutOfRangeException A");
+						gameStatus = statuses.Shutdown;
+						return;
+					}
+					#endregion
+
+					#region pause and unpause condition clauses
+					if (radioStatus >= 0 && radioStatus <= 9 && radioPlayDuringRadio == true && isPaused == true) {
+						Debug.WriteLine("condition 197 false medddddddt");
+						isPaused = false;
+						RadioChangerPause(isPaused);
+					}
+					else if (radioStatus == 10 && radioPlayDuringEmergency == true && isPaused == true) {
+						Debug.WriteLine("condition 197 false metaaaaa");
+						isPaused = false;
+						RadioChangerPause(isPaused);
+					}
+					else if (radioStatus == 197 && radioPlayDuringPauseMenu == true && isPaused == true) {
+						Debug.WriteLine("condition 197 true met");
+						isPaused = false;
+						RadioChangerPause(isPaused);
+					}
+
+					else if (radioStatus == 197 && radioPlayDuringPauseMenu == false && isPaused == false) {
+						Debug.WriteLine("condition 197 false met");
 						isPaused = true;
-						RadioChangerPause();
+						RadioChangerPause(isPaused);
+					}
+					else if (radioStatus == 10 && radioPlayDuringEmergency == false && isPaused == false) {
+						Debug.WriteLine("condition 197 ffsdfsdfsdfsdfalse met");
+						isPaused = true;
+						RadioChangerPause(isPaused);
+					}
+					else if (radioStatus >= 0 && radioStatus <= 9 && radioPlayDuringRadio == false && isPaused == false) {
+						Debug.WriteLine("condition 444444444444197 false met");
+						isPaused = true;
+						RadioChangerPause(isPaused);
+					}
+
+					else if (radioStatus > 10 && radioStatus != 197 && isPaused == false) {
+						Debug.WriteLine("condition 19fffffff7 false met");
+						isPaused = true;
+						RadioChangerPause(isPaused);
+					}
+					#endregion
+				}
+			}
+			else if (actionToTake == actions.Volume) {
+				// Unless the radio is currently changing, allow user to change volume
+				#region maxvolume changer
+				if (gameStatus != statuses.Running && gameStatus != statuses.Unconfirmed) {
+					maxVolume = checkMP3PlayerStatus();
+				}
+				else if (maxVolumeWriteable && radioStatus >= 0 && radioStatus <= 9 && radioPlayDuringRadio == true) {
+					maxVolume = checkMP3PlayerStatus();
+				}
+				else if (maxVolumeWriteable && radioStatus == 10 && radioPlayDuringEmergency == true) {
+					maxVolume = checkMP3PlayerStatus();
+				}
+				else if (maxVolumeWriteable && radioStatus == 197 && radioPlayDuringPauseMenu == true) {
+					maxVolume = checkMP3PlayerStatus();
+				}
+				#endregion
+				prevRadioStatus = radioStatus;
+
+				if (gameStatus == statuses.Running || gameStatus != statuses.Unconfirmed) {
+					#region try catch radiostatus
+					try {
+						radioStatus = ReadValue(p[0].Handle, address_radio, false);
+					}
+					catch (InvalidOperationException) {
+						Debug.WriteLine("InvalidOperationException B");
+						gameStatus = statuses.Shutdown;
+						return;
+					}
+					catch (NullReferenceException) {
+						Debug.WriteLine("NullReferenceException B");
+						gameStatus = statuses.Shutdown;
+						return;
+					}
+					catch (IndexOutOfRangeException) {
+						Debug.WriteLine("IndexOutOfRangeException B");
+						gameStatus = statuses.Shutdown;
+						return;
+					}
+					#endregion
+
+					volumeStatus = checkMP3PlayerStatus();
+					RadioChangerVolume(radioStatus >= 0 && radioStatus <= 9 && radioPlayDuringRadio || radioStatus == 10 && radioPlayDuringEmergency == true || radioStatus == 197 && radioPlayDuringPauseMenu == true);
+				}
+			}
+		}
+
+		public void CheckRadioStatusVC() {
+			if (playerStatus != statuses.Running) {
+				return;
+			}
+
+			if (actionToTake == actions.Pause) {
+				if (gameStatus == statuses.Running || gameStatus == statuses.Unconfirmed) {
+					try {
+						radioStatus = ReadValue(p[0].Handle, address_radio, false);
+					}
+					catch (InvalidOperationException) {
+						Debug.WriteLine("InvalidOperationException A");
+						gameStatus = statuses.Shutdown;
+						return;
+					}
+					catch (NullReferenceException) {
+						Debug.WriteLine("NullReferenceException A");
+						gameStatus = statuses.Shutdown;
+						return;
+					}
+					catch (IndexOutOfRangeException) {
+						Debug.WriteLine("IndexOutOfRangeException A");
+						gameStatus = statuses.Shutdown;
+						return;
+					}
+
+					if (radioStatus >= 0 && radioStatus <= 9  && radioPlayDuringRadio == true && isPaused == true) {
+						isPaused = false;
+						RadioChangerPause(isPaused);
+					}
+					else if (radioStatus == 23 && radioPlayDuringEmergency == true && isPaused == true) {
+						isPaused = false;
+						RadioChangerPause(isPaused);
+					}
+					else if (radioStatus == 1225 && radioPlayDuringPauseMenu == true && isPaused == true) {
+						isPaused = false;
+						RadioChangerPause(isPaused);
+					}
+
+					else if (radioStatus == 1225 && radioPlayDuringPauseMenu == false && isPaused == false) {
+						isPaused = true;
+						RadioChangerPause(isPaused);
+					}
+					else if (radioStatus == 23 && radioPlayDuringEmergency == false && isPaused == false) {
+						isPaused = true;
+						RadioChangerPause(isPaused);
+					}
+					else if (radioStatus >= 0 && radioStatus <= 9 && radioPlayDuringRadio == false && isPaused == false) {
+						isPaused = true;
+						RadioChangerPause(isPaused);
+					}
+
+					else if (radioStatus > 9 && radioStatus != 23 && radioStatus != 1225 && isPaused == false) {
+						isPaused = true;
+						RadioChangerPause(isPaused);
 					}
 				}
 			}
 			else if (actionToTake == actions.Volume) {
 				// Unless the radio is currently changing, allow user to change volume
-				if (maxVolumeWriteable == true && radioStatus == 2 || gameStatus != statuses.Running) {
+				if (gameStatus != statuses.Running && gameStatus != statuses.Unconfirmed) {
+					maxVolume = checkMP3PlayerStatus();
+				}
+				else if (maxVolumeWriteable && radioStatus >= 0 && radioStatus <= 9 && radioPlayDuringRadio == true) {
+					maxVolume = checkMP3PlayerStatus();
+				}
+				else if (maxVolumeWriteable && radioStatus == 23 && radioPlayDuringEmergency == true) {
+					maxVolume = checkMP3PlayerStatus();
+				}
+				else if (maxVolumeWriteable && radioStatus == 1225 && radioPlayDuringPauseMenu == true) {
 					maxVolume = checkMP3PlayerStatus();
 				}
 				prevRadioStatus = radioStatus;
 
-				if (gameStatus == statuses.Running) {
+				if (gameStatus == statuses.Running || gameStatus != statuses.Unconfirmed) {
 					try {
-						radioStatus = ReadInt32(p[0].Handle, address_radio);
+						radioStatus = ReadValue(p[0].Handle, address_radio, false);
 					}
 					catch (InvalidOperationException) {
-						Debug.WriteLine("It should write this line, but for some reason it doesn't. Ah well, at least the unhandled exception doesn't show up anymore");
+						Debug.WriteLine("InvalidOperationException B");
+						gameStatus = statuses.Shutdown;
+						return;
+					}
+					catch (NullReferenceException) {
+						Debug.WriteLine("NullReferenceException B");
+						gameStatus = statuses.Shutdown;
+						return;
+					}
+					catch (IndexOutOfRangeException) {
+						Debug.WriteLine("IndexOutOfRangeException B");
+						gameStatus = statuses.Shutdown;
 						return;
 					}
 
-
 					volumeStatus = checkMP3PlayerStatus();
-					RadioChangerVolume();
+					RadioChangerVolume(radioStatus >= 0 && radioStatus <= 9 && radioPlayDuringRadio || radioStatus == 23 && radioPlayDuringEmergency == true ||	radioStatus == 1225 && radioPlayDuringPauseMenu == true);
 				}
 			}
 		}
 
+		public void CheckRadioStatusSA() {
+			if (playerStatus != statuses.Running) {
+				return;
+			}
+
+			if (actionToTake == actions.Pause) {
+				if (gameStatus == statuses.Running || gameStatus == statuses.Unconfirmed) {
+					try {
+						radioStatus = ReadValue(p[0].Handle, address_radio, false);
+					}
+					catch (InvalidOperationException) {
+						Debug.WriteLine("InvalidOperationException C");
+						gameStatus = statuses.Shutdown;
+						return;
+					}
+					catch (NullReferenceException) {
+						Debug.WriteLine("NullReferenceException C");
+						gameStatus = statuses.Shutdown;
+						return;
+					}
+					catch (IndexOutOfRangeException) {
+						Debug.WriteLine("IndexOutOfRangeException C");
+						gameStatus = statuses.Shutdown;
+						return;
+					}
+
+					if (radioStatus == 2 && isPaused == true) {
+						isPaused = false;
+						RadioChangerPause(isPaused);
+					}
+					else if (radioStatus == 7 && isPaused == false) {
+						isPaused = true;
+						RadioChangerPause(isPaused);
+					}
+				}
+			}
+			else if (actionToTake == actions.Volume) {
+				// Unless the radio is currently changing, allow user to change volume
+				if (maxVolumeWriteable == true && radioStatus == 2 || gameStatus != statuses.Running && gameStatus != statuses.Unconfirmed) {
+					maxVolume = checkMP3PlayerStatus();
+				}
+				prevRadioStatus = radioStatus;
+
+				if (gameStatus == statuses.Running || gameStatus == statuses.Unconfirmed) {
+					try {
+						radioStatus = ReadValue(p[0].Handle, address_radio, false);
+					}
+					catch (InvalidOperationException) {
+						Debug.WriteLine("InvalidOperationException D");
+						gameStatus = statuses.Shutdown;
+						return;
+					}
+					catch (NullReferenceException) {
+						Debug.WriteLine("NullReferenceException D");
+						gameStatus = statuses.Shutdown;
+						return;
+					}
+					catch (IndexOutOfRangeException) {
+						Debug.WriteLine("IndexOutOfRangeException D");
+						gameStatus = statuses.Shutdown;
+						return;
+					}
+
+					volumeStatus = checkMP3PlayerStatus();
+					RadioChangerVolume(radioStatus == 2);
+				}
+			}
+		}
+
+
+		/* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * 
+				* Media Player Controls
+		* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
+
+
 		// Change Radio based on pausing/unpausing
-		void RadioChangerPause() {
+		void RadioChangerPause(bool radioOff) {
+			radioActive = !radioOff;
 			keybd_event(0xB3, 0, 1, IntPtr.Zero);
 			keybd_event(0xB3, 0, 2, IntPtr.Zero);
 		}
 
 		// Change Radio based on Volume slider
-		void RadioChangerVolume() {
-			if (radioStatus == 2 && volumeStatus < maxVolume) {
+		void RadioChangerVolume(bool radioOn) {
+			radioActive = radioOn;
+			if (radioOn && volumeStatus < maxVolume) {
 				// radio should be on but volume is too low
 				maxVolumeWriteable = false;
 				keybd_event(0xAF, 0, 1, IntPtr.Zero);
@@ -181,7 +505,7 @@ namespace GTASARadioExternal {
 				keybd_event(0xAF, 0, 2, IntPtr.Zero);
 				volumeStatus = checkMP3PlayerStatus();
 			}
-			else if (radioStatus == 7 && volumeStatus > 0) {
+			else if (!radioOn && volumeStatus > 0) {
 				// radio should be off but volume isn't 0
 				while (volumeStatus > 0) {
 					keybd_event(0XAE, 0, 1, IntPtr.Zero);
@@ -196,14 +520,25 @@ namespace GTASARadioExternal {
 
 
 		// volume slider is used for checking if radio is on or off (winamp didn't want to let me take control of its mute button)
-		private int checkMP3PlayerStatus() {
+		public int checkMP3PlayerStatus() {
 			int volumeLevel = -1;
 			if (playerStatus == statuses.Running) {
 				try {
-					volumeLevel = ReadInt32(q[0].Handle, address_volume);
+					volumeLevel = ReadValue(q[0].Handle, address_volume, musicP == musicPlayers.Foobar);
 				}
 				catch (InvalidOperationException) {
-					Debug.WriteLine("It should write this line, but for some reason it doesn't. Ah well, at least the unhandled exception doesn't show up anymore");
+					Debug.WriteLine("InvalidOperationException E");
+					playerStatus = statuses.Shutdown;
+					return -1;
+				}
+				catch (NullReferenceException) {
+					Debug.WriteLine("NullReferenceException E");
+					playerStatus = statuses.Shutdown;
+					return -1;
+				}
+				catch (IndexOutOfRangeException) {
+					Debug.WriteLine("IndexOutOfRangeException E");
+					playerStatus = statuses.Shutdown;
 					return -1;
 				}
 
@@ -225,10 +560,21 @@ namespace GTASARadioExternal {
 			int playerActive = 0;
 			if (playerStatus == statuses.Running) {
 				try {
-					playerActive = ReadInt32(q[0].Handle, address_running);
+					playerActive = ReadValue(q[0].Handle, address_running, musicP == musicPlayers.Foobar);
 				}
 				catch (InvalidOperationException) {
-					Debug.WriteLine("It should write this line, but for some reason it doesn't. Ah well, at least the unhandled exception doesn't show up anymore");
+					Debug.WriteLine("InvalidOperationException F");
+					playerStatus = statuses.Shutdown;
+					return 0;
+				}
+				catch (NullReferenceException) {
+					Debug.WriteLine("NullReferenceException F");
+					playerStatus = statuses.Shutdown;
+					return 0;
+				}
+				catch (IndexOutOfRangeException) {
+					Debug.WriteLine("IndexOutOfRangeException F");
+					playerStatus = statuses.Shutdown;
 					return 0;
 				}
 				return playerActive;
@@ -247,13 +593,39 @@ namespace GTASARadioExternal {
 		}
 
 		void Timer1Tick(object sender, EventArgs e) {
-			CheckRadioStatus();
+			if (game == games.SA) {
+				CheckRadioStatusSA();
+			}
+			else if (game == games.VC) {
+				CheckRadioStatusVC();
+			}
+			else if (game == games.III) {
+				CheckRadioStatusIII();
+			}
 		}
 
 
 		// Bitconverter to return whatever is in that memory address to an integer so I can work with it
-		private static int ReadInt32(IntPtr handle, long address) {
+		private int ReadValue(IntPtr handle, long address, bool floatRequested) {
+			if (floatRequested) {
+				Single floatInstead = ReadFloat(handle, address);
+				return Convert.ToInt32(floatInstead) + 50;
+			}
+			else {
+				return BitConverter.ToInt32(ReadBytes(handle, address, 4), 0);
+			}
+		}
+
+		/*private int ReadInt32(IntPtr handle, long address) {
+			if (musicP == musicPlayers.Foobar) {
+				Single floatInstead = ReadFloat(handle, address);
+				return Convert.ToInt32(floatInstead) + 100;
+			}
 			return BitConverter.ToInt32(ReadBytes(handle, address, 4), 0);
+		}*/
+
+		private static Single ReadFloat(IntPtr handle, long address) {
+			return BitConverter.ToSingle(ReadBytes(handle, address, 4), 0);
 		}
 
 		// Read memory

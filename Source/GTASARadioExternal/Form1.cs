@@ -34,10 +34,19 @@ namespace GTASARadioExternal {
 			if (radioButtonSA.Checked) {
 				readMemory.DetermineGameVersionSA();
 			}
+			else if (radioButtonVC.Checked) {
+				readMemory.DetermineGameVersionVC();
+			}
+			else if (radioButtonIII.Checked) {
+				readMemory.DetermineGameVersionIII();
+			}
 
 			// Check if the music player still exists
 			if (radioButtonWinamp.Checked) {
 				readMemory.DeterminePlayerVersionWinamp();
+			}
+			if (radioButtonFoobar.Checked) {
+				readMemory.DeterminePlayerVersionFoobar();
 			}
 			else if (radioButtonOther.Checked) {
 				readMemory.DeterminePlayerVersionOther();
@@ -48,50 +57,54 @@ namespace GTASARadioExternal {
 		void UpdateWindow() {
 			if (readMemory.actionToTake == ReadMemory.actions.None) {
 				label1.Text = "Tool not configured";
+				label2.Text = "V" + readMemory.major + "." + readMemory.minor + " " + readMemory.region;
 				displayedText = displayedTexts.Unitialized;
 			}
 			else if (readMemory.playerStatus == ReadMemory.statuses.Shutdown) {
 				label1.Text = "Music player not running";
+				label2.Text = "V" + readMemory.major + "." + readMemory.minor + " " + readMemory.region;
 				displayedText = displayedTexts.NoMusicPlayer;
 			}
 			else if (readMemory.gameStatus == ReadMemory.statuses.Shutdown && displayedText != displayedTexts.Shutdown) {
 				label1.Text = "Game not running";
+				label2.Text = "";
 				displayedText = displayedTexts.Shutdown;
 			}
 			else if (readMemory.gameStatus == ReadMemory.statuses.Unrecognized && displayedText != displayedTexts.Unrecognized) {
 				label1.Text = "Unable to detect game version";
+				label2.Text = "V" + readMemory.major + "." + readMemory.minor + " " + readMemory.region;
 				displayedText = displayedTexts.Unrecognized;
 			}
 			else if (readMemory.gameStatus == ReadMemory.statuses.Unconfirmed) {
-				if (readMemory.radioStatus == 2) {
-					label1.Text = "radio ON (or at least it should be)";
-					//displayedText = displayedTexts.Unconfirmed;
-				}
-				else if (readMemory.radioStatus == 7) {
-					label1.Text = "radio OFF (or at least it should be)";
+				if (readMemory.radioActive) {
+					label1.Text = "radio ON (I think)";
+					label2.Text = "V" + readMemory.major + "." + readMemory.minor + " " + readMemory.region;
 					//displayedText = displayedTexts.Unconfirmed;
 				}
 				else {
-					label1.Text = "Whoopsee, something went wrong. Here's a number: " + readMemory.radioStatus;
+					label1.Text = "radio OFF (I think)";
+					label2.Text = "V" + readMemory.major + "." + readMemory.minor + " " + readMemory.region;
+					//displayedText = displayedTexts.Unconfirmed;
 				}
 			}
 			else if (readMemory.gameStatus == ReadMemory.statuses.Running) {
-				if (readMemory.radioStatus == 2) {
+				if (readMemory.radioActive) {
 					label1.Text = "radio ON";
+					label2.Text = "V" + readMemory.major + "." + readMemory.minor + " " + readMemory.region;
 					//displayedText = displayedTexts.Running;
 				}
-				else if (readMemory.radioStatus == 7) {
+				else {
 					label1.Text = "radio OFF";
+					label2.Text = "V" + readMemory.major + "." + readMemory.minor + " " + readMemory.region;
 					//displayedText = displayedTexts.Running;
 				}
 			}
-			if (radioButtonWinamp.Checked) {
+			if (radioButtonWinamp.Checked || radioButtonFoobar.Checked) {
 				labelVolume.Text = "Volume: " + readMemory.maxVolume;
 			}
 			else {
 				labelVolume.Text = null;
 			}
-			label2.Text = "V" + readMemory.major + ".0" + readMemory.minor + " " + readMemory.region;
 		}
 
         // print some status stuff
@@ -130,29 +143,55 @@ namespace GTASARadioExternal {
 
 		private void checkBox1_CheckedChanged(object sender, EventArgs e) {
 			readMemory.quickVolume = checkBox1.Checked;
+			readMemory.maxVolumeWriteable = false;
 		}
 
 		private void radioButtonVolume_CheckedChanged(object sender, EventArgs e) {
 			readMemory.actionToTake = ReadMemory.actions.Volume;
 			checkBox1.Enabled = radioButtonVolume.Checked;
+			readMemory.maxVolumeWriteable = false;
 		}
 
 		private void radioButtonPause_CheckedChanged(object sender, EventArgs e) {
+			readMemory.isPaused = false;
 			if (radioButtonPause.Checked) {
 				readMemory.actionToTake = ReadMemory.actions.Pause;
 			}
+			readMemory.maxVolumeWriteable = false;
 		}
 
 		private void radioButtonOther_CheckedChanged(object sender, EventArgs e) {
-			radioButtonVolume.Enabled = !radioButtonOther.Checked;
-			radioButtonMute.Enabled = !radioButtonOther.Checked;
-			radioButtonPause.Enabled = radioButtonOther.Checked;
+			if (radioButtonOther.Checked) {
+				readMemory.musicP = ReadMemory.musicPlayers.Other;
+				radioButtonVolume.Enabled = !radioButtonOther.Checked;
+				radioButtonMute.Enabled = !radioButtonOther.Checked;
+				radioButtonPause.Enabled = radioButtonOther.Checked;
+				readMemory.maxVolumeWriteable = false;
+			}
 		}
 
 		private void radioButtonWinamp_CheckedChanged(object sender, EventArgs e) {
-			radioButtonVolume.Enabled = radioButtonWinamp.Checked;
-			radioButtonMute.Enabled = !radioButtonWinamp.Checked;
-			radioButtonPause.Enabled = radioButtonWinamp.Checked;
+			if (radioButtonWinamp.Checked) {
+				radioButtonVolume.Enabled = radioButtonWinamp.Checked;
+				radioButtonMute.Enabled = !radioButtonWinamp.Checked;
+				radioButtonPause.Enabled = radioButtonWinamp.Checked;
+				readMemory.musicP = ReadMemory.musicPlayers.Winamp;
+				readMemory.maxVolumeWriteable = false;
+				readMemory.DeterminePlayerVersionWinamp();
+				readMemory.maxVolume = readMemory.checkMP3PlayerStatus();
+			}
+		}
+
+		private void radioButtonFoobar_CheckedChanged(object sender, EventArgs e) {
+			if (radioButtonFoobar.Checked) {
+				radioButtonVolume.Enabled = radioButtonFoobar.Checked;
+				radioButtonMute.Enabled = !radioButtonFoobar.Checked;
+				radioButtonPause.Enabled = radioButtonFoobar.Checked;
+				readMemory.musicP = ReadMemory.musicPlayers.Foobar;
+				readMemory.maxVolumeWriteable = false;
+				readMemory.DeterminePlayerVersionFoobar();
+				readMemory.maxVolume = readMemory.checkMP3PlayerStatus();
+			}
 		}
 
 		private void radioButtonVolume_EnabledChanged(object sender, EventArgs e) {
@@ -160,7 +199,71 @@ namespace GTASARadioExternal {
 				radioButtonVolume.Checked = false;
 				readMemory.actionToTake = ReadMemory.actions.None;
 				radioButtonPause.Checked = true;
+				readMemory.DeterminePlayerVersionOther();
 			}
+		}
+
+		private void radioButtonIII_CheckedChanged(object sender, EventArgs e) {
+			readMemory.DetermineGameVersionIII();
+			readMemory.game = ReadMemory.games.III;
+			checkBoxA.Enabled = true;
+			checkBoxA.Checked = true;
+			checkBoxB.Enabled = true;
+			checkBoxB.Checked = true;
+			checkBoxC.Enabled = false;
+			checkBoxC.Checked = false;
+			checkBoxD.Enabled = true;
+			//checkBoxD.Checked = false;
+			readMemory.maxVolumeWriteable = false;
+			readMemory.p = null;
+			readMemory.gameStatus = ReadMemory.statuses.Shutdown;
+		}
+
+		private void radioButtonVC_CheckedChanged(object sender, EventArgs e) {
+			readMemory.DetermineGameVersionVC();
+			readMemory.game = ReadMemory.games.VC;
+			checkBoxA.Enabled = true;
+			checkBoxA.Checked = true;
+			checkBoxB.Enabled = true;
+			checkBoxB.Checked = true;
+			checkBoxC.Enabled = false;
+			checkBoxC.Checked = false;
+			checkBoxD.Enabled = true;
+			//checkBoxD.Checked = false;
+			readMemory.maxVolumeWriteable = false;
+			readMemory.p = null;
+			readMemory.gameStatus = ReadMemory.statuses.Shutdown;
+		}
+
+		private void radioButtonSA_CheckedChanged(object sender, EventArgs e) {
+			readMemory.DetermineGameVersionSA();
+			readMemory.game = ReadMemory.games.SA;
+			checkBoxA.Enabled = false;
+			checkBoxA.Checked = true;
+			checkBoxB.Enabled = false;
+			checkBoxB.Checked = true;
+			checkBoxC.Enabled = false;
+			checkBoxC.Checked = true;
+			checkBoxD.Enabled = false;
+			checkBoxD.Checked = true;
+			readMemory.maxVolumeWriteable = false;
+			readMemory.p = null;
+			readMemory.gameStatus = ReadMemory.statuses.Shutdown;
+		}
+
+		private void checkBoxA_CheckedChanged(object sender, EventArgs e) {
+			readMemory.radioPlayDuringEmergency = checkBoxA.Checked;
+			readMemory.maxVolumeWriteable = false;
+		}
+
+		private void checkBoxB_CheckedChanged(object sender, EventArgs e) {
+			readMemory.radioPlayDuringRadio = checkBoxB.Checked;
+			readMemory.maxVolumeWriteable = false;
+		}
+
+		private void checkBoxD_CheckedChanged(object sender, EventArgs e) {
+			readMemory.radioPlayDuringPauseMenu = checkBoxD.Checked;
+			readMemory.maxVolumeWriteable = false;
 		}
 	}
 }
