@@ -1,6 +1,12 @@
-# GTASA-x-Winamp-Radio-Tool
-A tool that mutes/unmutes winamp depending on whether the radio would play in GTASA. Also supports pausing/unpausing it and other players.
+# GTA Radio External
+A tool that mutes/unmutes external music players depending on whether the radio would play in GTA.
 
-Should work with the most common versions of GTASA. Versions of winamp other than 5.666 not supported, but might work.
+Features:
+-Supports GTA3, VC & SA
+-Supports Winamp v5.666 and Foobar2000 v1.3.14
+-Can Mute or Pause music when radio stops
 
-I'll add support for other versions/games/tools if there's demand.
+To add:
+-Log settings to file so the tool doesn't need configuring every time it's booted
+-Proper muting rather than jury rigging it with volume control.
+-Cool stuff
