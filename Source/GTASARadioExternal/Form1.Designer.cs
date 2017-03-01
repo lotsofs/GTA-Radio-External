@@ -38,17 +38,19 @@
 			this.radioButtonFoobar = new System.Windows.Forms.RadioButton();
 			this.labelVolume = new System.Windows.Forms.Label();
 			this.groupBox3 = new System.Windows.Forms.GroupBox();
+			this.radioButtonDirect = new System.Windows.Forms.RadioButton();
 			this.checkBox1 = new System.Windows.Forms.CheckBox();
 			this.radioButtonVolume = new System.Windows.Forms.RadioButton();
 			this.radioButtonPause = new System.Windows.Forms.RadioButton();
 			this.radioButtonMute = new System.Windows.Forms.RadioButton();
 			this.toolTip1 = new System.Windows.Forms.ToolTip(this.components);
 			this.groupBox4 = new System.Windows.Forms.GroupBox();
+			this.checkBoxE = new System.Windows.Forms.CheckBox();
 			this.checkBoxD = new System.Windows.Forms.CheckBox();
 			this.checkBoxC = new System.Windows.Forms.CheckBox();
 			this.checkBoxB = new System.Windows.Forms.CheckBox();
 			this.checkBoxA = new System.Windows.Forms.CheckBox();
-			this.radioButtonDirect = new System.Windows.Forms.RadioButton();
+			this.checkBoxF = new System.Windows.Forms.CheckBox();
 			this.groupBox1.SuspendLayout();
 			this.groupBox2.SuspendLayout();
 			this.groupBox3.SuspendLayout();
@@ -68,11 +70,11 @@
 			// label3
 			// 
 			this.label3.AutoSize = true;
-			this.label3.Location = new System.Drawing.Point(195, 242);
+			this.label3.Location = new System.Drawing.Point(109, 290);
 			this.label3.Name = "label3";
-			this.label3.Size = new System.Drawing.Size(92, 26);
+			this.label3.Size = new System.Drawing.Size(167, 13);
 			this.label3.TabIndex = 4;
-			this.label3.Text = "Program made by \r\ntwitch.tv/lotsofs";
+			this.label3.Text = "Program made by twitch.tv/lotsofs";
 			// 
 			// radioButtonIII
 			// 
@@ -145,7 +147,9 @@
 			this.groupBox2.TabIndex = 7;
 			this.groupBox2.TabStop = false;
 			this.groupBox2.Text = "Music Player";
-			this.toolTip1.SetToolTip(this.groupBox2, "Select which Music Player you are using");
+			this.toolTip1.SetToolTip(this.groupBox2, "Select which Music Player you are using\r\nNote: Foobar does not natively support v" +
+        "olume up/down keys. Please bind these manually if desiring to use the Volume opt" +
+        "ion with Foobar\r\n");
 			// 
 			// radioButtonOther
 			// 
@@ -155,7 +159,9 @@
 			this.radioButtonOther.Size = new System.Drawing.Size(51, 17);
 			this.radioButtonOther.TabIndex = 8;
 			this.radioButtonOther.Text = "Other";
-			this.toolTip1.SetToolTip(this.radioButtonOther, "Select which Music Player you are using");
+			this.toolTip1.SetToolTip(this.radioButtonOther, "Select which Music Player you are using\r\nNote: Foobar does not natively support v" +
+        "olume up/down keys. Please bind these manually if desiring to use the Volume opt" +
+        "ion with Foobar\r\n");
 			this.radioButtonOther.UseVisualStyleBackColor = true;
 			this.radioButtonOther.CheckedChanged += new System.EventHandler(this.radioButtonOther_CheckedChanged);
 			// 
@@ -167,7 +173,9 @@
 			this.radioButtonWinamp.Size = new System.Drawing.Size(153, 17);
 			this.radioButtonWinamp.TabIndex = 5;
 			this.radioButtonWinamp.Text = "Winamp v5.666 Build 3516";
-			this.toolTip1.SetToolTip(this.radioButtonWinamp, "Select which Music Player you are using");
+			this.toolTip1.SetToolTip(this.radioButtonWinamp, "Select which Music Player you are using\r\nNote: Foobar does not natively support v" +
+        "olume up/down keys. Please bind these manually if desiring to use the Volume opt" +
+        "ion with Foobar\r\n");
 			this.radioButtonWinamp.UseVisualStyleBackColor = true;
 			this.radioButtonWinamp.CheckedChanged += new System.EventHandler(this.radioButtonWinamp_CheckedChanged);
 			// 
@@ -179,7 +187,9 @@
 			this.radioButtonFoobar.Size = new System.Drawing.Size(121, 17);
 			this.radioButtonFoobar.TabIndex = 5;
 			this.radioButtonFoobar.Text = "Foobar2000 v1.3.14";
-			this.toolTip1.SetToolTip(this.radioButtonFoobar, "Select which Music Player you are using");
+			this.toolTip1.SetToolTip(this.radioButtonFoobar, "Select which Music Player you are using\r\nNote: Foobar does not natively support v" +
+        "olume up/down keys. Please bind these manually if desiring to use the Volume opt" +
+        "ion with Foobar\r\n");
 			this.radioButtonFoobar.UseVisualStyleBackColor = true;
 			this.radioButtonFoobar.CheckedChanged += new System.EventHandler(this.radioButtonFoobar_CheckedChanged);
 			// 
@@ -207,6 +217,18 @@
 			this.groupBox3.TabStop = false;
 			this.groupBox3.Text = "Action";
 			this.toolTip1.SetToolTip(this.groupBox3, resources.GetString("groupBox3.ToolTip"));
+			// 
+			// radioButtonDirect
+			// 
+			this.radioButtonDirect.AutoSize = true;
+			this.radioButtonDirect.Enabled = false;
+			this.radioButtonDirect.Location = new System.Drawing.Point(205, 19);
+			this.radioButtonDirect.Name = "radioButtonDirect";
+			this.radioButtonDirect.Size = new System.Drawing.Size(50, 17);
+			this.radioButtonDirect.TabIndex = 9;
+			this.radioButtonDirect.Text = "Write";
+			this.toolTip1.SetToolTip(this.radioButtonDirect, resources.GetString("radioButtonDirect.ToolTip"));
+			this.radioButtonDirect.UseVisualStyleBackColor = true;
 			// 
 			// checkBox1
 			// 
@@ -259,30 +281,46 @@
 			this.radioButtonMute.Text = "Mute";
 			this.toolTip1.SetToolTip(this.radioButtonMute, resources.GetString("radioButtonMute.ToolTip"));
 			this.radioButtonMute.UseVisualStyleBackColor = true;
+			this.radioButtonMute.CheckedChanged += new System.EventHandler(this.radioButtonMute_CheckedChanged);
 			// 
 			// groupBox4
 			// 
+			this.groupBox4.Controls.Add(this.checkBoxF);
+			this.groupBox4.Controls.Add(this.checkBoxE);
 			this.groupBox4.Controls.Add(this.checkBoxD);
 			this.groupBox4.Controls.Add(this.checkBoxC);
 			this.groupBox4.Controls.Add(this.checkBoxB);
 			this.groupBox4.Controls.Add(this.checkBoxA);
 			this.groupBox4.Location = new System.Drawing.Point(15, 222);
 			this.groupBox4.Name = "groupBox4";
-			this.groupBox4.Size = new System.Drawing.Size(174, 67);
+			this.groupBox4.Size = new System.Drawing.Size(261, 65);
 			this.groupBox4.TabIndex = 10;
 			this.groupBox4.TabStop = false;
 			this.groupBox4.Text = "When";
 			this.toolTip1.SetToolTip(this.groupBox4, resources.GetString("groupBox4.ToolTip"));
 			// 
+			// checkBoxE
+			// 
+			this.checkBoxE.AutoSize = true;
+			this.checkBoxE.Enabled = false;
+			this.checkBoxE.Location = new System.Drawing.Point(192, 19);
+			this.checkBoxE.Name = "checkBoxE";
+			this.checkBoxE.Size = new System.Drawing.Size(68, 17);
+			this.checkBoxE.TabIndex = 12;
+			this.checkBoxE.Text = "Kaufman";
+			this.toolTip1.SetToolTip(this.checkBoxE, resources.GetString("checkBoxE.ToolTip"));
+			this.checkBoxE.UseVisualStyleBackColor = true;
+			this.checkBoxE.CheckedChanged += new System.EventHandler(this.checkBoxE_CheckedChanged);
+			// 
 			// checkBoxD
 			// 
 			this.checkBoxD.AutoSize = true;
 			this.checkBoxD.Enabled = false;
-			this.checkBoxD.Location = new System.Drawing.Point(99, 42);
+			this.checkBoxD.Location = new System.Drawing.Point(192, 42);
 			this.checkBoxD.Name = "checkBoxD";
-			this.checkBoxD.Size = new System.Drawing.Size(62, 17);
+			this.checkBoxD.Size = new System.Drawing.Size(53, 17);
 			this.checkBoxD.TabIndex = 11;
-			this.checkBoxD.Text = "Paused";
+			this.checkBoxD.Text = "Menu";
 			this.toolTip1.SetToolTip(this.checkBoxD, resources.GetString("checkBoxD.ToolTip"));
 			this.checkBoxD.UseVisualStyleBackColor = true;
 			this.checkBoxD.CheckedChanged += new System.EventHandler(this.checkBoxD_CheckedChanged);
@@ -298,6 +336,7 @@
 			this.checkBoxC.Text = "Interiors";
 			this.toolTip1.SetToolTip(this.checkBoxC, resources.GetString("checkBoxC.ToolTip"));
 			this.checkBoxC.UseVisualStyleBackColor = true;
+			this.checkBoxC.CheckedChanged += new System.EventHandler(this.checkBoxC_CheckedChanged);
 			// 
 			// checkBoxB
 			// 
@@ -325,23 +364,24 @@
 			this.checkBoxA.UseVisualStyleBackColor = true;
 			this.checkBoxA.CheckedChanged += new System.EventHandler(this.checkBoxA_CheckedChanged);
 			// 
-			// radioButtonDirect
+			// checkBoxF
 			// 
-			this.radioButtonDirect.AutoSize = true;
-			this.radioButtonDirect.Enabled = false;
-			this.radioButtonDirect.Location = new System.Drawing.Point(205, 19);
-			this.radioButtonDirect.Name = "radioButtonDirect";
-			this.radioButtonDirect.Size = new System.Drawing.Size(50, 17);
-			this.radioButtonDirect.TabIndex = 9;
-			this.radioButtonDirect.Text = "Write";
-			this.toolTip1.SetToolTip(this.radioButtonDirect, resources.GetString("radioButtonDirect.ToolTip"));
-			this.radioButtonDirect.UseVisualStyleBackColor = true;
+			this.checkBoxF.AutoSize = true;
+			this.checkBoxF.Enabled = false;
+			this.checkBoxF.Location = new System.Drawing.Point(99, 42);
+			this.checkBoxF.Name = "checkBoxF";
+			this.checkBoxF.Size = new System.Drawing.Size(78, 17);
+			this.checkBoxF.TabIndex = 13;
+			this.checkBoxF.Text = "Announcer";
+			this.toolTip1.SetToolTip(this.checkBoxF, resources.GetString("checkBoxF.ToolTip"));
+			this.checkBoxF.UseVisualStyleBackColor = true;
+			this.checkBoxF.CheckedChanged += new System.EventHandler(this.checkBoxF_CheckedChanged);
 			// 
 			// Form1
 			// 
 			this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
 			this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
-			this.ClientSize = new System.Drawing.Size(288, 300);
+			this.ClientSize = new System.Drawing.Size(288, 312);
 			this.Controls.Add(this.groupBox4);
 			this.Controls.Add(this.groupBox3);
 			this.Controls.Add(this.labelVolume);
@@ -390,6 +430,8 @@
 		private System.Windows.Forms.CheckBox checkBoxA;
 		private System.Windows.Forms.CheckBox checkBoxD;
 		private System.Windows.Forms.RadioButton radioButtonDirect;
+		private System.Windows.Forms.CheckBox checkBoxE;
+		private System.Windows.Forms.CheckBox checkBoxF;
 	}
 }
 

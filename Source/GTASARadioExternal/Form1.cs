@@ -65,6 +65,10 @@ namespace GTASARadioExternal {
 				label2.Text = "V" + readMemory.major + "." + readMemory.minor + " " + readMemory.region;
 				displayedText = displayedTexts.NoMusicPlayer;
 			}
+			else if (readMemory.playerStatus == ReadMemory.statuses.Error) {
+				label1.Text = "ERROR";
+				label2.Text = "V" + readMemory.major + "." + readMemory.minor + " " + readMemory.region;
+			}
 			else if (readMemory.gameStatus == ReadMemory.statuses.Shutdown && displayedText != displayedTexts.Shutdown) {
 				label1.Text = "Game not running";
 				label2.Text = "";
@@ -141,8 +145,9 @@ namespace GTASARadioExternal {
 			CheckGame();
         }
 
+		#region unsorted list music players + action buttons
 		private void checkBox1_CheckedChanged(object sender, EventArgs e) {
-			readMemory.quickVolume = checkBox1.Checked;
+		readMemory.quickVolume = checkBox1.Checked;
 			readMemory.maxVolumeWriteable = false;
 		}
 
@@ -203,6 +208,12 @@ namespace GTASARadioExternal {
 			}
 		}
 
+		private void radioButtonMute_CheckedChanged(object sender, EventArgs e) {
+
+		}
+		#endregion
+
+		#region game radio buttons
 		private void radioButtonIII_CheckedChanged(object sender, EventArgs e) {
 			readMemory.DetermineGameVersionIII();
 			readMemory.game = ReadMemory.games.III;
@@ -214,6 +225,10 @@ namespace GTASARadioExternal {
 			checkBoxC.Checked = false;
 			checkBoxD.Enabled = true;
 			//checkBoxD.Checked = false;
+			checkBoxE.Enabled = false;
+			checkBoxE.Checked = false;
+			checkBoxF.Enabled = true;
+			checkBoxF.Checked = false;
 			readMemory.maxVolumeWriteable = false;
 			readMemory.p = null;
 			readMemory.gameStatus = ReadMemory.statuses.Shutdown;
@@ -230,6 +245,10 @@ namespace GTASARadioExternal {
 			checkBoxC.Checked = false;
 			checkBoxD.Enabled = true;
 			//checkBoxD.Checked = false;
+			checkBoxE.Enabled = true;
+			checkBoxE.Checked = true;
+			checkBoxF.Enabled = true;
+			checkBoxF.Checked = false;
 			readMemory.maxVolumeWriteable = false;
 			readMemory.p = null;
 			readMemory.gameStatus = ReadMemory.statuses.Shutdown;
@@ -246,11 +265,17 @@ namespace GTASARadioExternal {
 			checkBoxC.Checked = true;
 			checkBoxD.Enabled = false;
 			checkBoxD.Checked = true;
+			checkBoxE.Enabled = false;
+			checkBoxE.Checked = false;
+			checkBoxF.Enabled = false;
+			checkBoxF.Checked = false;
 			readMemory.maxVolumeWriteable = false;
 			readMemory.p = null;
 			readMemory.gameStatus = ReadMemory.statuses.Shutdown;
 		}
+		#endregion
 
+		#region when buttons
 		private void checkBoxA_CheckedChanged(object sender, EventArgs e) {
 			readMemory.radioPlayDuringEmergency = checkBoxA.Checked;
 			readMemory.maxVolumeWriteable = false;
@@ -261,9 +286,28 @@ namespace GTASARadioExternal {
 			readMemory.maxVolumeWriteable = false;
 		}
 
+		private void checkBoxC_CheckedChanged(object sender, EventArgs e) {
+
+		}
+
 		private void checkBoxD_CheckedChanged(object sender, EventArgs e) {
 			readMemory.radioPlayDuringPauseMenu = checkBoxD.Checked;
 			readMemory.maxVolumeWriteable = false;
 		}
+
+		private void checkBoxE_CheckedChanged(object sender, EventArgs e) {
+			readMemory.radioPlayDuringKaufman = checkBoxE.Checked;
+			readMemory.maxVolumeWriteable = false;
+		}
+
+		private void checkBoxF_CheckedChanged(object sender, EventArgs e) {
+			readMemory.radioPlayDuringAnnouncement = checkBoxF.Checked;
+			readMemory.maxVolumeWriteable = false;
+		}
+		#endregion
+
+
+
+
 	}
 }
