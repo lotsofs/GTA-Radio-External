@@ -535,8 +535,11 @@ namespace GTASARadioExternal {
 			radioActive = radioOn;
 			if (radioOn && volumeStatus < maxVolume) {
 				if (volumeStatus == prevVolumeStatus) {
-					playerStatus = statuses.Error;
-					return;
+					failSafeAttempts += 1;
+					if (failSafeAttempts > 10) {
+						playerStatus = statuses.Error;
+						return;
+					}
 				}
 				// radio should be on but volume is too low
 				maxVolumeWriteable = false;
@@ -552,8 +555,11 @@ namespace GTASARadioExternal {
 			else if (!radioOn && volumeStatus > 0) {
 				// radio should be off but volume isn't 0
 				if (volumeStatus == prevVolumeStatus) {
-					playerStatus = statuses.Error;
-					return;
+					failSafeAttempts += 1;
+					if (failSafeAttempts > 10) {
+						playerStatus = statuses.Error;
+						return;
+					}
 				}
 				keybd_event(0xAE, 0, 1, IntPtr.Zero);
 				keybd_event(0xAE, 0, 1, IntPtr.Zero);
@@ -572,6 +578,7 @@ namespace GTASARadioExternal {
 			}
 			else if (maxVolumeWriteable == false) {
 				maxVolumeWriteable = true;
+				failSafeAttempts = 0;
 			}
 		}
 
