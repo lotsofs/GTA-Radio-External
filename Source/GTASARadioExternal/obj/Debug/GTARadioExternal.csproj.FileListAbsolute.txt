@@ -24,3 +24,16 @@ D:\Visual Studio\Source\GTASARadioExternal\obj\Debug\GTASARadioExternal.Properti
 D:\Visual Studio\Source\GTASARadioExternal\obj\Debug\GTARadioExternal.csproj.GenerateResource.Cache
 D:\Visual Studio\Source\GTASARadioExternal\obj\Debug\GTASARadioExternal.exe.manifest
 D:\Visual Studio\Source\GTASARadioExternal\obj\Debug\GTASARadioExternal.application
+D:\Visual Studio\GTA-Radio-External\Source\GTASARadioExternal\bin\Debug\GTASARadioExternal.exe.config
+D:\Visual Studio\GTA-Radio-External\Source\GTASARadioExternal\obj\Debug\GTASARadioExternal.exe
+D:\Visual Studio\GTA-Radio-External\Source\GTASARadioExternal\obj\Debug\GTASARadioExternal.pdb
+D:\Visual Studio\GTA-Radio-External\Source\GTASARadioExternal\bin\Debug\GTASARadioExternal.exe.manifest
+D:\Visual Studio\GTA-Radio-External\Source\GTASARadioExternal\bin\Debug\GTASARadioExternal.application
+D:\Visual Studio\GTA-Radio-External\Source\GTASARadioExternal\bin\Debug\GTASARadioExternal.exe
+D:\Visual Studio\GTA-Radio-External\Source\GTASARadioExternal\bin\Debug\GTASARadioExternal.pdb
+D:\Visual Studio\GTA-Radio-External\Source\GTASARadioExternal\obj\Debug\GTARadioExternal.csprojResolveAssemblyReference.cache
+D:\Visual Studio\GTA-Radio-External\Source\GTASARadioExternal\obj\Debug\GTASARadioExternal.Form1.resources
+D:\Visual Studio\GTA-Radio-External\Source\GTASARadioExternal\obj\Debug\GTASARadioExternal.Properties.Resources.resources
+D:\Visual Studio\GTA-Radio-External\Source\GTASARadioExternal\obj\Debug\GTARadioExternal.csproj.GenerateResource.Cache
+D:\Visual Studio\GTA-Radio-External\Source\GTASARadioExternal\obj\Debug\GTASARadioExternal.exe.manifest
+D:\Visual Studio\GTA-Radio-External\Source\GTASARadioExternal\obj\Debug\GTASARadioExternal.application

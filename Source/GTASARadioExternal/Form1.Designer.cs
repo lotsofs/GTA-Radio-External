@@ -45,12 +45,13 @@
 			this.radioButtonMute = new System.Windows.Forms.RadioButton();
 			this.toolTip1 = new System.Windows.Forms.ToolTip(this.components);
 			this.groupBox4 = new System.Windows.Forms.GroupBox();
+			this.checkBoxF = new System.Windows.Forms.CheckBox();
 			this.checkBoxE = new System.Windows.Forms.CheckBox();
 			this.checkBoxD = new System.Windows.Forms.CheckBox();
 			this.checkBoxC = new System.Windows.Forms.CheckBox();
 			this.checkBoxB = new System.Windows.Forms.CheckBox();
 			this.checkBoxA = new System.Windows.Forms.CheckBox();
-			this.checkBoxF = new System.Windows.Forms.CheckBox();
+			this.checkBox7 = new System.Windows.Forms.CheckBox();
 			this.groupBox1.SuspendLayout();
 			this.groupBox2.SuspendLayout();
 			this.groupBox3.SuspendLayout();
@@ -70,7 +71,7 @@
 			// label3
 			// 
 			this.label3.AutoSize = true;
-			this.label3.Location = new System.Drawing.Point(109, 290);
+			this.label3.Location = new System.Drawing.Point(111, 289);
 			this.label3.Name = "label3";
 			this.label3.Size = new System.Drawing.Size(167, 13);
 			this.label3.TabIndex = 4;
@@ -205,12 +206,13 @@
 			// 
 			// groupBox3
 			// 
+			this.groupBox3.Controls.Add(this.checkBox7);
 			this.groupBox3.Controls.Add(this.radioButtonDirect);
 			this.groupBox3.Controls.Add(this.checkBox1);
 			this.groupBox3.Controls.Add(this.radioButtonVolume);
 			this.groupBox3.Controls.Add(this.radioButtonPause);
 			this.groupBox3.Controls.Add(this.radioButtonMute);
-			this.groupBox3.Location = new System.Drawing.Point(15, 149);
+			this.groupBox3.Location = new System.Drawing.Point(15, 148);
 			this.groupBox3.Name = "groupBox3";
 			this.groupBox3.Size = new System.Drawing.Size(263, 67);
 			this.groupBox3.TabIndex = 9;
@@ -291,13 +293,26 @@
 			this.groupBox4.Controls.Add(this.checkBoxC);
 			this.groupBox4.Controls.Add(this.checkBoxB);
 			this.groupBox4.Controls.Add(this.checkBoxA);
-			this.groupBox4.Location = new System.Drawing.Point(15, 222);
+			this.groupBox4.Location = new System.Drawing.Point(15, 221);
 			this.groupBox4.Name = "groupBox4";
 			this.groupBox4.Size = new System.Drawing.Size(261, 65);
 			this.groupBox4.TabIndex = 10;
 			this.groupBox4.TabStop = false;
 			this.groupBox4.Text = "When";
 			this.toolTip1.SetToolTip(this.groupBox4, resources.GetString("groupBox4.ToolTip"));
+			// 
+			// checkBoxF
+			// 
+			this.checkBoxF.AutoSize = true;
+			this.checkBoxF.Enabled = false;
+			this.checkBoxF.Location = new System.Drawing.Point(99, 42);
+			this.checkBoxF.Name = "checkBoxF";
+			this.checkBoxF.Size = new System.Drawing.Size(78, 17);
+			this.checkBoxF.TabIndex = 13;
+			this.checkBoxF.Text = "Announcer";
+			this.toolTip1.SetToolTip(this.checkBoxF, resources.GetString("checkBoxF.ToolTip"));
+			this.checkBoxF.UseVisualStyleBackColor = true;
+			this.checkBoxF.CheckedChanged += new System.EventHandler(this.checkBoxF_CheckedChanged);
 			// 
 			// checkBoxE
 			// 
@@ -364,24 +379,24 @@
 			this.checkBoxA.UseVisualStyleBackColor = true;
 			this.checkBoxA.CheckedChanged += new System.EventHandler(this.checkBoxA_CheckedChanged);
 			// 
-			// checkBoxF
+			// checkBox7
 			// 
-			this.checkBoxF.AutoSize = true;
-			this.checkBoxF.Enabled = false;
-			this.checkBoxF.Location = new System.Drawing.Point(99, 42);
-			this.checkBoxF.Name = "checkBoxF";
-			this.checkBoxF.Size = new System.Drawing.Size(78, 17);
-			this.checkBoxF.TabIndex = 13;
-			this.checkBoxF.Text = "Announcer";
-			this.toolTip1.SetToolTip(this.checkBoxF, resources.GetString("checkBoxF.ToolTip"));
-			this.checkBoxF.UseVisualStyleBackColor = true;
-			this.checkBoxF.CheckedChanged += new System.EventHandler(this.checkBoxF_CheckedChanged);
+			this.checkBox7.AutoSize = true;
+			this.checkBox7.Enabled = false;
+			this.checkBox7.Location = new System.Drawing.Point(105, 42);
+			this.checkBox7.Name = "checkBox7";
+			this.checkBox7.Size = new System.Drawing.Size(101, 17);
+			this.checkBox7.TabIndex = 8;
+			this.checkBox7.Text = "Ignore Modifiers";
+			this.toolTip1.SetToolTip(this.checkBox7, resources.GetString("checkBox7.ToolTip"));
+			this.checkBox7.UseVisualStyleBackColor = true;
+			this.checkBox7.CheckedChanged += new System.EventHandler(this.checkBox7_CheckedChanged);
 			// 
 			// Form1
 			// 
 			this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
 			this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
-			this.ClientSize = new System.Drawing.Size(288, 312);
+			this.ClientSize = new System.Drawing.Size(288, 311);
 			this.Controls.Add(this.groupBox4);
 			this.Controls.Add(this.groupBox3);
 			this.Controls.Add(this.labelVolume);
@@ -432,6 +447,7 @@
 		private System.Windows.Forms.RadioButton radioButtonDirect;
 		private System.Windows.Forms.CheckBox checkBoxE;
 		private System.Windows.Forms.CheckBox checkBoxF;
+		private System.Windows.Forms.CheckBox checkBox7;
 	}
 }
 

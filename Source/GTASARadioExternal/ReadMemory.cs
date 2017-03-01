@@ -43,6 +43,7 @@ namespace GTASARadioExternal {
 		public int prevRadioStatus;
 		public int maxVolume;
 		public bool radioActive = false;
+		public bool ignoreMods = false;
 
 		//public int radioLowerBoundary = 0;
 		//public int radioUpperBoundary = 10;
@@ -64,6 +65,7 @@ namespace GTASARadioExternal {
 		// Send keystrokes for volume
 		[DllImport("user32.dll")]
 		public static extern void keybd_event(byte virtualKey, byte scanCode, uint flags, IntPtr extraInfo);
+
 
 		/* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * 
 					* Game Detection
@@ -289,7 +291,7 @@ namespace GTASARadioExternal {
 				#endregion
 				prevRadioStatus = radioStatus;
 
-				if (gameStatus == statuses.Running || gameStatus != statuses.Unconfirmed) {
+				if (gameStatus == statuses.Running || gameStatus == statuses.Unconfirmed) {
 					#region try catch radiostatus
 					try {
 						radioStatus = ReadValue(p[0].Handle, address_radio, false, false);
@@ -311,7 +313,6 @@ namespace GTASARadioExternal {
 					}
 					#endregion
 
-					volumeStatus = checkMP3PlayerStatus();
 					RadioChangerVolume(radioStatus >= 0 && radioStatus <= 9 && radioPlayDuringRadio 
 											|| radioStatus == 10 && radioPlayDuringEmergency == true 
 											|| radioStatus >= 13 && radioStatus <= 14 && radioPlayDuringAnnouncement == true
@@ -332,17 +333,17 @@ namespace GTASARadioExternal {
 						radioStatus = ReadValue(p[0].Handle, address_radio, false, true);
 					}
 					catch (InvalidOperationException) {
-						Debug.WriteLine("InvalidOperationException A");
+						Debug.WriteLine("InvalidOperationException C");
 						gameStatus = statuses.Shutdown;
 						return;
 					}
 					catch (NullReferenceException) {
-						Debug.WriteLine("NullReferenceException A");
+						Debug.WriteLine("NullReferenceException C");
 						gameStatus = statuses.Shutdown;
 						return;
 					}
 					catch (IndexOutOfRangeException) {
-						Debug.WriteLine("IndexOutOfRangeException A");
+						Debug.WriteLine("IndexOutOfRangeException C");
 						gameStatus = statuses.Shutdown;
 						return;
 					}
@@ -417,22 +418,22 @@ namespace GTASARadioExternal {
 				}
 				prevRadioStatus = radioStatus;
 
-				if (gameStatus == statuses.Running || gameStatus != statuses.Unconfirmed) {
+				if (gameStatus == statuses.Running || gameStatus == statuses.Unconfirmed) {
 					try {
 						radioStatus = ReadValue(p[0].Handle, address_radio, false, true);
 					}
 					catch (InvalidOperationException) {
-						Debug.WriteLine("InvalidOperationException B");
+						Debug.WriteLine("InvalidOperationException D");
 						gameStatus = statuses.Shutdown;
 						return;
 					}
 					catch (NullReferenceException) {
-						Debug.WriteLine("NullReferenceException B");
+						Debug.WriteLine("NullReferenceException D");
 						gameStatus = statuses.Shutdown;
 						return;
 					}
 					catch (IndexOutOfRangeException) {
-						Debug.WriteLine("IndexOutOfRangeException B");
+						Debug.WriteLine("IndexOutOfRangeException D");
 						gameStatus = statuses.Shutdown;
 						return;
 					}
@@ -459,17 +460,17 @@ namespace GTASARadioExternal {
 						radioStatus = ReadValue(p[0].Handle, address_radio, false, true);
 					}
 					catch (InvalidOperationException) {
-						Debug.WriteLine("InvalidOperationException C");
+						Debug.WriteLine("InvalidOperationException H");
 						gameStatus = statuses.Shutdown;
 						return;
 					}
 					catch (NullReferenceException) {
-						Debug.WriteLine("NullReferenceException C");
+						Debug.WriteLine("NullReferenceException H");
 						gameStatus = statuses.Shutdown;
 						return;
 					}
 					catch (IndexOutOfRangeException) {
-						Debug.WriteLine("IndexOutOfRangeException C");
+						Debug.WriteLine("IndexOutOfRangeException H");
 						gameStatus = statuses.Shutdown;
 						return;
 					}
@@ -496,17 +497,17 @@ namespace GTASARadioExternal {
 						radioStatus = ReadValue(p[0].Handle, address_radio, false, true);
 					}
 					catch (InvalidOperationException) {
-						Debug.WriteLine("InvalidOperationException D");
+						Debug.WriteLine("InvalidOperationException J");
 						gameStatus = statuses.Shutdown;
 						return;
 					}
 					catch (NullReferenceException) {
-						Debug.WriteLine("NullReferenceException D");
+						Debug.WriteLine("NullReferenceException J");
 						gameStatus = statuses.Shutdown;
 						return;
 					}
 					catch (IndexOutOfRangeException) {
-						Debug.WriteLine("IndexOutOfRangeException D");
+						Debug.WriteLine("IndexOutOfRangeException J");
 						gameStatus = statuses.Shutdown;
 						return;
 					}
@@ -534,29 +535,42 @@ namespace GTASARadioExternal {
 		void RadioChangerVolume(bool radioOn) {
 			radioActive = radioOn;
 			if (radioOn && volumeStatus < maxVolume) {
+				maxVolumeWriteable = false;
+				if (Control.ModifierKeys == Keys.Shift || Control.ModifierKeys == Keys.Alt || Control.ModifierKeys == Keys.Control) {
+					if (!ignoreMods) {
+						return;
+					}
+				}
+
 				if (volumeStatus == prevVolumeStatus) {
 					failSafeAttempts += 1;
-					if (failSafeAttempts > 10) {
+					if (failSafeAttempts > 100000) {
 						playerStatus = statuses.Error;
 						return;
 					}
 				}
 				// radio should be on but volume is too low
-				maxVolumeWriteable = false;
 				keybd_event(0xAF, 0, 1, IntPtr.Zero);
 				if (quickVolume) {
 					keybd_event(0xAF, 0, 1, IntPtr.Zero);
 					keybd_event(0xAF, 0, 1, IntPtr.Zero);
 				}
 				keybd_event(0xAF, 0, 2, IntPtr.Zero);
+				
+
 				prevVolumeStatus = volumeStatus;
 				volumeStatus = checkMP3PlayerStatus();
 			}
 			else if (!radioOn && volumeStatus > 0) {
+				if (Control.ModifierKeys == Keys.Shift || Control.ModifierKeys == Keys.Alt || Control.ModifierKeys == Keys.Control) {
+					if (!ignoreMods) {
+						return;
+					}
+				}
 				// radio should be off but volume isn't 0
 				if (volumeStatus == prevVolumeStatus) {
 					failSafeAttempts += 1;
-					if (failSafeAttempts > 10) {
+					if (failSafeAttempts > 100000) {
 						playerStatus = statuses.Error;
 						return;
 					}
@@ -650,6 +664,9 @@ namespace GTASARadioExternal {
 
 		// timer that updates radio status every frame or so
 		public void InitTimer() {
+
+
+
 			timer1 = new Timer();
 			timer1.Tick += new EventHandler(Timer1Tick);
 			timer1.Interval = 40;

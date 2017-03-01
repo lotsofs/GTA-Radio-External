@@ -155,6 +155,7 @@ namespace GTASARadioExternal {
 			readMemory.actionToTake = ReadMemory.actions.Volume;
 			checkBox1.Enabled = radioButtonVolume.Checked;
 			readMemory.maxVolumeWriteable = false;
+			checkBox7.Enabled = radioButtonVolume.Checked;
 		}
 
 		private void radioButtonPause_CheckedChanged(object sender, EventArgs e) {
@@ -304,10 +305,13 @@ namespace GTASARadioExternal {
 			readMemory.radioPlayDuringAnnouncement = checkBoxF.Checked;
 			readMemory.maxVolumeWriteable = false;
 		}
+
+
+
 		#endregion
 
-
-
-
+		private void checkBox7_CheckedChanged(object sender, EventArgs e) {
+			readMemory.ignoreMods = checkBox7.Checked;
+		}
 	}
 }
