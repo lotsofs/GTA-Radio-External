@@ -20,10 +20,12 @@ Foobar will need its volume up/down controls bound manually to these buttons, as
 
 
 
+License: (is this how this works?)
+
 
 MIT License
 
-Copyright (c) [year] [fullname]
+Copyright (c) 2017 LotsOfS
 
 Permission is hereby granted, free of charge, to any person obtaining a copy
 of this software and associated documentation files (the "Software"), to deal
