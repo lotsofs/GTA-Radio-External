@@ -313,6 +313,7 @@ namespace GTASARadioExternal {
 					}
 					#endregion
 
+					volumeStatus = checkMP3PlayerStatus();
 					RadioChangerVolume(radioStatus >= 0 && radioStatus <= 9 && radioPlayDuringRadio 
 											|| radioStatus == 10 && radioPlayDuringEmergency == true 
 											|| radioStatus >= 13 && radioStatus <= 14 && radioPlayDuringAnnouncement == true
