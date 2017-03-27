@@ -7,33 +7,52 @@ using System.Windows.Forms;
 using System.Diagnostics;
 using System.Runtime.InteropServices;
 using System.Text;
+using System.IO;    // e216: needed, now that i changed something.
 
 namespace GTASARadioExternal {
 	public class ReadMemory {
 
+        // No idea what these do
 		public int major = 0;
 		public int minor = 0;
+
+        // Regions
 		public enum regionTypes { GTA, US, Europe, Japan, Steam };
 		public regionTypes region = regionTypes.GTA;
+
+        // Statuses
 		public enum statuses { Unitialized, Shutdown, Running, Unrecognized, Unconfirmed, Playing, Silent, Error }
 		public statuses gameStatus = statuses.Unitialized;
+
+        // Games
 		public enum games { None, III, VC, SA }
 		public games game = games.None;
+
+        // Music Players
 		public enum musicPlayers { None, Winamp, Foobar, Other }
 		public musicPlayers musicP = musicPlayers.None;
-		public statuses playerStatus = statuses.Unitialized;
+
+        // Actions
+        public enum actions { None, Volume, Mute, Pause }
+        public actions actionToTake;
+
+        // No idea
+        public statuses playerStatus = statuses.Unitialized;
 		public Process[] p;
 		public Process[] q;
+
+        // Various addresses
 		public int address_radio = 0x0;     // The address of the int that changes depending on radio status
 		public int address_volume = 0x0;    // The address of the int that reads the volume of the music player
 		public int address_running = 0x0;   // The address of the int that reads whether the music player is on or not
 		public int address_base = 0x0;
-		Timer timer1;
+
 		public bool maxVolumeWriteable = true;
 		public bool quickVolume = false;
 		public bool isPaused = false;
-		public enum actions { None, Volume, Mute, Pause }
-		public actions actionToTake;
+        public bool isMuted = false; // e216: Extra variable needed for muting/unmuting
+
+        Timer timer1;
 
 		public int failSafeAttempts = 0;
 
@@ -56,9 +75,10 @@ namespace GTASARadioExternal {
 
 		// Dont know what this does
 		const int PROCESS_WM_READ = 0x0010;
+        private string foobarExecutableLocation; // e216: String where the location of the F2K executable is stored
 
-		// Allows me to read memory from processes
-		[DllImport("kernel32.dll")]
+        // Allows me to read memory from processes
+        [DllImport("kernel32.dll")]
 		public static extern Int32 ReadProcessMemory(IntPtr hProcess, IntPtr lpBaseAddress,
 		  [In, Out] byte[] buffer, UInt32 size, out IntPtr lpNumberOfBytesRead);
 
@@ -186,7 +206,8 @@ namespace GTASARadioExternal {
 				address_base = q[0].MainModule.BaseAddress.ToInt32();
 				address_volume = address_base + 0x18C438;
 				address_running = address_base + 0x18B1F0;
-			}
+                foobarExecutableLocation = q[0].MainModule.FileName;
+            }
 			else {
 				playerStatus = statuses.Shutdown;
 			}
@@ -321,7 +342,8 @@ namespace GTASARadioExternal {
 					);
 				}
 			}
-		}
+
+        }
 
 		public void CheckRadioStatusVC() {
 			if (playerStatus != statuses.Running) {
@@ -448,7 +470,8 @@ namespace GTASARadioExternal {
 					);
 				}
 			}
-		}
+            
+        }
 
 		public void CheckRadioStatusSA() {
 			if (playerStatus != statuses.Running) {
@@ -517,16 +540,69 @@ namespace GTASARadioExternal {
 					RadioChangerVolume(radioStatus == 2);
 				}
 			}
-		}
+
+            // e216: else if for muting added
+            else if (actionToTake == actions.Mute)
+            {
+                if (gameStatus == statuses.Running || gameStatus == statuses.Unconfirmed)
+                {
+                    try
+                    {
+                        radioStatus = ReadValue(p[0].Handle, address_radio, false, true);
+                    }
+                    catch (InvalidOperationException)
+                    {
+                        Debug.WriteLine("InvalidOperationException H");
+                        gameStatus = statuses.Shutdown;
+                        return;
+                    }
+                    catch (NullReferenceException)
+                    {
+                        Debug.WriteLine("NullReferenceException H");
+                        gameStatus = statuses.Shutdown;
+                        return;
+                    }
+                    catch (IndexOutOfRangeException)
+                    {
+                        Debug.WriteLine("IndexOutOfRangeException H");
+                        gameStatus = statuses.Shutdown;
+                        return;
+                    }
+
+                    if (radioStatus == 2 && isMuted == true)
+                    {
+                        isMuted = false;
+                        RadioChangerMute(isMuted);
+                    }
+                    else if (radioStatus == 7 && isMuted == false)
+                    {
+                        isMuted = true;
+                        RadioChangerMute(isMuted);
+                    }
+                }
+            }
+        }
 
 
-		/* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * 
+        /* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * 
 				* Media Player Controls
 		* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
 
+        // e216: Change Radio based on muting/unmuting
+        void RadioChangerMute(bool radioOff)
+        {
+            radioActive = !radioOff;
 
-		// Change Radio based on pausing/unpausing
-		void RadioChangerPause(bool radioOff) {
+            string fullPath = foobarExecutableLocation;
+            ProcessStartInfo psi = new ProcessStartInfo();
+            psi.FileName = Path.GetFileName(fullPath);
+            psi.WorkingDirectory = Path.GetDirectoryName(fullPath);
+            psi.Arguments = "/command:mute";
+            Process.Start(psi);
+        }
+
+        // Change Radio based on pausing/unpausing
+        void RadioChangerPause(bool radioOff) {
 			radioActive = !radioOff;
 			keybd_event(0xB3, 0, 1, IntPtr.Zero);
 			keybd_event(0xB3, 0, 2, IntPtr.Zero);
@@ -663,10 +739,8 @@ namespace GTASARadioExternal {
 			}
 		}
 
-		// timer that updates radio status every frame or so
+		// Timer that updates radio status every frame or so
 		public void InitTimer() {
-
-
 
 			timer1 = new Timer();
 			timer1.Tick += new EventHandler(Timer1Tick);
@@ -724,3 +798,47 @@ namespace GTASARadioExternal {
 
 	}
 }
+
+
+
+/*
+ * 
+ * 
+ *                                      .-'
+ *                                   .':         
+ *  .-:''':=.    .'''''-.  ..:'|    : :       
+ * : :     : :  '     | |    | |   | |.-'-..  
+ * | |''''''''       .'.'    | |   | |    : :  
+ * | |             .''       | |   | |    | |  
+ * : :           .'     .    | |    ::    : :  
+ *  ''-...=-'  .'::::::::  .::.::.   ':...:' __  
+ *                   ______ _____ _____     / /_   ___   _____ ___
+ *                  / / / /_\_  //  __/    / _  \ / _ \ / _  // _ \
+ *                 / ' ' // _  /__\ \     / / / // ___//   _// ___/  __
+ *                 \/\/\/ \___//____/    /_/ /_/ \___\/_/\_\ \___\  /_/               
+ *
+ * 
+ * 
+ * 
+ *   .--.  --  -- ..--.. --  -- ------ ..--.. --  -- ------
+ *  ||  || ||  || ||  || ||  || ' || ' ||  || ||  || ' || '  ::
+ *   '--.  ||--|| ||  || ||  ||   ||   ||  || ||  ||   ||    
+ *  ||  || ||  || ||  || ||  ||   ||   ||  || ||  ||   ||    ::
+ *   '--'  --  -- ''--'  ''--''  ----  ''--'' ''--''  ----
+ *   
+ *                           _..._    .
+ *                        .:'     ':.-|
+ *    |   _  |_  __     / /         \ |     
+ *    |  | | |  '..'    | |          '|      
+ *    '. '.' '. -..'    \  \                 
+ *                _       '. '. _
+ *            _  |_          '-. '-.
+ *           | | |               '. '.
+ *           '.' :                 \  \
+ *                      .           | |
+ *                      |\          / /
+ *                      |.|:._   _.:'
+ *                      '     '''
+ *              
+ *         
+ */              

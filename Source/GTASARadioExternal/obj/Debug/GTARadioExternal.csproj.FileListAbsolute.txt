@@ -37,3 +37,29 @@ D:\Visual Studio\GTA-Radio-External\Source\GTASARadioExternal\obj\Debug\GTASARad
 D:\Visual Studio\GTA-Radio-External\Source\GTASARadioExternal\obj\Debug\GTARadioExternal.csproj.GenerateResource.Cache
 D:\Visual Studio\GTA-Radio-External\Source\GTASARadioExternal\obj\Debug\GTASARadioExternal.exe.manifest
 D:\Visual Studio\GTA-Radio-External\Source\GTASARadioExternal\obj\Debug\GTASARadioExternal.application
+E:\data\documents\visual_studio_cpp\GTA-Radio-External-master\Source\GTASARadioExternal\bin\Debug\GTASARadioExternal.exe.config
+E:\data\documents\visual_studio_cpp\GTA-Radio-External-master\Source\GTASARadioExternal\obj\Debug\GTASARadioExternal.exe
+E:\data\documents\visual_studio_cpp\GTA-Radio-External-master\Source\GTASARadioExternal\obj\Debug\GTASARadioExternal.pdb
+E:\data\documents\visual_studio_cpp\GTA-Radio-External-master\Source\GTASARadioExternal\obj\Debug\GTARadioExternal.csprojResolveAssemblyReference.cache
+E:\data\documents\visual_studio_cpp\GTA-Radio-External-master\Source\GTASARadioExternal\obj\Debug\GTASARadioExternal.Form1.resources
+E:\data\documents\visual_studio_cpp\GTA-Radio-External-master\Source\GTASARadioExternal\obj\Debug\GTASARadioExternal.Properties.Resources.resources
+E:\data\documents\visual_studio_cpp\GTA-Radio-External-master\Source\GTASARadioExternal\obj\Debug\GTARadioExternal.csproj.GenerateResource.Cache
+E:\data\documents\visual_studio_cpp\GTA-Radio-External-master\Source\GTASARadioExternal\bin\Debug\GTASARadioExternal.exe.manifest
+E:\data\documents\visual_studio_cpp\GTA-Radio-External-master\Source\GTASARadioExternal\bin\Debug\GTASARadioExternal.application
+E:\data\documents\visual_studio_cpp\GTA-Radio-External-master\Source\GTASARadioExternal\bin\Debug\GTASARadioExternal.exe
+E:\data\documents\visual_studio_cpp\GTA-Radio-External-master\Source\GTASARadioExternal\bin\Debug\GTASARadioExternal.pdb
+E:\data\documents\visual_studio_cpp\GTA-Radio-External-master\Source\GTASARadioExternal\obj\Debug\GTASARadioExternal.exe.manifest
+E:\data\documents\visual_studio_cpp\GTA-Radio-External-master\Source\GTASARadioExternal\obj\Debug\GTASARadioExternal.application
+E:\data\documents\visual_studio_cpp\GTA-Radio-External-master - Copy\Source\GTASARadioExternal\bin\Debug\GTASARadioExternal.exe.config
+E:\data\documents\visual_studio_cpp\GTA-Radio-External-master - Copy\Source\GTASARadioExternal\obj\Debug\GTASARadioExternal.exe
+E:\data\documents\visual_studio_cpp\GTA-Radio-External-master - Copy\Source\GTASARadioExternal\obj\Debug\GTASARadioExternal.pdb
+E:\data\documents\visual_studio_cpp\GTA-Radio-External-master - Copy\Source\GTASARadioExternal\bin\Debug\GTASARadioExternal.exe.manifest
+E:\data\documents\visual_studio_cpp\GTA-Radio-External-master - Copy\Source\GTASARadioExternal\bin\Debug\GTASARadioExternal.application
+E:\data\documents\visual_studio_cpp\GTA-Radio-External-master - Copy\Source\GTASARadioExternal\bin\Debug\GTASARadioExternal.exe
+E:\data\documents\visual_studio_cpp\GTA-Radio-External-master - Copy\Source\GTASARadioExternal\bin\Debug\GTASARadioExternal.pdb
+E:\data\documents\visual_studio_cpp\GTA-Radio-External-master - Copy\Source\GTASARadioExternal\obj\Debug\GTARadioExternal.csprojResolveAssemblyReference.cache
+E:\data\documents\visual_studio_cpp\GTA-Radio-External-master - Copy\Source\GTASARadioExternal\obj\Debug\GTASARadioExternal.Form1.resources
+E:\data\documents\visual_studio_cpp\GTA-Radio-External-master - Copy\Source\GTASARadioExternal\obj\Debug\GTASARadioExternal.Properties.Resources.resources
+E:\data\documents\visual_studio_cpp\GTA-Radio-External-master - Copy\Source\GTASARadioExternal\obj\Debug\GTARadioExternal.csproj.GenerateResource.Cache
+E:\data\documents\visual_studio_cpp\GTA-Radio-External-master - Copy\Source\GTASARadioExternal\obj\Debug\GTASARadioExternal.exe.manifest
+E:\data\documents\visual_studio_cpp\GTA-Radio-External-master - Copy\Source\GTASARadioExternal\obj\Debug\GTASARadioExternal.application
