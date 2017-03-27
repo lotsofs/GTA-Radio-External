@@ -1,6 +1,7 @@
 ﻿<?xml version="1.0" encoding="utf-8"?>
 <asmv1:assembly xsi:schemaLocation="urn:schemas-microsoft-com:asm.v1 assembly.adaptive.xsd" manifestVersion="1.0" xmlns:asmv1="urn:schemas-microsoft-com:asm.v1" xmlns="urn:schemas-microsoft-com:asm.v2" xmlns:asmv2="urn:schemas-microsoft-com:asm.v2" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:co.v1="urn:schemas-microsoft-com:clickonce.v1" xmlns:asmv3="urn:schemas-microsoft-com:asm.v3" xmlns:dsig="http://www.w3.org/2000/09/xmldsig#" xmlns:co.v2="urn:schemas-microsoft-com:clickonce.v2">
   <asmv1:assemblyIdentity name="GTASARadioExternal.exe" version="1.0.0.3" publicKeyToken="0000000000000000" language="neutral" processorArchitecture="msil" type="win32" />
+  <description asmv2:iconFile="icon1.ico" xmlns="urn:schemas-microsoft-com:asm.v1" />
   <application />
   <entryPoint>
     <assemblyIdentity name="GTASARadioExternal" version="1.0.0.0" language="neutral" processorArchitecture="msil" />
@@ -42,24 +43,42 @@
     </dependentAssembly>
   </dependency>
   <dependency>
-    <dependentAssembly dependencyType="install" allowDelayedBinding="true" codebase="GTASARadioExternal.exe" size="44544">
+    <dependentAssembly dependencyType="install" allowDelayedBinding="true" codebase="GTASARadioExternal.exe" size="52736">
       <assemblyIdentity name="GTASARadioExternal" version="1.0.0.0" language="neutral" processorArchitecture="msil" />
       <hash>
         <dsig:Transforms>
           <dsig:Transform Algorithm="urn:schemas-microsoft-com:HashTransforms.Identity" />
         </dsig:Transforms>
         <dsig:DigestMethod Algorithm="http://www.w3.org/2000/09/xmldsig#sha256" />
-        <dsig:DigestValue>XsNX5znQAeni8icOTY+9TUHrLWwfU16Cgljef4nuTqY=</dsig:DigestValue>
+        <dsig:DigestValue>IhjJX8NAaQHdQ7Wm2sV+2OGZSJ9NWT2AI9YHJRVuoaY=</dsig:DigestValue>
       </hash>
     </dependentAssembly>
   </dependency>
-  <file name="GTASARadioExternal.exe.config" size="189">
+  <file name="GTASARadioExternal.exe.config" size="2198">
     <hash>
       <dsig:Transforms>
         <dsig:Transform Algorithm="urn:schemas-microsoft-com:HashTransforms.Identity" />
       </dsig:Transforms>
       <dsig:DigestMethod Algorithm="http://www.w3.org/2000/09/xmldsig#sha256" />
-      <dsig:DigestValue>6N7MliNbVJSIAIPrecIshMbZ7zEoKLr5SQvud4LDUOw=</dsig:DigestValue>
+      <dsig:DigestValue>eb7BDo2QM4GcqBBmJfvozeWy7Rj9a9K3fcAqYfBNb3g=</dsig:DigestValue>
+    </hash>
+  </file>
+  <file name="icon0.ico" size="1150">
+    <hash>
+      <dsig:Transforms>
+        <dsig:Transform Algorithm="urn:schemas-microsoft-com:HashTransforms.Identity" />
+      </dsig:Transforms>
+      <dsig:DigestMethod Algorithm="http://www.w3.org/2000/09/xmldsig#sha256" />
+      <dsig:DigestValue>aevjCFZaMUEmMbbsFeasewAW9J4bWOESgKbVpzGb28U=</dsig:DigestValue>
+    </hash>
+  </file>
+  <file name="icon1.ico" size="1150">
+    <hash>
+      <dsig:Transforms>
+        <dsig:Transform Algorithm="urn:schemas-microsoft-com:HashTransforms.Identity" />
+      </dsig:Transforms>
+      <dsig:DigestMethod Algorithm="http://www.w3.org/2000/09/xmldsig#sha256" />
+      <dsig:DigestValue>W0REud33ncBtP07/u89NnNNAHIrvRlGYWKI+HjAwRw8=</dsig:DigestValue>
     </hash>
   </file>
 </asmv1:assembly>
