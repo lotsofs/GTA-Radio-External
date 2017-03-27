@@ -38,7 +38,7 @@
 			this.radioButtonFoobar = new System.Windows.Forms.RadioButton();
 			this.labelVolume = new System.Windows.Forms.Label();
 			this.groupBox3 = new System.Windows.Forms.GroupBox();
-			this.radioButtonDirect = new System.Windows.Forms.RadioButton();
+			this.checkBox7 = new System.Windows.Forms.CheckBox();
 			this.checkBox1 = new System.Windows.Forms.CheckBox();
 			this.radioButtonVolume = new System.Windows.Forms.RadioButton();
 			this.radioButtonPause = new System.Windows.Forms.RadioButton();
@@ -51,7 +51,6 @@
 			this.checkBoxC = new System.Windows.Forms.CheckBox();
 			this.checkBoxB = new System.Windows.Forms.CheckBox();
 			this.checkBoxA = new System.Windows.Forms.CheckBox();
-			this.checkBox7 = new System.Windows.Forms.CheckBox();
 			this.groupBox1.SuspendLayout();
 			this.groupBox2.SuspendLayout();
 			this.groupBox3.SuspendLayout();
@@ -71,11 +70,12 @@
 			// label3
 			// 
 			this.label3.AutoSize = true;
-			this.label3.Location = new System.Drawing.Point(111, 289);
+			this.label3.Location = new System.Drawing.Point(111, 313);
 			this.label3.Name = "label3";
 			this.label3.Size = new System.Drawing.Size(167, 13);
 			this.label3.TabIndex = 4;
 			this.label3.Text = "Program made by twitch.tv/lotsofs";
+			this.toolTip1.SetToolTip(this.label3, "Some parts made by e216");
 			// 
 			// radioButtonIII
 			// 
@@ -207,36 +207,36 @@
 			// groupBox3
 			// 
 			this.groupBox3.Controls.Add(this.checkBox7);
-			this.groupBox3.Controls.Add(this.radioButtonDirect);
 			this.groupBox3.Controls.Add(this.checkBox1);
 			this.groupBox3.Controls.Add(this.radioButtonVolume);
 			this.groupBox3.Controls.Add(this.radioButtonPause);
 			this.groupBox3.Controls.Add(this.radioButtonMute);
 			this.groupBox3.Location = new System.Drawing.Point(15, 148);
 			this.groupBox3.Name = "groupBox3";
-			this.groupBox3.Size = new System.Drawing.Size(263, 67);
+			this.groupBox3.Size = new System.Drawing.Size(263, 91);
 			this.groupBox3.TabIndex = 9;
 			this.groupBox3.TabStop = false;
 			this.groupBox3.Text = "Action";
 			this.toolTip1.SetToolTip(this.groupBox3, resources.GetString("groupBox3.ToolTip"));
 			// 
-			// radioButtonDirect
+			// checkBox7
 			// 
-			this.radioButtonDirect.AutoSize = true;
-			this.radioButtonDirect.Enabled = false;
-			this.radioButtonDirect.Location = new System.Drawing.Point(205, 19);
-			this.radioButtonDirect.Name = "radioButtonDirect";
-			this.radioButtonDirect.Size = new System.Drawing.Size(50, 17);
-			this.radioButtonDirect.TabIndex = 9;
-			this.radioButtonDirect.Text = "Write";
-			this.toolTip1.SetToolTip(this.radioButtonDirect, resources.GetString("radioButtonDirect.ToolTip"));
-			this.radioButtonDirect.UseVisualStyleBackColor = true;
+			this.checkBox7.AutoSize = true;
+			this.checkBox7.Enabled = false;
+			this.checkBox7.Location = new System.Drawing.Point(128, 66);
+			this.checkBox7.Name = "checkBox7";
+			this.checkBox7.Size = new System.Drawing.Size(126, 17);
+			this.checkBox7.TabIndex = 8;
+			this.checkBox7.Text = "Adv: Ignore Modifiers";
+			this.toolTip1.SetToolTip(this.checkBox7, resources.GetString("checkBox7.ToolTip"));
+			this.checkBox7.UseVisualStyleBackColor = true;
+			this.checkBox7.CheckedChanged += new System.EventHandler(this.checkBox7_CheckedChanged);
 			// 
 			// checkBox1
 			// 
 			this.checkBox1.AutoSize = true;
 			this.checkBox1.Enabled = false;
-			this.checkBox1.Location = new System.Drawing.Point(7, 42);
+			this.checkBox1.Location = new System.Drawing.Point(128, 42);
 			this.checkBox1.Name = "checkBox1";
 			this.checkBox1.Size = new System.Drawing.Size(92, 17);
 			this.checkBox1.TabIndex = 8;
@@ -249,11 +249,11 @@
 			// 
 			this.radioButtonVolume.AutoSize = true;
 			this.radioButtonVolume.Enabled = false;
-			this.radioButtonVolume.Location = new System.Drawing.Point(7, 19);
+			this.radioButtonVolume.Location = new System.Drawing.Point(6, 42);
 			this.radioButtonVolume.Name = "radioButtonVolume";
-			this.radioButtonVolume.Size = new System.Drawing.Size(60, 17);
+			this.radioButtonVolume.Size = new System.Drawing.Size(106, 17);
 			this.radioButtonVolume.TabIndex = 7;
-			this.radioButtonVolume.Text = "Volume";
+			this.radioButtonVolume.Text = "Volume Keypress";
 			this.toolTip1.SetToolTip(this.radioButtonVolume, resources.GetString("radioButtonVolume.ToolTip"));
 			this.radioButtonVolume.UseVisualStyleBackColor = true;
 			this.radioButtonVolume.CheckedChanged += new System.EventHandler(this.radioButtonVolume_CheckedChanged);
@@ -263,11 +263,11 @@
 			// 
 			this.radioButtonPause.AutoSize = true;
 			this.radioButtonPause.Enabled = false;
-			this.radioButtonPause.Location = new System.Drawing.Point(139, 19);
+			this.radioButtonPause.Location = new System.Drawing.Point(6, 65);
 			this.radioButtonPause.Name = "radioButtonPause";
-			this.radioButtonPause.Size = new System.Drawing.Size(55, 17);
+			this.radioButtonPause.Size = new System.Drawing.Size(101, 17);
 			this.radioButtonPause.TabIndex = 6;
-			this.radioButtonPause.Text = "Pause";
+			this.radioButtonPause.Text = "Pause Keypress";
 			this.toolTip1.SetToolTip(this.radioButtonPause, resources.GetString("radioButtonPause.ToolTip"));
 			this.radioButtonPause.UseVisualStyleBackColor = true;
 			this.radioButtonPause.CheckedChanged += new System.EventHandler(this.radioButtonPause_CheckedChanged);
@@ -276,11 +276,11 @@
 			// 
 			this.radioButtonMute.AutoSize = true;
 			this.radioButtonMute.Enabled = false;
-			this.radioButtonMute.Location = new System.Drawing.Point(73, 19);
+			this.radioButtonMute.Location = new System.Drawing.Point(6, 19);
 			this.radioButtonMute.Name = "radioButtonMute";
-			this.radioButtonMute.Size = new System.Drawing.Size(49, 17);
+			this.radioButtonMute.Size = new System.Drawing.Size(99, 17);
 			this.radioButtonMute.TabIndex = 5;
-			this.radioButtonMute.Text = "Mute";
+			this.radioButtonMute.Text = "Mute Command";
 			this.toolTip1.SetToolTip(this.radioButtonMute, resources.GetString("radioButtonMute.ToolTip"));
 			this.radioButtonMute.UseVisualStyleBackColor = true;
 			this.radioButtonMute.CheckedChanged += new System.EventHandler(this.radioButtonMute_CheckedChanged);
@@ -293,7 +293,7 @@
 			this.groupBox4.Controls.Add(this.checkBoxC);
 			this.groupBox4.Controls.Add(this.checkBoxB);
 			this.groupBox4.Controls.Add(this.checkBoxA);
-			this.groupBox4.Location = new System.Drawing.Point(15, 221);
+			this.groupBox4.Location = new System.Drawing.Point(15, 245);
 			this.groupBox4.Name = "groupBox4";
 			this.groupBox4.Size = new System.Drawing.Size(261, 65);
 			this.groupBox4.TabIndex = 10;
@@ -379,24 +379,11 @@
 			this.checkBoxA.UseVisualStyleBackColor = true;
 			this.checkBoxA.CheckedChanged += new System.EventHandler(this.checkBoxA_CheckedChanged);
 			// 
-			// checkBox7
-			// 
-			this.checkBox7.AutoSize = true;
-			this.checkBox7.Enabled = false;
-			this.checkBox7.Location = new System.Drawing.Point(105, 42);
-			this.checkBox7.Name = "checkBox7";
-			this.checkBox7.Size = new System.Drawing.Size(101, 17);
-			this.checkBox7.TabIndex = 8;
-			this.checkBox7.Text = "Ignore Modifiers";
-			this.toolTip1.SetToolTip(this.checkBox7, resources.GetString("checkBox7.ToolTip"));
-			this.checkBox7.UseVisualStyleBackColor = true;
-			this.checkBox7.CheckedChanged += new System.EventHandler(this.checkBox7_CheckedChanged);
-			// 
 			// Form1
 			// 
 			this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
 			this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
-			this.ClientSize = new System.Drawing.Size(288, 311);
+			this.ClientSize = new System.Drawing.Size(288, 332);
 			this.Controls.Add(this.groupBox4);
 			this.Controls.Add(this.groupBox3);
 			this.Controls.Add(this.labelVolume);
@@ -444,7 +431,6 @@
 		private System.Windows.Forms.CheckBox checkBoxB;
 		private System.Windows.Forms.CheckBox checkBoxA;
 		private System.Windows.Forms.CheckBox checkBoxD;
-		private System.Windows.Forms.RadioButton radioButtonDirect;
 		private System.Windows.Forms.CheckBox checkBoxE;
 		private System.Windows.Forms.CheckBox checkBoxF;
 		private System.Windows.Forms.CheckBox checkBox7;

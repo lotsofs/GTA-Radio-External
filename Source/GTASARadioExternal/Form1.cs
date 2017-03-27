@@ -166,6 +166,14 @@ namespace GTASARadioExternal {
 			readMemory.maxVolumeWriteable = false;
 		}
 
+		private void radioButtonMute_CheckedChanged(object sender, EventArgs e) {
+			readMemory.isMuted = false;
+			if (radioButtonMute.Checked) {
+				readMemory.actionToTake = ReadMemory.actions.Mute;
+			}
+			readMemory.maxVolumeWriteable = false;
+		}
+
 		private void radioButtonOther_CheckedChanged(object sender, EventArgs e) {
 			if (radioButtonOther.Checked) {
 				readMemory.musicP = ReadMemory.musicPlayers.Other;
@@ -191,7 +199,7 @@ namespace GTASARadioExternal {
 		private void radioButtonFoobar_CheckedChanged(object sender, EventArgs e) {
 			if (radioButtonFoobar.Checked) {
 				radioButtonVolume.Enabled = radioButtonFoobar.Checked;
-				radioButtonMute.Enabled = !radioButtonFoobar.Checked;
+				radioButtonMute.Enabled = radioButtonFoobar.Checked;
 				radioButtonPause.Enabled = radioButtonFoobar.Checked;
 				readMemory.musicP = ReadMemory.musicPlayers.Foobar;
 				readMemory.maxVolumeWriteable = false;
@@ -200,6 +208,7 @@ namespace GTASARadioExternal {
 			}
 		}
 
+
 		private void radioButtonVolume_EnabledChanged(object sender, EventArgs e) {
 			if (radioButtonVolume.Checked) {
 				radioButtonVolume.Checked = false;
@@ -207,10 +216,6 @@ namespace GTASARadioExternal {
 				radioButtonPause.Checked = true;
 				readMemory.DeterminePlayerVersionOther();
 			}
-		}
-
-		private void radioButtonMute_CheckedChanged(object sender, EventArgs e) {
-
 		}
 		#endregion
 

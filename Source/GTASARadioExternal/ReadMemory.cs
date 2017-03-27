@@ -7,6 +7,7 @@ using System.Windows.Forms;
 using System.Diagnostics;
 using System.Runtime.InteropServices;
 using System.Text;
+using System.IO;
 
 namespace GTASARadioExternal {
 	public class ReadMemory {
@@ -28,10 +29,12 @@ namespace GTASARadioExternal {
 		public int address_volume = 0x0;    // The address of the int that reads the volume of the music player
 		public int address_running = 0x0;   // The address of the int that reads whether the music player is on or not
 		public int address_base = 0x0;
+		public string executable_location;	// Executable location
 		Timer timer1;
 		public bool maxVolumeWriteable = true;
 		public bool quickVolume = false;
 		public bool isPaused = false;
+		public bool isMuted = false;
 		public enum actions { None, Volume, Mute, Pause }
 		public actions actionToTake;
 
@@ -53,6 +56,8 @@ namespace GTASARadioExternal {
 		public bool radioPlayDuringKaufman;
 		public bool radioPlayDuringAnnouncement;
 		public bool radioPlayDuringInterior;
+
+
 
 		// Dont know what this does
 		const int PROCESS_WM_READ = 0x0010;
@@ -186,6 +191,7 @@ namespace GTASARadioExternal {
 				address_base = q[0].MainModule.BaseAddress.ToInt32();
 				address_volume = address_base + 0x18C438;
 				address_running = address_base + 0x18B1F0;
+				executable_location = q[0].MainModule.FileName;
 			}
 			else {
 				playerStatus = statuses.Shutdown;
@@ -321,6 +327,72 @@ namespace GTASARadioExternal {
 					);
 				}
 			}
+			else if (actionToTake == actions.Mute) {
+				if (gameStatus == statuses.Running || gameStatus == statuses.Unconfirmed) {
+					#region try catch radiostatus
+					try {
+						radioStatus = ReadValue(p[0].Handle, address_radio, false, false);
+					}
+					catch (InvalidOperationException) {
+						Debug.WriteLine("InvalidOperationException K");
+						gameStatus = statuses.Shutdown;
+						return;
+					}
+					catch (NullReferenceException) {
+						Debug.WriteLine("NullReferenceException K");
+						gameStatus = statuses.Shutdown;
+						return;
+					}
+					catch (IndexOutOfRangeException) {
+						Debug.WriteLine("IndexOutOfRangeException K");
+						gameStatus = statuses.Shutdown;
+						return;
+					}
+					#endregion
+
+					#region mute and unmute condition clauses
+					if (radioStatus >= 0 && radioStatus <= 9 && radioPlayDuringRadio == true && isMuted == true) {
+						isMuted = false;
+						RadioChangerMute(isMuted);
+					}
+					else if (radioStatus == 10 && radioPlayDuringEmergency == true && isMuted == true) {
+						isMuted = false;
+						RadioChangerMute(isMuted);
+					}
+					else if (radioStatus == 197 && radioPlayDuringPauseMenu == true && isMuted == true) {
+						isMuted = false;
+						RadioChangerMute(isMuted);
+					}
+					if (radioStatus >= 13 && radioStatus <= 14 && radioPlayDuringAnnouncement == true && isMuted == true) {
+						isMuted = false;
+						RadioChangerMute(isMuted);
+					}
+
+
+					else if (radioStatus == 197 && radioPlayDuringPauseMenu == false && isMuted == false) {
+						isMuted = true;
+						RadioChangerMute(isMuted);
+					}
+					else if (radioStatus == 10 && radioPlayDuringEmergency == false && isMuted == false) {
+						isMuted = true;
+						RadioChangerMute(isMuted);
+					}
+					else if (radioStatus >= 0 && radioStatus <= 9 && radioPlayDuringRadio == false && isMuted == false) {
+						isMuted = true;
+						RadioChangerMute(isMuted);
+					}
+					else if (radioStatus >= 13 && radioStatus <= 14 && radioPlayDuringAnnouncement == false && isMuted == false) {
+						isMuted = true;
+						RadioChangerMute(isMuted);
+					}
+
+					else if (radioStatus > 10 && radioStatus != 197 && radioStatus != 13 && radioStatus != 14 && isMuted == false) {
+						isMuted = true;
+						RadioChangerMute(isMuted);
+					}
+					#endregion
+				}
+			}
 		}
 
 		public void CheckRadioStatusVC() {
@@ -448,6 +520,75 @@ namespace GTASARadioExternal {
 					);
 				}
 			}
+			else if (actionToTake == actions.Mute) {
+				if (gameStatus == statuses.Running || gameStatus == statuses.Unconfirmed) {
+					try {
+						radioStatus = ReadValue(p[0].Handle, address_radio, false, true);
+					}
+					catch (InvalidOperationException) {
+						Debug.WriteLine("InvalidOperationException I");
+						gameStatus = statuses.Shutdown;
+						return;
+					}
+					catch (NullReferenceException) {
+						Debug.WriteLine("NullReferenceException I");
+						gameStatus = statuses.Shutdown;
+						return;
+					}
+					catch (IndexOutOfRangeException) {
+						Debug.WriteLine("IndexOutOfRangeException I");
+						gameStatus = statuses.Shutdown;
+						return;
+					}
+				}
+
+				if (radioStatus >= 0 && radioStatus <= 9 && radioPlayDuringRadio == true && isMuted == true) {
+					isMuted = false;
+					RadioChangerMute(isMuted);
+				}
+				if (radioStatus >= 25 && radioStatus <= 26 && radioPlayDuringAnnouncement == true && isMuted == true) {
+					isMuted = false;
+					RadioChangerMute(isMuted);
+				}
+				else if (radioStatus == 23 && radioPlayDuringEmergency == true && isMuted == true) {
+					isMuted = false;
+					RadioChangerMute(isMuted);
+				}
+				else if (radioStatus == 1225 && radioPlayDuringPauseMenu == true && isMuted == true) {
+					isMuted = false;
+					RadioChangerMute(isMuted);
+				}
+				else if (radioStatus == 24 && radioPlayDuringKaufman == true && isMuted == true) {
+					isMuted = false;
+					RadioChangerMute(isMuted);
+				}
+
+				else if (radioStatus == 1225 && radioPlayDuringPauseMenu == false && isMuted == false) {
+					isMuted = true;
+					RadioChangerMute(isMuted);
+				}
+				else if (radioStatus >= 25 && radioStatus <= 26 && radioPlayDuringAnnouncement == false && isMuted == false) {
+					isMuted = true;
+					RadioChangerMute(isMuted);
+				}
+				else if (radioStatus == 23 && radioPlayDuringEmergency == false && isMuted == false) {
+					isMuted = true;
+					RadioChangerMute(isMuted);
+				}
+				else if (radioStatus == 24 && radioPlayDuringKaufman == false && isMuted == false) {
+					isMuted = true;
+					RadioChangerMute(isMuted);
+				}
+				else if (radioStatus >= 0 && radioStatus <= 9 && radioPlayDuringRadio == false && isMuted == false) {
+					isMuted = true;
+					RadioChangerMute(isMuted);
+				}
+
+				else if (radioStatus > 9 && radioStatus < 23 && isMuted == false || radioStatus > 26 && radioStatus != 1225 && isMuted == false) {
+					isMuted = true;
+					RadioChangerMute(isMuted);
+				}
+			}
 		}
 
 		public void CheckRadioStatusSA() {
@@ -517,6 +658,37 @@ namespace GTASARadioExternal {
 					RadioChangerVolume(radioStatus == 2);
 				}
 			}
+			else if (actionToTake == actions.Mute) {
+				if (gameStatus == statuses.Running || gameStatus == statuses.Unconfirmed) {
+					try {
+						radioStatus = ReadValue(p[0].Handle, address_radio, false, true);
+					}
+					catch (InvalidOperationException) {
+						Debug.WriteLine("InvalidOperationException G");
+						gameStatus = statuses.Shutdown;
+						return;
+					}
+					catch (NullReferenceException) {
+						Debug.WriteLine("NullReferenceException G");
+						gameStatus = statuses.Shutdown;
+						return;
+					}
+					catch (IndexOutOfRangeException) {
+						Debug.WriteLine("IndexOutOfRangeException G");
+						gameStatus = statuses.Shutdown;
+						return;
+					}
+				}
+
+				if (radioStatus == 2 && isMuted == true) {
+					isMuted = false;
+					RadioChangerMute(isMuted);
+				}
+				else if (radioStatus == 7 && isMuted == false) {
+					isMuted = true;
+					RadioChangerMute(isMuted);
+				}
+			}
 		}
 
 
@@ -524,6 +696,18 @@ namespace GTASARadioExternal {
 				* Media Player Controls
 		* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
 
+
+		// Change Radio based on muting/unmuting
+		void RadioChangerMute(bool radioOff) {
+			// This only works with foobar and will break if I try to implement this with anything else.
+			radioActive = !radioOff;
+
+			ProcessStartInfo psi = new ProcessStartInfo();
+			psi.FileName = Path.GetFileName(executable_location);
+			psi.WorkingDirectory = Path.GetDirectoryName(executable_location);
+			psi.Arguments = "/command:mute";
+			Process.Start(psi);
+		}
 
 		// Change Radio based on pausing/unpausing
 		void RadioChangerPause(bool radioOff) {

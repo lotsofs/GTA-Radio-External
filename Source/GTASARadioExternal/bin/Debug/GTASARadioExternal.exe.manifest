@@ -42,14 +42,14 @@
     </dependentAssembly>
   </dependency>
   <dependency>
-    <dependentAssembly dependencyType="install" allowDelayedBinding="true" codebase="GTASARadioExternal.exe" size="44544">
+    <dependentAssembly dependencyType="install" allowDelayedBinding="true" codebase="GTASARadioExternal.exe" size="46080">
       <assemblyIdentity name="GTASARadioExternal" version="1.0.0.0" language="neutral" processorArchitecture="msil" />
       <hash>
         <dsig:Transforms>
           <dsig:Transform Algorithm="urn:schemas-microsoft-com:HashTransforms.Identity" />
         </dsig:Transforms>
         <dsig:DigestMethod Algorithm="http://www.w3.org/2000/09/xmldsig#sha256" />
-        <dsig:DigestValue>XsNX5znQAeni8icOTY+9TUHrLWwfU16Cgljef4nuTqY=</dsig:DigestValue>
+        <dsig:DigestValue>lKOr4/6jbJgASEUHI+M+lUbwlKeIk904YkHJHAsBmLI=</dsig:DigestValue>
       </hash>
     </dependentAssembly>
   </dependency>
