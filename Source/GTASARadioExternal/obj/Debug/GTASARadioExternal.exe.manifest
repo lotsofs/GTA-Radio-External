@@ -42,24 +42,24 @@
     </dependentAssembly>
   </dependency>
   <dependency>
-    <dependentAssembly dependencyType="install" allowDelayedBinding="true" codebase="GTASARadioExternal.exe" size="46080">
+    <dependentAssembly dependencyType="install" allowDelayedBinding="true" codebase="GTASARadioExternal.exe" size="49152">
       <assemblyIdentity name="GTASARadioExternal" version="1.0.0.0" language="neutral" processorArchitecture="msil" />
       <hash>
         <dsig:Transforms>
           <dsig:Transform Algorithm="urn:schemas-microsoft-com:HashTransforms.Identity" />
         </dsig:Transforms>
         <dsig:DigestMethod Algorithm="http://www.w3.org/2000/09/xmldsig#sha256" />
-        <dsig:DigestValue>lKOr4/6jbJgASEUHI+M+lUbwlKeIk904YkHJHAsBmLI=</dsig:DigestValue>
+        <dsig:DigestValue>Hl6vs+9LtwpnDUGJ+rN6VdzJFYRORk3v688zjMKLiyk=</dsig:DigestValue>
       </hash>
     </dependentAssembly>
   </dependency>
-  <file name="GTASARadioExternal.exe.config" size="189">
+  <file name="GTASARadioExternal.exe.config" size="658">
     <hash>
       <dsig:Transforms>
         <dsig:Transform Algorithm="urn:schemas-microsoft-com:HashTransforms.Identity" />
       </dsig:Transforms>
       <dsig:DigestMethod Algorithm="http://www.w3.org/2000/09/xmldsig#sha256" />
-      <dsig:DigestValue>6N7MliNbVJSIAIPrecIshMbZ7zEoKLr5SQvud4LDUOw=</dsig:DigestValue>
+      <dsig:DigestValue>jOAKFaQw49XmHNTSq4v0EeNTjjiG0aiMuUAUA6bGdWU=</dsig:DigestValue>
     </hash>
   </file>
 </asmv1:assembly>

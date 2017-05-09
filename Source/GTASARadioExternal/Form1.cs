@@ -8,11 +8,12 @@ using System.Text;
 using System.Threading.Tasks;
 using System.Windows.Forms;
 using System.Diagnostics;
+using System.Configuration;
 
 namespace GTASARadioExternal {
-    public partial class Form1 : Form {
+	public partial class Form1 : Form {
 
-        Timer timer2;
+		Timer timer2;
 
 		public enum displayedTexts { Unitialized, Shutdown, Running, Unrecognized, Unconfirmed, NoMusicPlayer }
 		displayedTexts displayedText = displayedTexts.Unitialized;
@@ -21,13 +22,13 @@ namespace GTASARadioExternal {
 
 
 		public Form1() {
-            InitializeComponent();
+			InitializeComponent();
 
 			label1.Text = "Tool not configured";
 
 			readMemory.InitTimer();        // run the timer that checks for updates
-            WindowTimer();              // run the timer that prints these updates
-        }
+			WindowTimer();              // run the timer that prints these updates
+		}
 
 		void CheckGame() {
 			// Check if the game still exists
@@ -111,8 +112,8 @@ namespace GTASARadioExternal {
 			}
 		}
 
-        // print some status stuff
-        /*void UpdateWindowOld() {
+		// print some status stuff
+		/*void UpdateWindowOld() {
             if (Program.radioStatus == 2) {
                 label1.Text = "Radio ON with volume " + Program.volumeStatus;
                 label2.Text = Program.volumeStatus.ToString();
@@ -132,22 +133,22 @@ namespace GTASARadioExternal {
             }
         }*/
 
-        // timer that checks every second for updates to be made to the printed info on the window
-        public void WindowTimer() {
-            timer2 = new Timer();
-            timer2.Tick += new EventHandler(timer2Tick);
-            timer2.Interval = 1000;
-            timer2.Start();
-        }
+		// timer that checks every second for updates to be made to the printed info on the window
+		public void WindowTimer() {
+			timer2 = new Timer();
+			timer2.Tick += new EventHandler(timer2Tick);
+			timer2.Interval = 1000;
+			timer2.Start();
+		}
 
-        void timer2Tick(object sender, EventArgs e) {
-            UpdateWindow();
+		void timer2Tick(object sender, EventArgs e) {
+			UpdateWindow();
 			CheckGame();
-        }
+		}
 
 		#region unsorted list music players + action buttons
 		private void checkBox1_CheckedChanged(object sender, EventArgs e) {
-		readMemory.quickVolume = checkBox1.Checked;
+			readMemory.quickVolume = checkBox1.Checked;
 			readMemory.maxVolumeWriteable = false;
 		}
 
@@ -318,5 +319,129 @@ namespace GTASARadioExternal {
 		private void checkBox7_CheckedChanged(object sender, EventArgs e) {
 			readMemory.ignoreMods = checkBox7.Checked;
 		}
+
+
+
+		#region configuration
+
+		private void Form1_FormClosing(object sender, FormClosingEventArgs e) {
+
+			try {
+				Configuration config = ConfigurationManager.OpenExeConfiguration(ConfigurationUserLevel.None);
+
+				if (radioButtonSA.Checked) {
+					config.AppSettings.Settings["gameSet"].Value = "SA";
+				}
+
+
+				//game
+				if (radioButtonSA.Checked) {
+					config.AppSettings.Settings["gameSet"].Value = "SA";
+				}
+				else if (radioButtonVC.Checked) {
+					config.AppSettings.Settings["gameSet"].Value = "VC";
+				}
+				else if (radioButtonIII.Checked) {
+					config.AppSettings.Settings["gameSet"].Value = "III";
+				}
+				//player
+				if (radioButtonWinamp.Checked) {
+					config.AppSettings.Settings["playerSet"].Value = "Winamp";
+				}
+				else if (radioButtonFoobar.Checked) {
+					config.AppSettings.Settings["playerSet"].Value = "Foobar";
+				}
+				else if (radioButtonVolume.Checked) {
+					config.AppSettings.Settings["playerSet"].Value = "Other";
+				}
+				//action
+				if (radioButtonMute.Checked) {
+					config.AppSettings.Settings["actionSet"].Value = "Mute";
+				}
+				else if (radioButtonPause.Checked) {
+					config.AppSettings.Settings["actionSet"].Value = "Pause";
+				}
+				else if (radioButtonVolume.Checked) {
+					config.AppSettings.Settings["actionSet"].Value = "Volume";
+				}
+				//action-settings
+				config.AppSettings.Settings["quickvolumeSet"].Value = checkBox1.Checked.ToString();
+				config.AppSettings.Settings["ignoremodifiersSet"].Value = checkBox7.Checked.ToString();
+				//when
+				config.AppSettings.Settings["emergencySet"].Value = checkBoxA.Checked.ToString();
+				config.AppSettings.Settings["radioSet"].Value = checkBoxB.Checked.ToString();
+				config.AppSettings.Settings["interiorsSet"].Value = checkBoxC.Checked.ToString();
+				config.AppSettings.Settings["announcerSet"].Value = checkBoxF.Checked.ToString();
+				config.AppSettings.Settings["kaufmanSet"].Value = checkBoxE.Checked.ToString();
+				config.AppSettings.Settings["menuSet"].Value = checkBoxD.Checked.ToString();
+
+				config.Save(ConfigurationSaveMode.Modified);
+			}
+			catch (NullReferenceException) {
+				Debug.WriteLine("Error writing app settings");
+			}
+		}
+
+		private void Form1_Load(object sender, EventArgs e) {
+			try {
+				switch (ConfigurationManager.AppSettings["gameSet"]) {
+					case "SA":
+						radioButtonSA.Checked = true;
+						break;
+					case "VC":
+						radioButtonVC.Checked = true;
+						break;
+					case "III":
+						radioButtonIII.Checked = true;
+						break;
+					default:
+						break;
+				}
+				switch (ConfigurationManager.AppSettings["playerSet"]) {
+					case "Winamp":
+						radioButtonWinamp.Checked = true;
+						break;
+					case "Foobar":
+						radioButtonFoobar.Checked = true;
+						break;
+					case "Other":
+						radioButtonOther.Checked = true;
+						break;
+					default:
+						break;
+				}
+				switch (ConfigurationManager.AppSettings["actionSet"]) {
+					case "Mute":
+						radioButtonMute.Checked = true;
+						break;
+					case "Pause":
+						radioButtonPause.Checked = true;
+						break;
+					case "Volume":
+						radioButtonVolume.Checked = true;
+						break;
+					default:
+						break;
+				}
+				checkBox1.Checked = bool.Parse(ConfigurationManager.AppSettings["quickvolumeSet"]);
+				checkBox7.Checked = bool.Parse(ConfigurationManager.AppSettings["ignoremodifiersSet"]);
+				checkBoxA.Checked = bool.Parse(ConfigurationManager.AppSettings["emergencySet"]);
+				checkBoxB.Checked = bool.Parse(ConfigurationManager.AppSettings["radioSet"]);
+				checkBoxC.Checked = bool.Parse(ConfigurationManager.AppSettings["interiorsSet"]);
+				checkBoxF.Checked = bool.Parse(ConfigurationManager.AppSettings["announcerSet"]);
+				checkBoxE.Checked = bool.Parse(ConfigurationManager.AppSettings["kaufmanSet"]);
+				checkBoxD.Checked = bool.Parse(ConfigurationManager.AppSettings["menuSet"]);
+			}
+
+			catch (NullReferenceException) {
+				Debug.WriteLine("Error reading app settings");
+			}
+		}
+
+
+
+		#endregion
+
+
 	}
 }
