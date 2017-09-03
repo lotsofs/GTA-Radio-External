@@ -29,7 +29,8 @@ namespace GTASARadioExternal {
 		public int address_volume = 0x0;    // The address of the int that reads the volume of the music player
 		public int address_running = 0x0;   // The address of the int that reads whether the music player is on or not
 		public int address_base = 0x0;
-		public string executable_location;	// Executable location
+		public string executable_location;  // Executable location
+		public int window_name;			// Window name
 		Timer timer1;
 		public bool maxVolumeWriteable = true;
 		public bool quickVolume = false;
@@ -40,7 +41,7 @@ namespace GTASARadioExternal {
 
 		public int failSafeAttempts = 0;
 
-		public int prevVolumeStatus;
+		public int prevVolumeStatus = -1;
 		public int volumeStatus;
 		public int radioStatus;
 		public int prevRadioStatus;
@@ -71,6 +72,12 @@ namespace GTASARadioExternal {
 		[DllImport("user32.dll")]
 		public static extern void keybd_event(byte virtualKey, byte scanCode, uint flags, IntPtr extraInfo);
 
+		[DllImport("user32.dll")]
+		public static extern int SendMessage(int hwnd, int wMsg, int wParam, int lParam);
+
+		[DllImport("user32.dll")]
+		public static extern int FindWindow(string lpClassName, String lpWindowName);
+
 
 		/* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * 
 					* Game Detection
@@ -79,91 +86,148 @@ namespace GTASARadioExternal {
 		// Determine the version of GTA3
 		public void DetermineGameVersionIII() {
 			p = Process.GetProcessesByName("gta3");
-			if (p.Length != 0) {
-				if (ReadValue(p[0].Handle, 0x5C1E70, false, true) == 1407551829) {        // 1.0
-					major = 1; minor = 0; region = regionTypes.GTA; gameStatus = statuses.Running;
-					address_radio = 0x8F3967;
-				}
-				else if (ReadValue(p[0].Handle, 0x5C2130, false, true) == 1407551829) {   // 1.1
-					major = 1; minor = 1; region = regionTypes.GTA; gameStatus = statuses.Running;
-					address_radio = 0x8F3A1B; 
-				}
-				else if (ReadValue(p[0].Handle, 0x5C6FD0, false, true) == 1407551829) {       // 1.1 Steam
-					major = 1; minor = 1; region = regionTypes.Steam; gameStatus = statuses.Running;
-					address_radio = 0x903B5C; ;
+			try {
+				if (p.Length != 0) {
+					if (ReadValue(p[0].Handle, 0x5C1E70, false, true) == 1407551829) {        // 1.0
+						major = 1; minor = 0; region = regionTypes.GTA; gameStatus = statuses.Running;
+						address_radio = 0x8F3967;
+					}
+					else if (ReadValue(p[0].Handle, 0x5C2130, false, true) == 1407551829) {   // 1.1
+						major = 1; minor = 1; region = regionTypes.GTA; gameStatus = statuses.Running;
+						address_radio = 0x8F3A1B;
+					}
+					else if (ReadValue(p[0].Handle, 0x5C6FD0, false, true) == 1407551829) {       // 1.1 Steam
+						major = 1; minor = 1; region = regionTypes.Steam; gameStatus = statuses.Running;
+						address_radio = 0x903B5C; ;
+					}
+					else {
+						gameStatus = statuses.Unrecognized;
+					}
 				}
 				else {
-					gameStatus = statuses.Unrecognized;
+					gameStatus = statuses.Shutdown;
 				}
 			}
-			else {
+			#region catch
+			catch (InvalidOperationException) {
+				Debug.WriteLine("InvalidOperationException N");
 				gameStatus = statuses.Shutdown;
+				return;
 			}
+			catch (NullReferenceException) {
+				Debug.WriteLine("NullReferenceException N");
+				gameStatus = statuses.Shutdown;
+				return;
+			}
+			catch (IndexOutOfRangeException) {
+				Debug.WriteLine("IndexOutOfRangeException N");
+				gameStatus = statuses.Shutdown;
+				return;
+			}
+			#endregion
 		}
 
 		// Determine the version of GTAVC
 		public void DetermineGameVersionVC() {
 			p = Process.GetProcessesByName("gta-vc");
-			if (p.Length != 0) {
-				if (ReadValue(p[0].Handle, 0x667BF0, false, true) == 1407551829) {        // 1.0
-					major = 1; minor = 0; region = regionTypes.GTA; gameStatus = statuses.Running;
-					address_radio = 0x9839C0;
-				}
-				else if (ReadValue(p[0].Handle, 0x667C40, false, true) == 1407551829) {   // 1.1
-					major = 1; minor = 1; region = regionTypes.GTA; gameStatus = statuses.Running;
-					address_radio = 0x9839C0; gameStatus = statuses.Unconfirmed;
-				}
-				else if (ReadValue(p[0].Handle, 0xA402ED, false, true) == 1448235347) {       // 1.1 Steam
-					major = 1; minor = 1; region = regionTypes.Steam; gameStatus = statuses.Running;
-					address_radio = 0x9829C8;
-				}
-				else if (ReadValue(p[0].Handle, 0xACD0A2, false, true) == 1793887061) {       // 1.1 JP
-					major = 1; minor = 1; region = regionTypes.Japan; gameStatus = statuses.Running;
-					address_radio = 0x9809D0;
+			try {
+				if (p.Length != 0) {
+					if (ReadValue(p[0].Handle, 0x667BF0, false, true) == 1407551829) {        // 1.0
+						major = 1; minor = 0; region = regionTypes.GTA; gameStatus = statuses.Running;
+						address_radio = 0x9839C0;
+					}
+					else if (ReadValue(p[0].Handle, 0x667C40, false, true) == 1407551829) {   // 1.1
+						major = 1; minor = 1; region = regionTypes.GTA; gameStatus = statuses.Running;
+						address_radio = 0x9839C0; gameStatus = statuses.Unconfirmed;
+					}
+					else if (ReadValue(p[0].Handle, 0xA402ED, false, true) == 1448235347) {       // 1.1 Steam
+						major = 1; minor = 1; region = regionTypes.Steam; gameStatus = statuses.Running;
+						address_radio = 0x9829C8;
+					}
+					else if (ReadValue(p[0].Handle, 0xACD0A2, false, true) == 1793887061) {       // 1.1 JP
+						major = 1; minor = 1; region = regionTypes.Japan; gameStatus = statuses.Running;
+						address_radio = 0x9809D0;
+					}
+					else {
+						gameStatus = statuses.Unrecognized;
+					}
 				}
 				else {
-					gameStatus = statuses.Unrecognized;
+					gameStatus = statuses.Shutdown;
 				}
 			}
-			else {
+			#region catch
+			catch (InvalidOperationException) {
+				Debug.WriteLine("InvalidOperationException M");
 				gameStatus = statuses.Shutdown;
+				return;
 			}
+			catch (NullReferenceException) {
+				Debug.WriteLine("NullReferenceException M");
+				gameStatus = statuses.Shutdown;
+				return;
+			}
+			catch (IndexOutOfRangeException) {
+				Debug.WriteLine("IndexOutOfRangeException M");
+				gameStatus = statuses.Shutdown;
+				return;
+			}
+			#endregion
 		}
-		
+
 		// Determine the version of GTASA
 		public void DetermineGameVersionSA() {
 			p = Process.GetProcessesByName("gta-sa");
 			if (p.Length == 0) {
 				p = Process.GetProcessesByName("gta_sa");
 			}
-			if (p.Length != 0) {
-				if (ReadValue(p[0].Handle, 0x82457C, false, true) == 38079) {        // 1.0 US
-					major = 1; minor = 0; region = regionTypes.US; gameStatus = statuses.Running;
-					address_radio = 0x008CB760;
-				}
-				else if (ReadValue(p[0].Handle, 0x8245BC, false, true) == 38079) {   // 1.0 EU
-					major = 1; minor = 0; region = regionTypes.Europe; gameStatus = statuses.Running;
-					address_radio = 0x008CB760;
-				}
-				else if (ReadValue(p[0].Handle, 0x8252FC, false, true) == 38079) {       // 1.1 US
-					major = 1; minor = 1; region = regionTypes.US; gameStatus = statuses.Running;
-					address_radio = 0x008CCFE8; gameStatus = statuses.Unconfirmed;
-				}
-				else if (ReadValue(p[0].Handle, 0x82533C, false, true) == 38079) {       // 1.1 EU
-					major = 1; minor = 1; region = regionTypes.Europe; gameStatus = statuses.Running;
-					address_radio = 0x008CCFE8; gameStatus = statuses.Unconfirmed;
-				}
-				else if (ReadValue(p[0].Handle, 0x85EC4A, false, true) == 38079) {       // 3.0 Steam
-					major = 3; minor = 0; region = regionTypes.Steam; gameStatus = statuses.Running;
-					address_radio = 0x0093AB68;
+			try {
+				if (p.Length != 0) {
+					if (ReadValue(p[0].Handle, 0x82457C, false, true) == 38079) {        // 1.0 US
+						major = 1; minor = 0; region = regionTypes.US; gameStatus = statuses.Running;
+						address_radio = 0x008CB760;
+					}
+					else if (ReadValue(p[0].Handle, 0x8245BC, false, true) == 38079) {   // 1.0 EU
+						major = 1; minor = 0; region = regionTypes.Europe; gameStatus = statuses.Running;
+						address_radio = 0x008CB760;
+					}
+					else if (ReadValue(p[0].Handle, 0x8252FC, false, true) == 38079) {       // 1.1 US
+						major = 1; minor = 1; region = regionTypes.US; gameStatus = statuses.Running;
+						address_radio = 0x008CCFE8; gameStatus = statuses.Unconfirmed;
+					}
+					else if (ReadValue(p[0].Handle, 0x82533C, false, true) == 38079) {       // 1.1 EU
+						major = 1; minor = 1; region = regionTypes.Europe; gameStatus = statuses.Running;
+						address_radio = 0x008CCFE8; gameStatus = statuses.Unconfirmed;
+					}
+					else if (ReadValue(p[0].Handle, 0x85EC4A, false, true) == 38079) {       // 3.0 Steam
+						major = 3; minor = 0; region = regionTypes.Steam; gameStatus = statuses.Running;
+						address_radio = 0x0093AB68;
+					}
+					else {
+						gameStatus = statuses.Unrecognized;
+					}
 				}
 				else {
-					gameStatus = statuses.Unrecognized;
+					gameStatus = statuses.Shutdown;
 				}
 			}
-			else {
+			#region catch
+			catch (InvalidOperationException) {
+				Debug.WriteLine("InvalidOperationException L");
 				gameStatus = statuses.Shutdown;
+				return;
 			}
+			catch (NullReferenceException) {
+				Debug.WriteLine("NullReferenceException L");
+				gameStatus = statuses.Shutdown;
+				return;
+			}
+			catch (IndexOutOfRangeException) {
+				Debug.WriteLine("IndexOutOfRangeException L");
+				gameStatus = statuses.Shutdown;
+				return;
+			}
+			#endregion
 		}
 
 		/* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * 
@@ -177,6 +241,7 @@ namespace GTASARadioExternal {
 				playerStatus = statuses.Running;
 				address_volume = 0x07AA9D9C;
 				address_running = 0x4BF3EC;
+				window_name = FindWindow("Winamp v1.x", null);
 			}
 			else {
 				playerStatus = statuses.Shutdown;
@@ -699,14 +764,26 @@ namespace GTASARadioExternal {
 
 		// Change Radio based on muting/unmuting
 		void RadioChangerMute(bool radioOff) {
-			// This only works with foobar and will break if I try to implement this with anything else.
-			radioActive = !radioOff;
+			if (musicP == musicPlayers.Foobar) {
+				// This only works with foobar and will break if I try to implement this with anything else.
+				radioActive = !radioOff;
 
-			ProcessStartInfo psi = new ProcessStartInfo();
-			psi.FileName = Path.GetFileName(executable_location);
-			psi.WorkingDirectory = Path.GetDirectoryName(executable_location);
-			psi.Arguments = "/command:mute";
-			Process.Start(psi);
+				ProcessStartInfo psi = new ProcessStartInfo();
+				psi.FileName = Path.GetFileName(executable_location);
+				psi.WorkingDirectory = Path.GetDirectoryName(executable_location);
+				psi.Arguments = "/command:mute";
+				Process.Start(psi);
+			}
+			else if (musicP == musicPlayers.Winamp) {
+				radioActive = !radioOff;
+				if (radioOff) {
+					maxVolume = checkMP3PlayerStatus();
+					SendMessage(window_name, 0x0400, 0, 122);
+				}
+				else {
+					SendMessage(window_name, 0x0400, maxVolume, 122);
+				}
+			}
 		}
 
 		// Change Radio based on pausing/unpausing
@@ -729,7 +806,7 @@ namespace GTASARadioExternal {
 
 				if (volumeStatus == prevVolumeStatus) {
 					failSafeAttempts += 1;
-					if (failSafeAttempts > 100000) {
+					if (failSafeAttempts > 10000) {
 						playerStatus = statuses.Error;
 						return;
 					}
@@ -785,7 +862,10 @@ namespace GTASARadioExternal {
 		// volume slider is used for checking if radio is on or off (winamp didn't want to let me take control of its mute button)
 		public int checkMP3PlayerStatus() {
 			int volumeLevel = -1;
-			if (playerStatus == statuses.Running) {
+			if (gameStatus != statuses.Running && prevVolumeStatus != -1) {
+				return maxVolume;
+			}
+			else if (playerStatus == statuses.Running) {
 				try {
 					volumeLevel = ReadValue(q[0].Handle, address_volume, musicP == musicPlayers.Foobar, false);
 				}
@@ -840,6 +920,7 @@ namespace GTASARadioExternal {
 					playerStatus = statuses.Shutdown;
 					return 0;
 				}
+				volumeStatus = checkMP3PlayerStatus();
 				return playerActive;
 			}
 			else {

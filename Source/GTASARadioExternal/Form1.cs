@@ -188,7 +188,7 @@ namespace GTASARadioExternal {
 		private void radioButtonWinamp_CheckedChanged(object sender, EventArgs e) {
 			if (radioButtonWinamp.Checked) {
 				radioButtonVolume.Enabled = radioButtonWinamp.Checked;
-				radioButtonMute.Enabled = !radioButtonWinamp.Checked;
+				radioButtonMute.Enabled = radioButtonWinamp.Checked;
 				radioButtonPause.Enabled = radioButtonWinamp.Checked;
 				readMemory.musicP = ReadMemory.musicPlayers.Winamp;
 				readMemory.maxVolumeWriteable = false;
@@ -437,6 +437,8 @@ namespace GTASARadioExternal {
 				Debug.WriteLine("Error reading app settings");
 			}
 		}
+
+
 
 
 
