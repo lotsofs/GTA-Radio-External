@@ -41,6 +41,9 @@ namespace GTASARadioExternal {
 			else if (radioButtonIII.Checked) {
 				readMemory.DetermineGameVersionIII();
 			}
+			else if (radioButtonSR3.Checked) {
+				readMemory.DetermineGameVersionSR3();
+			}
 
 			// Check if the music player still exists
 			if (radioButtonWinamp.Checked) {
@@ -280,6 +283,27 @@ namespace GTASARadioExternal {
 			readMemory.p = null;
 			readMemory.gameStatus = ReadMemory.statuses.Shutdown;
 		}
+
+		private void radioButtonSR3_CheckedChanged(object sender, EventArgs e) {
+			readMemory.DetermineGameVersionSR3();
+			readMemory.game = ReadMemory.games.SR3;
+			checkBoxA.Enabled = false;
+			checkBoxA.Checked = true;
+			checkBoxB.Enabled = false;
+			checkBoxB.Checked = true;
+			checkBoxC.Enabled = false;
+			checkBoxC.Checked = false;
+			checkBoxD.Enabled = false;
+			checkBoxD.Checked = true;
+			checkBoxE.Enabled = false;
+			checkBoxE.Checked = false;
+			checkBoxF.Enabled = false;
+			checkBoxF.Checked = false;
+			readMemory.maxVolumeWriteable = false;
+			readMemory.p = null;
+			readMemory.gameStatus = ReadMemory.statuses.Shutdown;
+		}
+
 		#endregion
 
 		#region when buttons
@@ -312,15 +336,14 @@ namespace GTASARadioExternal {
 			readMemory.maxVolumeWriteable = false;
 		}
 
-
-
-		#endregion
-
 		private void checkBox7_CheckedChanged(object sender, EventArgs e) {
 			readMemory.ignoreMods = checkBox7.Checked;
 		}
 
 
+		#endregion
+
+		
 
 		#region configuration
 
@@ -328,11 +351,6 @@ namespace GTASARadioExternal {
 
 			try {
 				Configuration config = ConfigurationManager.OpenExeConfiguration(ConfigurationUserLevel.None);
-
-				if (radioButtonSA.Checked) {
-					config.AppSettings.Settings["gameSet"].Value = "SA";
-				}
-
 
 				//game
 				if (radioButtonSA.Checked) {
@@ -343,6 +361,9 @@ namespace GTASARadioExternal {
 				}
 				else if (radioButtonIII.Checked) {
 					config.AppSettings.Settings["gameSet"].Value = "III";
+				}
+				else if (radioButtonSR3.Checked) {
+					config.AppSettings.Settings["gameSet"].Value = "SR3";
 				}
 				//player
 				if (radioButtonWinamp.Checked) {
@@ -394,6 +415,9 @@ namespace GTASARadioExternal {
 					case "III":
 						radioButtonIII.Checked = true;
 						break;
+					case "SR3":
+						radioButtonSR3.Checked = true;
+						break;
 					default:
 						break;
 				}
@@ -437,6 +461,7 @@ namespace GTASARadioExternal {
 				Debug.WriteLine("Error reading app settings");
 			}
 		}
+
 
 
 

@@ -120,9 +120,25 @@
   <metadata name="toolTip1.TrayLocation" type="System.Drawing.Point, System.Drawing, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a">
     <value>17, 17</value>
   </metadata>
+  <metadata name="toolTip1.TrayLocation" type="System.Drawing.Point, System.Drawing, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a">
+    <value>17, 17</value>
+  </metadata>
   <metadata name="radioButtonWinamp.Locked" type="System.Boolean, mscorlib, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089">
     <value>True</value>
   </metadata>
+  <metadata name="radioButtonWinamp.Locked" type="System.Boolean, mscorlib, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089">
+    <value>True</value>
+  </metadata>
+  <data name="groupBox3.ToolTip" xml:space="preserve">
+    <value>The action to take when the radio is supposed to turn on/off. 
+Volume = Volume up/down multimedia key presses are sent repeatedly until the volume is correct. When playing music at high volumes, this can take up to a couple seconds. 
+Toggling 'Quick Volume' will speed this process, but volume restoration is less precise. 
+Toggling 'Ignore Modifiers' will ignore modifier keys, which will cause systemwide volume change when holding modifier keys (shift, alt, ctrl) when transitioning radio status. Enable if you have a virtual audio cable setup where system volume doesn't matter.
+  Note: Certain programs may need to have the media keys bound manually.
+Mute = Mute/unmute commands are sent. No fake keypresses are sent. (recommended)
+Play/pause = Play/pause is sent. Unlike the true GTA experience, the music is paused and resumed and will not continue playing silently in the background. Note: Pausing/Playing manually may be needed to prevent inverted radio playing.
+</value>
+  </data>
   <data name="checkBox7.ToolTip" xml:space="preserve">
     <value>The action to take when the radio is supposed to turn on/off. 
 Volume = Volume up/down multimedia key presses are sent repeatedly until the volume is correct. When playing music at high volumes, this can take up to a couple seconds. 
@@ -173,15 +189,14 @@ Mute = Mute/unmute commands are sent. No fake keypresses are sent. (recommended)
 Play/pause = Play/pause is sent. Unlike the true GTA experience, the music is paused and resumed and will not continue playing silently in the background. Note: Pausing/Playing manually may be needed to prevent inverted radio playing.
 </value>
   </data>
-  <data name="groupBox3.ToolTip" xml:space="preserve">
-    <value>The action to take when the radio is supposed to turn on/off. 
-Volume = Volume up/down multimedia key presses are sent repeatedly until the volume is correct. When playing music at high volumes, this can take up to a couple seconds. 
-Toggling 'Quick Volume' will speed this process, but volume restoration is less precise. 
-Toggling 'Ignore Modifiers' will ignore modifier keys, which will cause systemwide volume change when holding modifier keys (shift, alt, ctrl) when transitioning radio status. Enable if you have a virtual audio cable setup where system volume doesn't matter.
-  Note: Certain programs may need to have the media keys bound manually.
-Mute = Mute/unmute commands are sent. No fake keypresses are sent. (recommended)
-Play/pause = Play/pause is sent. Unlike the true GTA experience, the music is paused and resumed and will not continue playing silently in the background. Note: Pausing/Playing manually may be needed to prevent inverted radio playing.
-</value>
+  <data name="groupBox4.ToolTip" xml:space="preserve">
+    <value>Select when the music should be playing. 
+Emergency = music player will be playing when the game is playing Emergency Radio (Firetrucks, Ambulances, Police Cars)
+Radio = music player will be playing when the game is on a regular radio station (Both music radio &amp; talk radio)
+Interiors = music player will be playing in interiors that have radio playing inside them (Does not include interiors with their own special music, such as Malibu or Caligula)
+Menu = music will play in pause menu (disregards whether it was playing to begin with)
+Kaufman = music will play in Kaufman Cab after Cabmaggedon
+Announcer = music will play during bridge repair/storm warning announcements on the radio</value>
   </data>
   <data name="checkBoxF.ToolTip" xml:space="preserve">
     <value>Select when the music should be playing. 
@@ -229,15 +244,6 @@ Kaufman = music will play in Kaufman Cab after Cabmaggedon
 Announcer = music will play during bridge repair/storm warning announcements on the radio</value>
   </data>
   <data name="checkBoxA.ToolTip" xml:space="preserve">
-    <value>Select when the music should be playing. 
-Emergency = music player will be playing when the game is playing Emergency Radio (Firetrucks, Ambulances, Police Cars)
-Radio = music player will be playing when the game is on a regular radio station (Both music radio &amp; talk radio)
-Interiors = music player will be playing in interiors that have radio playing inside them (Does not include interiors with their own special music, such as Malibu or Caligula)
-Menu = music will play in pause menu (disregards whether it was playing to begin with)
-Kaufman = music will play in Kaufman Cab after Cabmaggedon
-Announcer = music will play during bridge repair/storm warning announcements on the radio</value>
-  </data>
-  <data name="groupBox4.ToolTip" xml:space="preserve">
     <value>Select when the music should be playing. 
 Emergency = music player will be playing when the game is playing Emergency Radio (Firetrucks, Ambulances, Police Cars)
 Radio = music player will be playing when the game is on a regular radio station (Both music radio &amp; talk radio)

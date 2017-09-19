@@ -51,6 +51,7 @@
 			this.checkBoxC = new System.Windows.Forms.CheckBox();
 			this.checkBoxB = new System.Windows.Forms.CheckBox();
 			this.checkBoxA = new System.Windows.Forms.CheckBox();
+			this.radioButtonSR3 = new System.Windows.Forms.RadioButton();
 			this.groupBox1.SuspendLayout();
 			this.groupBox2.SuspendLayout();
 			this.groupBox3.SuspendLayout();
@@ -70,7 +71,7 @@
 			// label3
 			// 
 			this.label3.AutoSize = true;
-			this.label3.Location = new System.Drawing.Point(111, 313);
+			this.label3.Location = new System.Drawing.Point(111, 333);
 			this.label3.Name = "label3";
 			this.label3.Size = new System.Drawing.Size(167, 13);
 			this.label3.TabIndex = 4;
@@ -115,13 +116,14 @@
 			// 
 			// groupBox1
 			// 
+			this.groupBox1.Controls.Add(this.radioButtonSR3);
 			this.groupBox1.Controls.Add(this.label2);
 			this.groupBox1.Controls.Add(this.radioButtonIII);
 			this.groupBox1.Controls.Add(this.radioButtonVC);
 			this.groupBox1.Controls.Add(this.radioButtonSA);
 			this.groupBox1.Location = new System.Drawing.Point(15, 33);
 			this.groupBox1.Name = "groupBox1";
-			this.groupBox1.Size = new System.Drawing.Size(87, 109);
+			this.groupBox1.Size = new System.Drawing.Size(87, 129);
 			this.groupBox1.TabIndex = 7;
 			this.groupBox1.TabStop = false;
 			this.groupBox1.Text = "Game";
@@ -131,7 +133,7 @@
 			// 
 			this.label2.AutoSize = true;
 			this.label2.ForeColor = System.Drawing.SystemColors.ControlDarkDark;
-			this.label2.Location = new System.Drawing.Point(3, 93);
+			this.label2.Location = new System.Drawing.Point(3, 111);
 			this.label2.Name = "label2";
 			this.label2.Size = new System.Drawing.Size(51, 13);
 			this.label2.TabIndex = 6;
@@ -144,7 +146,7 @@
 			this.groupBox2.Controls.Add(this.radioButtonFoobar);
 			this.groupBox2.Location = new System.Drawing.Point(108, 33);
 			this.groupBox2.Name = "groupBox2";
-			this.groupBox2.Size = new System.Drawing.Size(168, 109);
+			this.groupBox2.Size = new System.Drawing.Size(168, 129);
 			this.groupBox2.TabIndex = 7;
 			this.groupBox2.TabStop = false;
 			this.groupBox2.Text = "Music Player";
@@ -211,7 +213,7 @@
 			this.groupBox3.Controls.Add(this.radioButtonVolume);
 			this.groupBox3.Controls.Add(this.radioButtonPause);
 			this.groupBox3.Controls.Add(this.radioButtonMute);
-			this.groupBox3.Location = new System.Drawing.Point(15, 148);
+			this.groupBox3.Location = new System.Drawing.Point(15, 168);
 			this.groupBox3.Name = "groupBox3";
 			this.groupBox3.Size = new System.Drawing.Size(263, 91);
 			this.groupBox3.TabIndex = 9;
@@ -293,7 +295,7 @@
 			this.groupBox4.Controls.Add(this.checkBoxC);
 			this.groupBox4.Controls.Add(this.checkBoxB);
 			this.groupBox4.Controls.Add(this.checkBoxA);
-			this.groupBox4.Location = new System.Drawing.Point(15, 245);
+			this.groupBox4.Location = new System.Drawing.Point(15, 265);
 			this.groupBox4.Name = "groupBox4";
 			this.groupBox4.Size = new System.Drawing.Size(261, 65);
 			this.groupBox4.TabIndex = 10;
@@ -379,11 +381,23 @@
 			this.checkBoxA.UseVisualStyleBackColor = true;
 			this.checkBoxA.CheckedChanged += new System.EventHandler(this.checkBoxA_CheckedChanged);
 			// 
+			// radioButtonSR3
+			// 
+			this.radioButtonSR3.AutoSize = true;
+			this.radioButtonSR3.Location = new System.Drawing.Point(6, 88);
+			this.radioButtonSR3.Name = "radioButtonSR3";
+			this.radioButtonSR3.Size = new System.Drawing.Size(46, 17);
+			this.radioButtonSR3.TabIndex = 7;
+			this.radioButtonSR3.Text = "SR3";
+			this.toolTip1.SetToolTip(this.radioButtonSR3, "The game to be played");
+			this.radioButtonSR3.UseVisualStyleBackColor = true;
+			this.radioButtonSR3.CheckedChanged += new System.EventHandler(this.radioButtonSR3_CheckedChanged);
+			// 
 			// Form1
 			// 
 			this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
 			this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
-			this.ClientSize = new System.Drawing.Size(288, 332);
+			this.ClientSize = new System.Drawing.Size(288, 358);
 			this.Controls.Add(this.groupBox4);
 			this.Controls.Add(this.groupBox3);
 			this.Controls.Add(this.labelVolume);
@@ -436,6 +450,7 @@
 		private System.Windows.Forms.CheckBox checkBoxE;
 		private System.Windows.Forms.CheckBox checkBoxF;
 		private System.Windows.Forms.CheckBox checkBox7;
+		private System.Windows.Forms.RadioButton radioButtonSR3;
 	}
 }
 
