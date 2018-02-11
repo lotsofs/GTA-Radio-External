@@ -254,8 +254,8 @@ namespace GTASARadioExternal {
 					}*/
 					major = 9; minor = 0; region = regionTypes.Steam; gameStatus = statuses.Running;
 					address_baseG = p[0].MainModule.BaseAddress.ToInt32();
-					address_radio = address_baseG + 0xEF0734;
-					address_radio2 = address_baseG + 0xEEC24C;
+					address_radio = 0x12F0734;
+					address_radio2 = 0x12EC24C;
 				}
 				else {
 					gameStatus = statuses.Shutdown;
@@ -398,16 +398,16 @@ namespace GTASARadioExternal {
 				// Unless the radio is currently changing, allow user to change volume
 				#region maxvolume changer
 				if (gameStatus != statuses.Running && gameStatus != statuses.Unconfirmed) {
-					maxVolume = checkMP3PlayerStatus();
+					maxVolume = CheckMP3PlayerStatus();
 				}
 				else if (maxVolumeWriteable && radioStatus >= 0 && radioStatus <= 9 && radioPlayDuringRadio == true) {
-					maxVolume = checkMP3PlayerStatus();
+					maxVolume = CheckMP3PlayerStatus();
 				}
 				else if (maxVolumeWriteable && radioStatus == 10 && radioPlayDuringEmergency == true) {
-					maxVolume = checkMP3PlayerStatus();
+					maxVolume = CheckMP3PlayerStatus();
 				}
 				else if (maxVolumeWriteable && radioStatus == 197 && radioPlayDuringPauseMenu == true) {
-					maxVolume = checkMP3PlayerStatus();
+					maxVolume = CheckMP3PlayerStatus();
 				}
 				#endregion
 				prevRadioStatus = radioStatus;
@@ -434,7 +434,7 @@ namespace GTASARadioExternal {
 					}
 					#endregion
 
-					volumeStatus = checkMP3PlayerStatus();
+					volumeStatus = CheckMP3PlayerStatus();
 					RadioChangerVolume(radioStatus >= 0 && radioStatus <= 9 && radioPlayDuringRadio 
 											|| radioStatus == 10 && radioPlayDuringEmergency == true 
 											|| radioStatus >= 13 && radioStatus <= 14 && radioPlayDuringAnnouncement == true
@@ -587,22 +587,22 @@ namespace GTASARadioExternal {
 			else if (actionToTake == actions.Volume) {
 				// Unless the radio is currently changing, allow user to change volume
 				if (gameStatus != statuses.Running && gameStatus != statuses.Unconfirmed) {
-					maxVolume = checkMP3PlayerStatus();
+					maxVolume = CheckMP3PlayerStatus();
 				}
 				else if (maxVolumeWriteable && radioStatus >= 0 && radioStatus <= 9 && radioPlayDuringRadio == true) {
-					maxVolume = checkMP3PlayerStatus();
+					maxVolume = CheckMP3PlayerStatus();
 				}
 				else if (maxVolumeWriteable && radioStatus >= 25 && radioStatus <= 26 && radioPlayDuringAnnouncement == true) {
-					maxVolume = checkMP3PlayerStatus();
+					maxVolume = CheckMP3PlayerStatus();
 				}
 				else if (maxVolumeWriteable && radioStatus == 23 && radioPlayDuringEmergency == true) {
-					maxVolume = checkMP3PlayerStatus();
+					maxVolume = CheckMP3PlayerStatus();
 				}
 				else if (maxVolumeWriteable && radioStatus == 24 && radioPlayDuringKaufman == true) {
-					maxVolume = checkMP3PlayerStatus();
+					maxVolume = CheckMP3PlayerStatus();
 				}
 				else if (maxVolumeWriteable && radioStatus == 1225 && radioPlayDuringPauseMenu == true) {
-					maxVolume = checkMP3PlayerStatus();
+					maxVolume = CheckMP3PlayerStatus();
 				}
 				prevRadioStatus = radioStatus;
 
@@ -626,7 +626,7 @@ namespace GTASARadioExternal {
 						return;
 					}
 
-					volumeStatus = checkMP3PlayerStatus();
+					volumeStatus = CheckMP3PlayerStatus();
 					RadioChangerVolume(radioStatus >= 0 && radioStatus <= 9 && radioPlayDuringRadio
 										|| radioStatus == 23 && radioPlayDuringEmergency == true
 										|| radioStatus == 24 && radioPlayDuringKaufman == true
@@ -745,7 +745,7 @@ namespace GTASARadioExternal {
 			else if (actionToTake == actions.Volume) {
 				// Unless the radio is currently changing, allow user to change volume
 				if (maxVolumeWriteable == true && radioStatus == 2 || gameStatus != statuses.Running && gameStatus != statuses.Unconfirmed) {
-					maxVolume = checkMP3PlayerStatus();
+					maxVolume = CheckMP3PlayerStatus();
 				}
 				prevRadioStatus = radioStatus;
 
@@ -769,7 +769,7 @@ namespace GTASARadioExternal {
 						return;
 					}
 
-					volumeStatus = checkMP3PlayerStatus();
+					volumeStatus = CheckMP3PlayerStatus();
 					RadioChangerVolume(radioStatus == 2);
 				}
 			}
@@ -845,7 +845,7 @@ namespace GTASARadioExternal {
 			else if (actionToTake == actions.Volume) {
 				// Unless the radio is currently changing, allow user to change volume
 				if (maxVolumeWriteable == true && radioStatus != 0 || gameStatus != statuses.Running && gameStatus != statuses.Unconfirmed) {
-					maxVolume = checkMP3PlayerStatus();
+					maxVolume = CheckMP3PlayerStatus();
 				}
 				prevRadioStatus = radioStatus;
 
@@ -869,7 +869,7 @@ namespace GTASARadioExternal {
 						return;
 					}
 
-					volumeStatus = checkMP3PlayerStatus();
+					volumeStatus = CheckMP3PlayerStatus();
 					RadioChangerVolume(radioStatus != 0);
 				}
 			}
@@ -926,7 +926,7 @@ namespace GTASARadioExternal {
 			else if (musicP == musicPlayers.Winamp) {
 				radioActive = !radioOff;
 				if (radioOff) {
-					maxVolume = checkMP3PlayerStatus();
+					maxVolume = CheckMP3PlayerStatus();
 					SendMessage(window_name, 0x0400, 0, 122);
 				}
 				else {
@@ -970,7 +970,7 @@ namespace GTASARadioExternal {
 				
 
 				prevVolumeStatus = volumeStatus;
-				volumeStatus = checkMP3PlayerStatus();
+				volumeStatus = CheckMP3PlayerStatus();
 			}
 			else if (!radioOn && volumeStatus > 0) {
 				if (Control.ModifierKeys == Keys.Shift || Control.ModifierKeys == Keys.Alt || Control.ModifierKeys == Keys.Control) {
@@ -999,7 +999,7 @@ namespace GTASARadioExternal {
 				}
 				keybd_event(0xAE, 0, 2, IntPtr.Zero);
 				prevVolumeStatus = volumeStatus;
-				volumeStatus = checkMP3PlayerStatus();
+				volumeStatus = CheckMP3PlayerStatus();
 			}
 			else if (maxVolumeWriteable == false) {
 				maxVolumeWriteable = true;
@@ -1009,7 +1009,7 @@ namespace GTASARadioExternal {
 
 
 		// volume slider is used for checking if radio is on or off (winamp didn't want to let me take control of its mute button)
-		public int checkMP3PlayerStatus() {
+		public int CheckMP3PlayerStatus() {
 
 			if (gameStatus != statuses.Running && prevVolumeStatus != -1) {
 				return maxVolume;
@@ -1038,7 +1038,7 @@ namespace GTASARadioExternal {
 				// If it returns 255, make sure it isn't glitching, which winamp likes to do if it hasn't been turned on yet
 				if (volumeLevel == 255) {
 					int activity;
-					activity = checkMP3ActiveStatus();
+					activity = CheckMP3ActiveStatus();
 					return volumeLevel * activity;
 				}
 				return volumeLevel;
@@ -1049,7 +1049,7 @@ namespace GTASARadioExternal {
 		}
 
 		// This function checks whether winamp is actually playing. To prevent crash if winamp has just been booted but hasn't started music yet.
-		private int checkMP3ActiveStatus() {
+		private int CheckMP3ActiveStatus() {
 			int playerActive = 0;
 			if (playerStatus == statuses.Running) {
 				try {

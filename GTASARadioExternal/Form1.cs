@@ -196,7 +196,7 @@ namespace GTASARadioExternal {
 				readMemory.musicP = ReadMemory.musicPlayers.Winamp;
 				readMemory.maxVolumeWriteable = false;
 				readMemory.DeterminePlayerVersionWinamp();
-				readMemory.maxVolume = readMemory.checkMP3PlayerStatus();
+				readMemory.maxVolume = readMemory.CheckMP3PlayerStatus();
 			}
 		}
 
@@ -208,7 +208,7 @@ namespace GTASARadioExternal {
 				readMemory.musicP = ReadMemory.musicPlayers.Foobar;
 				readMemory.maxVolumeWriteable = false;
 				readMemory.DeterminePlayerVersionFoobar();
-				readMemory.maxVolume = readMemory.checkMP3PlayerStatus();
+				readMemory.maxVolume = readMemory.CheckMP3PlayerStatus();
 			}
 		}
 
