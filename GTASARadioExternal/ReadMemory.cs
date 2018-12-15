@@ -239,7 +239,7 @@ namespace GTASARadioExternal {
 			q = Process.GetProcessesByName("winamp");
 			if (q.Length != 0) {
 				playerStatus = statuses.Running;
-				address_volume = 0x07AA9D9C;
+				address_volume = 0x03EDB0A0;
 				address_running = 0x4BF3EC;
 				window_name = FindWindow("Winamp v1.x", null);
 			}
