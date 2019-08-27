@@ -239,8 +239,19 @@ namespace GTASARadioExternal {
 			q = Process.GetProcessesByName("winamp");
 			if (q.Length != 0) {
 				playerStatus = statuses.Running;
-				address_volume = 0x07AA9D9C;
-				address_running = 0x4BF3EC;
+
+				//q[0].Modules
+				address_base = q[0].MainModule.BaseAddress.ToInt32();
+
+				foreach (ProcessModule i in q[0].Modules)
+				{
+					if (i.ModuleName == "out_ds.dll")
+					{
+						address_volume = i.BaseAddress.ToInt32() + 0xB0A0;      // TODO: Make this modular or something so this isn't hardcoded and adding new programs is easy.
+						break;
+					}										
+				}
+				address_running = address_base + 0xBD1EC;
 				window_name = FindWindow("Winamp v1.x", null);
 			}
 			else {
