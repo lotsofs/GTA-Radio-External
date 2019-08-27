@@ -70,11 +70,11 @@
 			// label3
 			// 
 			this.label3.AutoSize = true;
-			this.label3.Location = new System.Drawing.Point(111, 313);
+			this.label3.Location = new System.Drawing.Point(59, 313);
 			this.label3.Name = "label3";
-			this.label3.Size = new System.Drawing.Size(167, 13);
+			this.label3.Size = new System.Drawing.Size(219, 13);
 			this.label3.TabIndex = 4;
-			this.label3.Text = "Program made by twitch.tv/lotsofs";
+			this.label3.Text = "Program made by twitch.tv/lotsofs - V0.2.1b1";
 			this.toolTip1.SetToolTip(this.label3, "Some parts made by e216");
 			// 
 			// radioButtonIII
