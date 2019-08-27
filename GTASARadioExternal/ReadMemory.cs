@@ -931,7 +931,6 @@ namespace GTASARadioExternal {
 					playerStatus = statuses.Shutdown;
 					return 0;
 				}
-				volumeStatus = checkMP3PlayerStatus();
 				return playerActive;
 			}
 			else {
