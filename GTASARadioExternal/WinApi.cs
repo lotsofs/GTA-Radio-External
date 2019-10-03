@@ -1,0 +1,105 @@
+﻿using System;
+using System.Collections.Generic;
+using System.Diagnostics;
+using System.Linq;
+using System.Runtime.InteropServices;
+using System.Text;
+using System.Threading.Tasks;
+
+namespace GTASARadioExternal {
+    static class WinApi {
+
+        public enum Types {
+            Float,
+            Byte,
+            FourBytes
+        }
+
+        [DllImport("kernel32.dll")]
+        public static extern Int32 ReadProcessMemory(IntPtr hProcess, IntPtr lpBaseAddress,
+            [In, Out] byte[] buffer, UInt32 size, out IntPtr lpNumberOfBytesRead);
+
+        [DllImport("user32.dll")]
+        public static extern int SendMessage(int hwnd, int wMsg, int wParam, int lParam);
+
+        [DllImport("user32.dll")]
+        public static extern int FindWindow(string lpClassName, String lpWindowName);
+
+
+
+
+        /// <summary>
+        /// Reads a value of bytes in a process
+        /// </summary>
+        /// <param name="process"></param>
+        /// <param name="address"></param>
+        /// <param name="type"></param>
+        /// <returns></returns>
+        public static int ReadValue(Process process, long address, Types type) {
+            byte[] buffer;
+            switch (type) {
+                case Types.Byte:
+                    buffer = new byte[1];
+                    break;
+                case Types.Float:
+                case Types.FourBytes:
+                default:
+                    buffer = new byte[4];
+                    break;
+            }
+            ReadProcessMemory(process.Handle, new IntPtr(address), buffer, (uint)buffer.Length, out IntPtr lpNumberOfBytesRead);
+            switch (type) {
+                case Types.Byte:
+                    return (int)buffer[0];
+                case Types.Float:
+                    float bufferF = BitConverter.ToSingle(buffer, 0);
+                    return Convert.ToInt32(bufferF);    // in my old code it added 50 to this, but I dont know why. Is it something Foobar related?
+                case Types.FourBytes:
+                default:
+                    return BitConverter.ToInt32(buffer, 0);
+            }
+        }
+
+        /// <summary>
+        /// Gets a process by name
+        /// </summary>
+        /// <param name="name"></param>
+        /// <returns></returns>
+        public static Process GetProcess(string name) {
+            Process[] processes = Process.GetProcessesByName(name);
+            if (processes.Length == 0) {
+                // Player is not running
+                // TODO: Do stuff
+                return null;
+            }
+            else if (processes.Length > 1) {
+                // Multiple instances of the player are running
+                // TODO: Do stuff
+                return processes[0];
+            }
+            else {
+                // Player is running
+                return processes[0];
+            }
+        }
+
+        /// <summary>
+        /// Gets a module address from a process by name, or the base address of the process.
+        /// </summary>
+        /// <param name="process">the process</param>
+        /// <param name="name">the name of the module. leave blank to get the process base address instead.</param>
+        /// <returns></returns>
+		public static int GetModuleAddress(Process process, string name = "") {
+            if (string.IsNullOrEmpty(name)) {
+                return process.MainModule.BaseAddress.ToInt32();
+            }
+            foreach (ProcessModule pm in process.Modules) {
+                if (pm.ModuleName == name) {
+                    return pm.BaseAddress.ToInt32();
+                }
+            }
+            // throw an error here, because there's no such module name
+            return 0;
+        }
+    }
+}
