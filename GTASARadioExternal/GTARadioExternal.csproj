@@ -81,6 +81,7 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="Game.cs" />
     <Compile Include="Settings.cs" />
     <Compile Include="ReadMemory.cs" />
     <Compile Include="Form1.cs">
