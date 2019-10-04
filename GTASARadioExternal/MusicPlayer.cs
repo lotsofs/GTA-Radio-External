@@ -13,7 +13,6 @@ namespace GTASARadioExternal
     public class MusicPlayer
 	{
         public enum Statuses {
-            Uninitialized,
             Shutdown,
             Stopped,
             Playing
@@ -27,7 +26,7 @@ namespace GTASARadioExternal
         }
 
         Process _process;
-        int _musicPlayerWindow = 0;
+        int _window = 0;
         int _volume = 0;
 		int _addressVolume = 0x0;
         int _addressRunning = 0x0;
@@ -49,7 +48,7 @@ namespace GTASARadioExternal
         /// <returns></returns>
         public bool GetProcess()
 		{
-            _status = Statuses.Uninitialized;
+            _status = Statuses.Shutdown;
             _hookMethod = HookMethods.None;
 
             Process process = WinApi.GetProcess(Settings.ProcessName);
@@ -75,7 +74,7 @@ namespace GTASARadioExternal
 
             if (!string.IsNullOrEmpty(Settings.WindowName)) {   // todo: add an actual setting where the user can just select this
                 _hookMethod = HookMethods.SendMessage;
-                _musicPlayerWindow = WinApi.FindWindow(Settings.WindowName, null);
+                _window = WinApi.FindWindow(Settings.WindowName, null);
             }
             else if (!string.IsNullOrEmpty(Settings.ProcessArguments)) {
                 _hookMethod = HookMethods.ProcessStart;
@@ -103,11 +102,11 @@ namespace GTASARadioExternal
 
             // TODO: take care of all the other hookmethods for these methods
             if (!mute) {   // turn radio on
-                WinApi.SendMessage(_musicPlayerWindow, 0x0400, _volume, Settings.MessageLParam); //0x0400 = WM_USER
+                WinApi.SendMessage(_window, 0x0400, _volume, Settings.MessageLParam); //0x0400 = WM_USER
             }
             else {      // turn radio off
                 _volume = ReadVolume();
-                WinApi.SendMessage(_musicPlayerWindow, 0x0400, 0, Settings.MessageLParam); //0x0400 = WM_USER
+                WinApi.SendMessage(_window, 0x0400, 0, Settings.MessageLParam); //0x0400 = WM_USER
             }
         }
 
@@ -118,14 +117,15 @@ namespace GTASARadioExternal
             if (_status == Statuses.Shutdown) {
                 throw new WarningException("No music player is running.");
             }
+            // TODO: Other hookmethods
 
             int volume = ReadVolume();
             if (volume == 0) {  // turn radio on
-                WinApi.SendMessage(_musicPlayerWindow, 0x0400, _volume, Settings.MessageLParam); //0x0400 = WM_USER
+                WinApi.SendMessage(_window, 0x0400, _volume, Settings.MessageLParam); //0x0400 = WM_USER
             }
             else {              // turn radio off
                 _volume = volume;
-                WinApi.SendMessage(_musicPlayerWindow, 0x0400, 0, Settings.MessageLParam); //0x0400 = WM_USER
+                WinApi.SendMessage(_window, 0x0400, 0, Settings.MessageLParam); //0x0400 = WM_USER
             }
         }
 
