@@ -12,12 +12,6 @@ namespace GTASARadioExternal
 {
     public class MusicPlayer
 	{
-        public enum Statuses {
-            Shutdown,
-            Stopped,
-            Playing
-        }
-
         public enum HookMethods {
             None,
             SendMessage,    // for winamp, spotify
@@ -30,8 +24,8 @@ namespace GTASARadioExternal
         int _volume = 0;
 		int _addressVolume = 0x0;
         int _addressRunning = 0x0;
-        Statuses _status;
         HookMethods _hookMethod;
+
 
         public MusicPlayer() {
             Configure();
@@ -48,12 +42,10 @@ namespace GTASARadioExternal
         /// <returns></returns>
         public bool GetProcess()
 		{
-            _status = Statuses.Shutdown;
             _hookMethod = HookMethods.None;
 
             Process process = WinApi.GetProcess(Settings.ProcessName);
-            if (process == null) {
-                _status = Statuses.Shutdown;
+            if (process == null || process.HasExited) {
                 _process = null;
                 return false;
             }
@@ -63,11 +55,18 @@ namespace GTASARadioExternal
             //else {
             //    _status = Statuses.Playing;
             //}
-            _status = Statuses.Playing;
-             _process = process;
+            _process = process;
             
             int moduleAddress = WinApi.GetModuleAddress(process, Settings.VolumeModuleName);
+            if (moduleAddress == -1) {
+                // requested module not found. This can happen while the process boots, or if it's not configured properly. TODO: Message
+                _process = null;
+                return false;
+            }       // todo: There's overlap in this code with Game.cs , maybe make them inherit this from somewhere
             _addressVolume = moduleAddress + Settings.VolumeAddressOffset;
+
+
+            _volume = ReadVolume();
 
             //moduleAddress = WinApi.GetModuleAddress(process, Settings.RunningModuleName);
             //_addressRunning = moduleAddress + Settings.RunningAddressOffset;
@@ -91,13 +90,30 @@ namespace GTASARadioExternal
             return true;
         }
 
+        public bool Running() {
+            if (_process != null) {
+                // no process found
+                _process.Refresh();
+            }
+            else {
+                return GetProcess();
+            }
+
+            if (_process.HasExited) {
+                // processes exited
+                return GetProcess();
+            }
+            return true;
+        }
+
+
         /// <summary>
         /// Set radio to on or off
         /// </summary>
         /// <param name="mute">whether to turn the radio on</param>
         public void Mute(bool mute) {
-            if (_status == Statuses.Shutdown) {
-                throw new WarningException("No music player is running.");
+            if (!Running()) {
+                //throw new WarningException("No music player is running.");
             }
 
             // TODO: take care of all the other hookmethods for these methods
@@ -114,8 +130,8 @@ namespace GTASARadioExternal
         /// toggles the radio on or off
         /// </summary>
         public void ToggleMute() {
-            if (_status == Statuses.Shutdown) {
-                throw new WarningException("No music player is running.");
+            if (!Running()) {
+                //throw new WarningException("No music player is running.");
             }
             // TODO: Other hookmethods
 
@@ -130,24 +146,24 @@ namespace GTASARadioExternal
         }
 
         [Obsolete("Only exists to avoid a rare infinite recursion bug. Please deal with it where it happens")]
-        bool IsRunning() {
-            if (_status == Statuses.Shutdown) {
-                throw new WarningException("No music player is running.");
+        bool IsPlaying() {
+            if (!Running()) {
+                //throw new WarningException("No music player is running.");
             }
 
-            int running = 0;
+            int playing = 0;
             try {
-                running = WinApi.ReadValue(_process, _addressRunning, Settings.RunningAddressType);
+                playing = WinApi.ReadValue(_process, _addressRunning, Settings.RunningAddressType);
             }
             catch {
                 // TODO: catch errors
             }
-            return running != 0;
+            return playing != 0;
         }
 
         int ReadVolume() {
-            if (_status == Statuses.Shutdown) {
-                throw new WarningException("No music player is running.");
+            if (!Running()) {
+                //throw new WarningException("No music player is running.");
             }
 
             int volume = -1;
@@ -157,6 +173,7 @@ namespace GTASARadioExternal
             catch {
                 // TODO: catch errors
             }
+            Debug.WriteLine(volume);
             return volume;
         }
 

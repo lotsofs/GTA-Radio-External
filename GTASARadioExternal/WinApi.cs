@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Diagnostics;
+using System.IO;
 using System.Linq;
 using System.Runtime.InteropServices;
 using System.Text;
@@ -25,6 +26,24 @@ namespace GTASARadioExternal {
         [DllImport("user32.dll")]
         public static extern int FindWindow(string lpClassName, String lpWindowName);
 
+        [DllImport("psapi.dll")]
+        public static extern bool EnumProcessModulesEx(IntPtr hProcess, IntPtr[] lphModule, int cb, out int lpcbNeeded, uint dwFilterFlag);
+
+        [DllImport("psapi.dll")]
+        public static extern uint GetModuleFileNameEx(IntPtr hProcess, IntPtr hModule, StringBuilder lpBaseName, uint nSize);
+
+        [DllImport("psapi.dll")]
+        public static extern bool GetModuleInformation(IntPtr hProcess, IntPtr hModule, out ModuleInformation lpmodinfo, uint cb);
+
+
+
+        public const int MAX_PATH = 260;
+
+        public struct ModuleInformation {
+            public IntPtr lpBaseOfDll;
+            public uint SizeOfImage;
+            public IntPtr EntryPoint;
+        }
 
 
 
@@ -93,13 +112,58 @@ namespace GTASARadioExternal {
             if (string.IsNullOrEmpty(name)) {
                 return process.MainModule.BaseAddress.ToInt32();
             }
+            Debug.WriteLine(process.Modules.Count);
             foreach (ProcessModule pm in process.Modules) {
                 if (pm.ModuleName == name) {
                     return pm.BaseAddress.ToInt32();
                 }
             }
-            // throw an error here, because there's no such module name
-            return 0;
+            // Module not found, are we running 64 bit? Lets try another method. TODO: Tidy this
+            List<Module> w64Modules = CollectModules(process);
+            foreach (Module m in w64Modules) {
+                if (m.ModuleName == name) {
+                    return m.BaseAddress.ToInt32();
+                }
+            }
+            // Nothing found
+            return -1;
+        }
+
+
+
+
+
+
+        // TODO: What happens if I run this from x86 mode?
+        public static List<Module> CollectModules(Process process) {
+            List<Module> modules = new List<Module>();
+            
+            IntPtr[] modulePointers = new IntPtr[0];
+            int bytesNeeded;
+
+            if (!EnumProcessModulesEx(process.Handle, modulePointers, 0, out bytesNeeded, 0x03)) {
+                // no DLLs present
+                return modules;
+            }
+
+            int modulesCount = bytesNeeded / IntPtr.Size;
+            modulePointers = new IntPtr[modulesCount];
+
+            if (EnumProcessModulesEx(process.Handle, modulePointers, bytesNeeded, out bytesNeeded, 0x03)) {
+                for (int i = 0; i < modulesCount; i++) {
+                    StringBuilder moduleFilePath = new StringBuilder(MAX_PATH);
+                    GetModuleFileNameEx(process.Handle, modulePointers[i], moduleFilePath, (uint)moduleFilePath.Capacity);
+                    
+                    string moduleName = Path.GetFileName(moduleFilePath.ToString());
+                    ModuleInformation moduleInformation;
+                    GetModuleInformation(process.Handle, modulePointers[i], out moduleInformation, (uint)(modulePointers.Length * IntPtr.Size));
+
+                    Module module = new Module(moduleName, moduleInformation.lpBaseOfDll, moduleInformation.SizeOfImage);
+                    modules.Add(module);
+                }
+            }
+
+            return modules;
         }
     }
 }

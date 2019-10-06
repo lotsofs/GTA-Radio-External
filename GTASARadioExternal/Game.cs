@@ -8,20 +8,13 @@ using System.Threading.Tasks;
 
 namespace GTASARadioExternal {
     class Game {
-
-        public enum Statuses {
-            Shutdown,
-            Running,
-        }
-
         Process _process;
         int _window = 0;
         int _volume = 0;
         int _addressRadio = 0x0;
         int _addressRunning = 0x0;
-        Statuses _status;
 
-        public static string PROCESSNAME = "gta-sa";
+        public static string PROCESSNAME = "gta_sa";
         public static string MODULENAME = "";
         public static int ADDRESSOFFSET = 0x4CB760;
         public static WinApi.Types ADDRESSTYPE = WinApi.Types.FourBytes;    // TODO: This doesnt go in winapi.
@@ -42,25 +35,43 @@ namespace GTASARadioExternal {
          /// </summary>
          /// <returns></returns>
         public bool GetProcess() {
-            _status = Statuses.Shutdown;
-
             Process process = WinApi.GetProcess(PROCESSNAME);
             if (process == null) {
-                _status = Statuses.Shutdown;
                 _process = null;
                 return false;
             }
-            _status = Statuses.Running;
             _process = process;
 
             int moduleAddress = WinApi.GetModuleAddress(process, MODULENAME);
+            if (moduleAddress == -1) {
+                // requested module not found. This can happen while the process boots, or if it's not configured properly. TODO: Message
+                _process = null;
+                return false;
+            }
             _addressRadio = moduleAddress + ADDRESSOFFSET;
             return true;
         }
 
+        public bool Running() {
+            if (_process != null) {
+                // no process found
+                _process.Refresh();
+            }
+            else {
+                return GetProcess();
+            }
+            
+            if (_process.HasExited) {
+                // processes exited
+                return GetProcess();
+            }
+            return true;
+        }
+
         public bool RadioOn() {
-            if (_status == Statuses.Shutdown) {
-                throw new WarningException("No game is running.");
+            if (!Running()) {
+                //throw new WarningException("No game is running.");      // move htis to Running() TODO:
+                return false;
             }
 
             int radio = -1;
@@ -77,7 +88,8 @@ namespace GTASARadioExternal {
                 return false;
             }
             else {
-                throw new WarningException("Game radio address was an unrecognized value");
+                return false;
+                //throw new WarningException("Game radio address was an unrecognized value");
             }
         }
     }
