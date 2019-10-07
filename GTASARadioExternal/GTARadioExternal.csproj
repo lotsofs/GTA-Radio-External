@@ -90,6 +90,7 @@
       <DependentUpon>FormRE.cs</DependentUpon>
     </Compile>
     <Compile Include="Game.cs" />
+    <Compile Include="Json.cs" />
     <Compile Include="Module.cs" />
     <Compile Include="Radio.cs" />
     <Compile Include="Settings.cs" />
