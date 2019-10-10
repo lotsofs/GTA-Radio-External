@@ -1,0 +1,13 @@
+﻿{
+	"processName": "foobar2000",
+	"volumeNotImplementedYet": {
+		"addressOffset": "0x1BE9E8",
+		"module": "",
+		"type": "Float",
+		"minVolume": -100
+	},
+	"hook": {
+		"type": "ProcessStart",
+		"arguments": "/command:mute"
+	}
+}

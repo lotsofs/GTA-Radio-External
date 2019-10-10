@@ -68,7 +68,7 @@ namespace GTASARadioExternal {
             return true;
         }
 
-        public bool RadioOn() {
+        public bool IsRadioOn() {
             if (!Running()) {
                 //throw new WarningException("No game is running.");      // move htis to Running() TODO:
                 return false;

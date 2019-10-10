@@ -10,6 +10,30 @@ using System.Threading.Tasks;
 namespace GTASARadioExternal {
     static class WinApi {
 
+        public enum wMsg {
+            WM_NULL = 0x0000,
+            WM_CREATE = 0x0001,
+            WM_DESTROY = 0x0002,
+            WM_MOVE = 0x0003,
+            WM_SIZE = 0x0005,
+            WM_ACTIVATE = 0x0006,
+            WM_SETFOCUS = 0x0007,
+            WM_KILLFOCUS = 0x0008,
+            WM_ENABLE = 0x000A,
+            WM_SETREDRAW = 0x000B,
+            WM_SETTEXT = 0x000C,
+            WM_GETTEXT = 0x000D,
+            WM_GETTEXTLENGTH = 0x000E,
+            WM_PAINT = 0x000F,
+            WM_CLOSE = 0x0010,
+            // todo: fill this in
+            WM_USER = 0x0400,
+        }
+
+        internal static Process GetProcess(object processName) {
+            throw new NotImplementedException();
+        }
+
         public enum Types {
             Float,
             Byte,
@@ -56,7 +80,7 @@ namespace GTASARadioExternal {
         /// <returns></returns>
         public static int ReadValue(Process process, long address, Types type) {
             byte[] buffer;
-            switch (type) {
+            switch (type) {     // todo: read the amount of bytes first, and do the conversion elsewhere
                 case Types.Byte:
                     buffer = new byte[1];
                     break;

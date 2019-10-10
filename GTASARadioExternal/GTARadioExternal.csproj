@@ -90,7 +90,8 @@
       <DependentUpon>FormRE.cs</DependentUpon>
     </Compile>
     <Compile Include="Game.cs" />
-    <Compile Include="Json.cs" />
+    <Compile Include="Json\Json.cs" />
+    <Compile Include="Json\JsonObject.cs" />
     <Compile Include="Module.cs" />
     <Compile Include="Radio.cs" />
     <Compile Include="Settings.cs" />
@@ -120,6 +121,12 @@
       <AutoGen>True</AutoGen>
       <DependentUpon>Resources.resx</DependentUpon>
     </Compile>
+    <None Include="input\music players\Foobar2000 v1_4_8.json">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </None>
+    <None Include="input\music players\Winamp Build 3660.json">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </None>
     <None Include="Properties\Settings.settings">
       <Generator>SettingsSingleFileGenerator</Generator>
       <LastGenOutput>Settings.Designer.cs</LastGenOutput>

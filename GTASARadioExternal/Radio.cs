@@ -1,5 +1,7 @@
-﻿using System;
+﻿using S.Json;
+using System;
 using System.Collections.Generic;
+using System.IO;
 using System.Linq;
 using System.Text;
 using System.Timers;
@@ -17,7 +19,10 @@ namespace GTASARadioExternal {
         bool _musicPlayerRunning;
         
         public Radio() {
-            _musicPlayer = new MusicPlayer();
+            string path = Path.GetFullPath("E:\\Repositories\\GTA-Radio-External\\GTASARadioExternal\\input\\music players\\Foobar2000 v1_4_8.json");
+            JsonObject json = Json.OpenFile(path);      // todo: move this to some dedicated json handler for the tool, or at least a load script
+
+            _musicPlayer = new MusicPlayer(json);
             _game = new Game();
             StartTimer();
         }
@@ -40,7 +45,7 @@ namespace GTASARadioExternal {
         /// Checks if the radio should be playing, and changes it if it's doing the opposite
         /// </summary>
         void CheckRadio() {
-            bool on = _game.RadioOn();
+            bool on = _game.IsRadioOn();
             if (on != _on) {
                 _musicPlayer.Mute(!on);
                 _on = on;
@@ -53,7 +58,7 @@ namespace GTASARadioExternal {
         /// <returns></returns>
         bool CheckProcesses() {
             _gameRunning = _game.Running();
-            _musicPlayerRunning = _musicPlayer.Running();   // call an event when these change, inside a set { thing?
+            _musicPlayerRunning = _musicPlayer.IsRunning();   // call an event when these change, inside a set { thing?
             return _gameRunning && _musicPlayerRunning;
         }
 

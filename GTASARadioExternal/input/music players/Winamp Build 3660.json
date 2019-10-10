@@ -1,0 +1,15 @@
+﻿{
+	"processName": "winamp",
+	"volume": {
+		"addressOffset": "0xB0A0",
+		"type": "FourBytes",
+		"module": "out_ds.dll",
+		"minVolume": 0
+	},
+	"hook": {
+		"type": "SendMessage",
+		"windowName": "Winamp v1.x",
+		"wMsg": "WM_USER",
+		"lParam": 122
+	}
+}
