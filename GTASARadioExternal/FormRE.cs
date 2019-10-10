@@ -22,12 +22,14 @@ namespace GTASARadioExternal {
         public FormRE() {
             InitializeComponent();
 
-            //Process process = WinApi.GetProcess("foobar2000");
+            //Process process = WinApi.GetProcess("wmplayer");
             //int nRet;
             //StringBuilder ClassName = new StringBuilder(100);
             //nRet = GetClassName(process.MainWindowHandle, ClassName, ClassName.Capacity);
             //string a = ClassName.ToString();
             //Debug.WriteLine(a);
+            //int _window = WinApi.FindWindow("WMPlayerApp", null);
+            //WinApi.SendMessage(_window, 0x111, 0x4981, 0);
             radio = new Radio();
         }
 

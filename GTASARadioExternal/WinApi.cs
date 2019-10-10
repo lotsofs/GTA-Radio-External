@@ -27,6 +27,7 @@ namespace GTASARadioExternal {
             WM_PAINT = 0x000F,
             WM_CLOSE = 0x0010,
             // todo: fill this in
+            WM_COMMAND = 0x0111,
             WM_USER = 0x0400,
         }
 

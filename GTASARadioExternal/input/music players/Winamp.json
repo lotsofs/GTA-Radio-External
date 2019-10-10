@@ -1,4 +1,5 @@
 ﻿{
+	"description": "Tested with Winamp v5.8 Build 3660 (x86). Mute feature fully functional.",
 	"processName": "winamp",
 	"volume": {
 		"addressOffset": "0xB0A0",

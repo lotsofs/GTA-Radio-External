@@ -19,7 +19,7 @@ namespace GTASARadioExternal {
         bool _musicPlayerRunning;
         
         public Radio() {
-            string path = Path.GetFullPath("E:\\Repositories\\GTA-Radio-External\\GTASARadioExternal\\input\\music players\\Foobar2000 v1_4_8.json");
+            string path = Path.GetFullPath("E:\\Repositories\\GTA-Radio-External\\GTASARadioExternal\\input\\music players\\Windows Media Player.json");
             JsonObject json = Json.OpenFile(path);      // todo: move this to some dedicated json handler for the tool, or at least a load script
 
             _musicPlayer = new MusicPlayer(json);

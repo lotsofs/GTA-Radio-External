@@ -91,7 +91,7 @@ namespace S.Json {
                         if (char.IsDigit(ch) || ch == '-') {
                             // number
                             decimal value = GetNumber(file, out int length, i);
-                            i += length;
+                            i += length - 1;    // number length - first character
                             workingJsonObject = jsonObjects.Peek();
                             workingJsonObject.AddItem(keyName, value);
                             expectedChar = ExpectedChars.Next;
@@ -101,8 +101,7 @@ namespace S.Json {
                             case '"':
                                 // string
                                 string value = GetString(file, out int length, i);
-                                i += length;
-                                i++;
+                                i += length + 1; // word length + two quotation marks - first character
                                 workingJsonObject = jsonObjects.Peek();
                                 workingJsonObject.AddItem(keyName, value);
                                 expectedChar = ExpectedChars.Next;
@@ -166,7 +165,7 @@ namespace S.Json {
                 if (char.IsDigit(ch) || ch == '.' || ch == '-' || ch == 'e' || ch == 'E' || ch == '+') {
                     continue;
                 }
-                else if (char.IsWhiteSpace(ch)) {
+                else if (char.IsWhiteSpace(ch) || ch == ',' || ch == '}' || ch == ']') {
                     length = i - startingIndex;
                     string numberStr = file.Substring(startingIndex, length);
                     decimal numberDec = decimal.Parse(numberStr);

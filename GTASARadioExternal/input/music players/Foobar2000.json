@@ -1,6 +1,7 @@
 ﻿{
+	"description": "Tested with Foobar2000 v1.4.8. Can't distinguish between muting and unmuting, ensure Foobar is in the correct state when starting use",
 	"processName": "foobar2000",
-	"volumeNotImplementedYet": {
+	"volumeDisabled": {
 		"addressOffset": "0x1BE9E8",
 		"module": "",
 		"type": "Float",

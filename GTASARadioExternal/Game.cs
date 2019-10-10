@@ -36,7 +36,7 @@ namespace GTASARadioExternal {
          /// <returns></returns>
         public bool GetProcess() {
             Process process = WinApi.GetProcess(PROCESSNAME);
-            if (process == null) {
+            if (process == null || process.HasExited) {
                 _process = null;
                 return false;
             }
