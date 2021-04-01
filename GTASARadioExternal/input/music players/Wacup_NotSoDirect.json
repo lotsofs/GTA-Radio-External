@@ -1,10 +1,11 @@
 ﻿{
-	"description": "Untested, Winamp v5.8 Build 3660 (x86).",
-	"processName": "winamp",
+	"description": "Tested with WACUP 1.0.20.7170 with default output 'Not So Direct'.",
+	"processName": "wacup.exe",
 	"minVolume": 0,
+	"maxVolume": 255,
 	"readVolume": {
-		"module": "out_ds.dll",
-		"addressOffset": 0xB0A0,
+		"module": "out_notsodirect.dll",
+		"addressOffset": 0xA0BC,
 		"type": "FourBytes"
 	},
 	"setVolume": {

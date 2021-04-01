@@ -1,13 +1,13 @@
 ﻿{
-	"description": "Tested with Foobar2000 v1.4.8. Can't distinguish between muting and unmuting, ensure Foobar is in the correct state when starting use",
+	"description": "Untested, Foobar2000 v1.4.8.",
 	"processName": "foobar2000",
-	"volumeDisabled": {
+	"minVolume": -100,
+	"readVolume": {
 		"addressOffset": "0x1BE9E8",
 		"module": "",
-		"type": "Float",
-		"minVolume": -100
+		"type": "Float"
 	},
-	"hook": {
+	"setVolume": {
 		"type": "ProcessStart",
 		"arguments": "/command:mute"
 	}

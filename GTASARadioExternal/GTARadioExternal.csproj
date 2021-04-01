@@ -86,6 +86,8 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="GData.cs" />
+    <Compile Include="MPData.cs" />
     <Compile Include="FormRE.cs">
       <SubType>Form</SubType>
     </Compile>
@@ -122,7 +124,13 @@
       <AutoGen>True</AutoGen>
       <DependentUpon>Resources.resx</DependentUpon>
     </Compile>
+    <None Include="input\games\GTASA.json">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </None>
     <None Include="input\music players\Foobar2000.json">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </None>
+    <None Include="input\music players\Wacup_NotSoDirect.json">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </None>
     <None Include="input\music players\Windows Media Player.json">

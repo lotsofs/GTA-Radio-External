@@ -1,4 +1,4 @@
-﻿using S.Json;
+﻿//using S.Json;
 using System;
 using System.Collections.Generic;
 using System.ComponentModel;
@@ -8,84 +8,29 @@ using System.Linq;
 using System.Runtime.InteropServices;
 using System.Text;
 using System.Threading.Tasks;
+using Newtonsoft.Json;
 
 
 namespace GTASARadioExternal
 {
     public class MusicPlayer
 	{
-        public enum HookMethods {
-            None,
-            SendMessage,    // for winamp, spotify
-            ProcessStart,    // for foobar
-            MemoryWrite     // for anything else?
-        }
+
+        MPData _mp;
 
         Process _process;
 		int _addressVolume;
         int _volume;
         
-        int _window;
         ProcessStartInfo _processStartInfo;
 
-        //settings
-        string _processName;
-
-        bool _useVolume;
-        string _volumeModuleName;
-        int _volumeAddressOffset;
-        WinApi.Types _volumeValueType;
-        int _minVolume;
-
-        HookMethods _hookMethod;
-        
-        int _wMsg;
-        string _windowName;
-        int _lParam;
-
+        int _window;
         string _executableFile;
-        string _arguments;
 
-        public MusicPlayer(JsonObject json) {
-            Configure(json);
+        public MusicPlayer(string json) {
+            _mp = JsonConvert.DeserializeObject<MPData>(json);
             GetProcess();
-        }
-
-        public void Configure(JsonObject json) {
-            // todo: clean up this mess
-            JsonObject hookObject = json.GetValue("hook");
-            
-            _processName = json.GetValue("processName");
-            
-            string hook = hookObject.GetValue("type");
-            _hookMethod = (HookMethods)Enum.Parse(typeof(HookMethods), hook);
-            
-            _useVolume = json.ContainsKey("volume");
-            if (_useVolume) {
-                JsonObject volumeObject = json.GetValue("volume");
-                string offset = volumeObject.GetValue("addressOffset");
-                string valueType = volumeObject.GetValue("type");
-            
-                _volumeModuleName = volumeObject.GetValue("module");
-                _volumeAddressOffset = Convert.ToInt32(offset, 16);
-                _volumeValueType = (WinApi.Types)Enum.Parse(typeof(WinApi.Types), valueType);
-                _minVolume = (int)volumeObject.GetValue("minVolume");
-            }
-
-            switch (_hookMethod) {
-                case (HookMethods.SendMessage):
-                    string wMsg = hookObject.GetValue("wMsg");
-                    _wMsg = (int)Enum.Parse(typeof(WinApi.wMsg), wMsg);
-                    _windowName = hookObject.GetValue("windowName");
-                    _lParam = (int)hookObject.GetValue("lParam");
-                    break;
-                case (HookMethods.ProcessStart):
-                    _arguments = hookObject.GetValue("arguments");
-                    break;
-                default:
-                    break;
-            }
-
+            //Mute();
         }
 
         /// <summary>
@@ -95,36 +40,37 @@ namespace GTASARadioExternal
         public bool GetProcess()
 		{
             // get the process
-            Process process = WinApi.GetProcess(_processName);
+            Process process = WinApi.GetProcess(_mp.ProcessName);
             if (process == null || process.HasExited) {
                 _process = null;
                 return false;
             }
             _process = process;
 
-            if (_useVolume) {
+            if (_mp.ReadVolume != null) {
                 // find the required addresses
-                int moduleAddress = WinApi.GetModuleAddress(process, _volumeModuleName);
+                int moduleAddress = WinApi.GetModuleAddress(process, _mp.ReadVolume.Module);
                 // todo: There's overlap in this code with Game.cs , maybe make them inherit this from somewhere
                 if (moduleAddress == -1) {
                     // TODO: requested module not found. This can happen while the process boots, or if it's not configured properly. Display a Message
                     _process = null;
                     return false;
                 }
-                _addressVolume = moduleAddress + _volumeAddressOffset;
+                _addressVolume = moduleAddress + _mp.ReadVolume.AddressOffset;
                 _volume = ReadVolume();
             }
 
-            if (_hookMethod == HookMethods.SendMessage) {
-                _window = WinApi.FindWindow(_windowName, null);
+            if (_mp.SetVolume.Type == HookMethods.SendMessage) {
+                _window = WinApi.FindWindow(_mp.SetVolume.WindowName, null);
             }
-            else if (_hookMethod == HookMethods.ProcessStart) {
+            else if (_mp.SetVolume.Type == HookMethods.ProcessStart) {
                 _executableFile = _process.MainModule.FileName;
-                _processStartInfo = new ProcessStartInfo();
-                _processStartInfo.FileName = Path.GetFileName(_executableFile);
-                _processStartInfo.WorkingDirectory = Path.GetDirectoryName(_executableFile);
-                _processStartInfo.Arguments = _arguments;
-            }
+				_processStartInfo = new ProcessStartInfo {
+					FileName = Path.GetFileName(_executableFile),
+					WorkingDirectory = Path.GetDirectoryName(_executableFile),
+					Arguments = _mp.SetVolume.Arguments
+				};
+			}
 
             return true;
         }
@@ -154,25 +100,34 @@ namespace GTASARadioExternal
             if (!IsRunning()) {
                 //throw new WarningException("No music player is running.");
             }
-            if (!_useVolume) {
+            if (_mp.ReadVolume == null) {
                 ToggleMute();
                 return;
             }
 
-            switch (_hookMethod) {
+            switch (_mp.SetVolume.Type) {
+                // TODO: take care of all the other hookmethods for these methods
                 case HookMethods.SendMessage:
-                    // TODO: take care of all the other hookmethods for these methods
-                    int wParam;
-                    if (!mute) {   
+                    int destinationVolume;
+                    if (!mute) {
                         // turn radio on
-                        wParam = _volume;
+                        destinationVolume = _volume;
                     }
-                    else {      
-                        // turn radio off
+                    else {
+                        // turn radio off, store old volume
                         _volume = ReadVolume();
-                        wParam = _minVolume;
-                    }
-                    WinApi.SendMessage(_window, _wMsg, wParam, _lParam);
+                        destinationVolume = _mp.MinVolume;
+					}
+
+                    int wParam;
+                    int lParam;
+                    if (_mp.SetVolume.WParam == "{volume}") { wParam = destinationVolume; }
+                    else { wParam = int.Parse(_mp.SetVolume.WParam); } // todo: Validate? Or is that done in the json reader?
+                    if (_mp.SetVolume.LParam == "{volume}") { lParam = destinationVolume; }
+                    else { lParam = int.Parse(_mp.SetVolume.LParam); }
+                    
+                    int wMsg = (int)Enum.Parse(typeof(WinApi.wMsg), _mp.SetVolume.WMsg);
+                    WinApi.SendMessage(_window, wMsg, wParam, lParam);
                     break;
                 case HookMethods.ProcessStart:
                     throw new NotImplementedException("ProcessStart hookmethod hasn't been implemented for volume control yet"); //todo:
@@ -185,7 +140,7 @@ namespace GTASARadioExternal
                 //
             }
             int wParam = 0;     // todo: configure wParam
-            switch (_hookMethod) {
+            switch (_mp.SetVolume.Type) {
                 case HookMethods.SendMessage:
                     throw new NotImplementedException("SendMessage hookmethod can only be used if combination with volume reading so far"); //todo:
                     break;
@@ -200,9 +155,10 @@ namespace GTASARadioExternal
                 //throw new WarningException("No music player is running.");
             }
 
-            int volume = -1;
+            int volume = int.MinValue;
             try {
-                volume = WinApi.ReadValue(_process, _addressVolume, _volumeValueType);
+                WinApi.Types volumeValueType = (WinApi.Types)Enum.Parse(typeof(WinApi.Types), _mp.ReadVolume.Type);
+                volume = WinApi.ReadValue(_process, _addressVolume, volumeValueType);
             }
             catch {
                 // TODO: catch errors

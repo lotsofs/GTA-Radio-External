@@ -1,0 +1,11 @@
+﻿{
+	"description": "GTA: San Andreas",
+	"processName": "gta_sa",
+	"radioAddresses": {
+		"module": "",
+		"addressOffset": "0x4CB760",
+		"type": "FourBytes",
+		"onValues": [ 2 ],
+		"offValues": [ 7 ]
+	}
+}

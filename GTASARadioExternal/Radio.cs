@@ -1,10 +1,11 @@
-﻿using S.Json;
+﻿//using S.Json;
 using System;
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
 using System.Text;
 using System.Timers;
+using Newtonsoft.Json;
 
 namespace GTASARadioExternal {
     class Radio {
@@ -19,8 +20,11 @@ namespace GTASARadioExternal {
         bool _musicPlayerRunning;
         
         public Radio() {
-            string path = Path.GetFullPath("E:\\Repositories\\GTA-Radio-External\\GTASARadioExternal\\input\\music players\\Windows Media Player.json");
-            JsonObject json = Json.OpenFile(path);      // todo: move this to some dedicated json handler for the tool, or at least a load script
+            string path = Path.GetFullPath(".\\input\\music players\\Wacup_NotSoDirect.json");   // todo: Nice hardcode
+            string json = File.ReadAllText(path);
+
+
+            //JsonObject json = Json.OpenFile(path);      // todo: move this to some dedicated json handler for the tool, or at least a load script
 
             _musicPlayer = new MusicPlayer(json);
             _game = new Game();
