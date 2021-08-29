@@ -113,12 +113,11 @@ namespace GTASARadioExternal {
             Process[] processes = Process.GetProcessesByName(name);
             if (processes.Length == 0) {
                 // Player is not running
-                // TODO: Do stuff
                 return null;
             }
             else if (processes.Length > 1) {
                 // Multiple instances of the player are running
-                // TODO: Do stuff
+                // TODO: Check if the process is not null
                 return processes[0];
             }
             else {
@@ -137,7 +136,7 @@ namespace GTASARadioExternal {
             if (string.IsNullOrEmpty(name)) {
                 return process.MainModule.BaseAddress.ToInt32();
             }
-            Debug.WriteLine(process.Modules.Count);
+            //Debug.WriteLine(process.Modules.Count);
             foreach (ProcessModule pm in process.Modules) {
                 if (pm.ModuleName == name) {
                     return pm.BaseAddress.ToInt32();
