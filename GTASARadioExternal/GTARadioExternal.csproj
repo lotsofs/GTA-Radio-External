@@ -124,13 +124,16 @@
       <AutoGen>True</AutoGen>
       <DependentUpon>Resources.resx</DependentUpon>
     </Compile>
-    <None Include="input\games\GTASA.json">
+    <None Include="input\games\Grand Theft Auto IV.json">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </None>
+    <None Include="input\games\Grand Theft Auto San Andreas.json">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </None>
     <None Include="input\music players\Foobar2000.json">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </None>
-    <None Include="input\music players\Wacup_NotSoDirect.json">
+    <None Include="input\music players\Wacup - Not So Direct.json">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </None>
     <None Include="input\music players\Windows Media Player.json">

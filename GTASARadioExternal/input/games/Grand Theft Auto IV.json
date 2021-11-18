@@ -1,0 +1,11 @@
+﻿{
+	"description": "Grand Theft Auto IV",
+	"processName": "GTAIV",
+	"radioAddress": {
+		"module": "",
+		"addressOffset": 0xE8463C,
+		"type": "FourBytes",
+		"onValues": [ 2 ],
+		"offValues": [ 0, 1, 4 ]
+	}
+}

@@ -14,6 +14,8 @@ using System.Windows.Forms;
 namespace GTASARadioExternal {
     public partial class FormRE : Form {
 
+        static string inputPath;
+
         Radio radio;
         
         [DllImport("user32.dll", SetLastError = true, CharSet = CharSet.Auto)]
@@ -21,6 +23,8 @@ namespace GTASARadioExternal {
 
         public FormRE() {
             InitializeComponent();
+
+            inputPath = Path.Combine(Environment.CurrentDirectory, "input");
 
             //Process process = WinApi.GetProcess("wmplayer");
             //int nRet;
@@ -34,11 +38,39 @@ namespace GTASARadioExternal {
         }
 
         private void FormRE_Load(object sender, EventArgs e) {
-
+            RefreshLists();
         }
 
-        private void label5_Click(object sender, EventArgs e) {
+        private void RefreshLists() {
+            ComboBox_Game.Items.Clear();
+            string[] games = Directory.GetFiles(Path.Combine(inputPath, "games"));
+            foreach (string game in games) {
+                ComboBox_Game.Items.Add(Path.GetFileName(game));
+			}
+            
+            ComboBox_MusicPlayer.Items.Clear();
+            string[] musicPlayers = Directory.GetFiles(Path.Combine(inputPath, "music players"));
+            foreach (string mp in musicPlayers) {
+                ComboBox_MusicPlayer.Items.Add(Path.GetFileName(mp));
+            }
+        }
 
+		private void Button_OpenDirectory_Click(object sender, EventArgs e) {
+            Process.Start(inputPath);
+		}
+
+		private void Button_Refresh_Click(object sender, EventArgs e) {
+            RefreshLists();
+		}
+
+		private void ComboBox_MusicPlayer_SelectedIndexChanged(object sender, EventArgs e) {
+            string path = Path.Combine(inputPath, "music players", ComboBox_MusicPlayer.Text);
+            radio.MusicPlayerChanged(path);
+		}
+
+		private void ComboBox_Game_SelectedIndexChanged(object sender, EventArgs e) {
+            string path = Path.Combine(inputPath, "games", ComboBox_Game.Text);
+            radio.GameChanged(path);
         }
     }
 }

@@ -8,10 +8,11 @@ namespace GTASARadioExternal {
 	class GData {
 		public string Description;
 		public string ProcessName;
-		public RadioAddresses RadioAddress;
+		public string ModuleName;
+		public RadioAddress RadioAddress;
 	}
 
-	class RadioAddresses {
+	class RadioAddress {
 		public string Module;
 		public int AddressOffset;
 		public string Type;
