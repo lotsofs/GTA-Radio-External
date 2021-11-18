@@ -1,0 +1,11 @@
+﻿{
+	"description": "GTA: San Andreas: The Definitive Edition",
+	"processName": "SanAndreas",
+	"radioAddress": {
+		"module": "",
+		"addressOffset": 0x4EA6AD8,
+		"type": "FourBytes",
+		"onValues": [ 2 ],
+		"offValues": [ 7 ]
+	}
+}

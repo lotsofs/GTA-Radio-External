@@ -19,7 +19,7 @@ namespace VGRadioExternal
         MPData _mp;
 
         Process _process;
-		int _addressVolume;
+        long _addressVolume;
         int _volume;
         
         ProcessStartInfo _processStartInfo;
@@ -49,7 +49,7 @@ namespace VGRadioExternal
 
             if (_mp.ReadVolume != null) {
                 // find the required addresses
-                int moduleAddress = WinApi.GetModuleAddress(process, _mp.ReadVolume.Module);
+                long moduleAddress = WinApi.GetModuleAddress(process, _mp.ReadVolume.Module);
                 // todo: There's overlap in this code with Game.cs , maybe make them inherit this from somewhere
                 if (moduleAddress == -1) {
                     // TODO: requested module not found. This can happen while the process boots, or if it's not configured properly. Display a Message

@@ -132,21 +132,21 @@ namespace VGRadioExternal {
         /// <param name="process">the process</param>
         /// <param name="name">the name of the module. leave blank to get the process base address instead.</param>
         /// <returns></returns>
-		public static int GetModuleAddress(Process process, string name = "") {
+		public static long GetModuleAddress(Process process, string name = "") {
             if (string.IsNullOrEmpty(name)) {
-                return process.MainModule.BaseAddress.ToInt32();
+                return process.MainModule.BaseAddress.ToInt64();
             }
             //Debug.WriteLine(process.Modules.Count);
             foreach (ProcessModule pm in process.Modules) {
                 if (pm.ModuleName == name) {
-                    return pm.BaseAddress.ToInt32();
+                    return pm.BaseAddress.ToInt64();
                 }
             }
             // Module not found, are we running 64 bit? Lets try another method. TODO: Tidy this
             List<Module> w64Modules = CollectModules(process);
             foreach (Module m in w64Modules) {
                 if (m.ModuleName == name) {
-                    return m.BaseAddress.ToInt32();
+                    return m.BaseAddress.ToInt64();
                 }
             }
             // Nothing found

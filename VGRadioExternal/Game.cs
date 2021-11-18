@@ -14,8 +14,8 @@ namespace VGRadioExternal {
         Process _process;
         int _window = 0;
         int _volume = 0;
-        int _addressRadio = 0x0;
-        int _addressRunning = 0x0;
+        long _addressRadio = 0x0;
+        long _addressRunning = 0x0;
 
         //public static string PROCESSNAME = "GTAIV";
         //public static string MODULENAME = "";
@@ -43,7 +43,7 @@ namespace VGRadioExternal {
             }
             _process = process;
 
-            int moduleAddress = WinApi.GetModuleAddress(process, _gameData.ModuleName);
+            long moduleAddress = WinApi.GetModuleAddress(process, _gameData.ModuleName);
             if (moduleAddress == -1) {
                 // requested module not found. This can happen while the process boots, or if it's not configured properly. TODO: Message
                 _process = null;
