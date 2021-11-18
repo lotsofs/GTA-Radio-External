@@ -7,7 +7,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace GTASARadioExternal {
+namespace VGRadioExternal {
     class Game {
         GData _gameData;
         

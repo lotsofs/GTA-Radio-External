@@ -11,7 +11,7 @@ using System.Text;
 using System.Threading.Tasks;
 using System.Windows.Forms;
 
-namespace GTASARadioExternal {
+namespace VGRadioExternal {
     public partial class FormRE : Form {
 
         static string inputPath;

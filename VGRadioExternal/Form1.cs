@@ -10,7 +10,7 @@ using System.Windows.Forms;
 using System.Diagnostics;
 using System.Configuration;
 
-namespace GTASARadioExternal {
+namespace VGRadioExternal {
 	public partial class Form1 : Form {
 
 		Timer timer2;

@@ -7,8 +7,8 @@
     <ProjectGuid>{7BDD45AB-88A4-416D-B49C-0576507D6438}</ProjectGuid>
     <OutputType>WinExe</OutputType>
     <AppDesignerFolder>Properties</AppDesignerFolder>
-    <RootNamespace>GTASARadioExternal</RootNamespace>
-    <AssemblyName>GTASARadioExternal</AssemblyName>
+    <RootNamespace>VGRadioExternal</RootNamespace>
+    <AssemblyName>VGRadioExternal</AssemblyName>
     <TargetFrameworkVersion>v4.5.2</TargetFrameworkVersion>
     <FileAlignment>512</FileAlignment>
     <AutoGenerateBindingRedirects>true</AutoGenerateBindingRedirects>
@@ -123,6 +123,7 @@
     <Compile Include="Properties\Resources.Designer.cs">
       <AutoGen>True</AutoGen>
       <DependentUpon>Resources.resx</DependentUpon>
+      <DesignTime>True</DesignTime>
     </Compile>
     <None Include="input\games\Grand Theft Auto IV.json">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>

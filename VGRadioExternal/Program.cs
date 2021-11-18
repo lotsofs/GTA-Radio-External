@@ -11,7 +11,7 @@ using System.Text;
 
 
 
-namespace GTASARadioExternal {
+namespace VGRadioExternal {
     static class Program {
 
         /*static Timer timer1;

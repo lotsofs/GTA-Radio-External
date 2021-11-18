@@ -1,4 +1,4 @@
-﻿namespace GTASARadioExternal {
+﻿namespace VGRadioExternal {
     partial class FormRE {
         /// <summary>
         /// Required designer variable.

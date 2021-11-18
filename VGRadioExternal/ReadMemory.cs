@@ -9,7 +9,7 @@ using System.Runtime.InteropServices;
 using System.Text;
 using System.IO;
 
-namespace GTASARadioExternal {
+namespace VGRadioExternal {
 	public class ReadMemory {
 
 		public int major = 0;

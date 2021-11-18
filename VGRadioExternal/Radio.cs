@@ -8,7 +8,7 @@ using System.Text;
 using System.Timers;
 using Newtonsoft.Json;
 
-namespace GTASARadioExternal {
+namespace VGRadioExternal {
     class Radio {
         MusicPlayer _musicPlayer;
         Game _game;

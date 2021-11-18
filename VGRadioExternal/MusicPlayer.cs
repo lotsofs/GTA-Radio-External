@@ -11,7 +11,7 @@ using System.Threading.Tasks;
 using Newtonsoft.Json;
 
 
-namespace GTASARadioExternal
+namespace VGRadioExternal
 {
     public class MusicPlayer
 	{

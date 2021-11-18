@@ -4,7 +4,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace GTASARadioExternal {
+namespace VGRadioExternal {
     public class Module {   // todo: FRAMEWORK
         public Module(string moduleName, IntPtr baseAddress, uint size) {
             ModuleName = moduleName;
