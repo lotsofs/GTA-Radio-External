@@ -724,9 +724,6 @@ namespace GTASARadioExternal {
 						gameStatus = statuses.Shutdown;
 						return;
 					}
-
-					Debug.WriteLine($"radioStatus: {radioStatus}");
-
 					if (radioStatus == 2 && isPaused == true) {
 						isPaused = false;
 						Task.Run(() => MuteUnMuteSpotify(isPaused));
@@ -868,7 +865,7 @@ namespace GTASARadioExternal {
 
 				// If for some reason we can't find the specified source, use the Default Device
 				using (var device = enumerator.GetDefaultAudioEndpoint(dataFlow, Role.Multimedia)) {
-					Debug.WriteLine("DefaultDevice: " + device.FriendlyName);
+					//Debug.WriteLine("DefaultDevice: " + device.FriendlyName);
 					var sessionManager = AudioSessionManager2.FromMMDevice(device);
 					return sessionManager;
 				}
