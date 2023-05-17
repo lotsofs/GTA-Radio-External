@@ -8,6 +8,7 @@ using System.Diagnostics;
 using System.Runtime.InteropServices;
 using System.Text;
 using System.IO;
+using CSCore.CoreAudioAPI;
 
 namespace GTASARadioExternal {
 	public class ReadMemory {
@@ -30,13 +31,13 @@ namespace GTASARadioExternal {
 		public int address_running = 0x0;   // The address of the int that reads whether the music player is on or not
 		public int address_base = 0x0;
 		public string executable_location;  // Executable location
-		public int window_name;			// Window name
+		public int window_name;         // Window name
 		Timer timer1;
 		public bool maxVolumeWriteable = true;
 		public bool quickVolume = false;
 		public bool isPaused = false;
 		public bool isMuted = false;
-		public enum actions { None, Volume, Mute, Pause }
+		public enum actions { None, Volume, Mute, Pause, SpotifyMute }
 		public actions actionToTake;
 
 		public int failSafeAttempts = 0;
@@ -58,7 +59,8 @@ namespace GTASARadioExternal {
 		public bool radioPlayDuringAnnouncement;
 		public bool radioPlayDuringInterior;
 
-
+		// Name for the AudioSource Spotify uses
+		public static string spotifyAudioSourceName = "";
 
 		// Dont know what this does
 		const int PROCESS_WM_READ = 0x0010;
@@ -243,13 +245,11 @@ namespace GTASARadioExternal {
 				//q[0].Modules
 				address_base = q[0].MainModule.BaseAddress.ToInt32();
 
-				foreach (ProcessModule i in q[0].Modules)
-				{
-					if (i.ModuleName == "out_ds.dll")
-					{
+				foreach (ProcessModule i in q[0].Modules) {
+					if (i.ModuleName == "out_ds.dll") {
 						address_volume = i.BaseAddress.ToInt32() + 0xB0A0;      // TODO: Make this modular or something so this isn't hardcoded and adding new programs is easy.
 						break;
-					}										
+					}
 				}
 				address_running = address_base + 0xBD1EC;
 				window_name = FindWindow("Winamp v1.x", null);
@@ -396,8 +396,8 @@ namespace GTASARadioExternal {
 					#endregion
 
 					volumeStatus = checkMP3PlayerStatus();
-					RadioChangerVolume(radioStatus >= 0 && radioStatus <= 9 && radioPlayDuringRadio 
-											|| radioStatus == 10 && radioPlayDuringEmergency == true 
+					RadioChangerVolume(radioStatus >= 0 && radioStatus <= 9 && radioPlayDuringRadio
+											|| radioStatus == 10 && radioPlayDuringEmergency == true
 											|| radioStatus >= 13 && radioStatus <= 14 && radioPlayDuringAnnouncement == true
 											|| radioStatus == 197 && radioPlayDuringPauseMenu == true
 					);
@@ -497,7 +497,7 @@ namespace GTASARadioExternal {
 						return;
 					}
 
-					if (radioStatus >= 0 && radioStatus <= 9  && radioPlayDuringRadio == true && isPaused == true) {
+					if (radioStatus >= 0 && radioStatus <= 9 && radioPlayDuringRadio == true && isPaused == true) {
 						isPaused = false;
 						RadioChangerPause(isPaused);
 					}
@@ -692,7 +692,7 @@ namespace GTASARadioExternal {
 						gameStatus = statuses.Shutdown;
 						return;
 					}
-
+					
 					if (radioStatus == 2 && isPaused == true) {
 						isPaused = false;
 						RadioChangerPause(isPaused);
@@ -700,6 +700,36 @@ namespace GTASARadioExternal {
 					else if (radioStatus == 7 && isPaused == false) {
 						isPaused = true;
 						RadioChangerPause(isPaused);
+					}
+				}
+			}
+			else if (actionToTake == actions.SpotifyMute) {
+				if (gameStatus == statuses.Running || gameStatus == statuses.Unconfirmed) {
+					try {
+						radioStatus = ReadValue(p[0].Handle, address_radio, false, true);
+					}
+					catch (InvalidOperationException) {
+						Debug.WriteLine("InvalidOperationException H");
+						gameStatus = statuses.Shutdown;
+						return;
+					}
+					catch (NullReferenceException) {
+						Debug.WriteLine("NullReferenceException H");
+						gameStatus = statuses.Shutdown;
+						return;
+					}
+					catch (IndexOutOfRangeException) {
+						Debug.WriteLine("IndexOutOfRangeException H");
+						gameStatus = statuses.Shutdown;
+						return;
+					}
+					if (radioStatus == 2 && isPaused == true) {
+						isPaused = false;
+						Task.Run(() => MuteUnMuteSpotify(isPaused));
+					}
+					else if (radioStatus == 7 && isPaused == false) {
+						isPaused = true;
+						Task.Run(() => MuteUnMuteSpotify(isPaused));
 					}
 				}
 			}
@@ -797,6 +827,52 @@ namespace GTASARadioExternal {
 			}
 		}
 
+		// Mutes or unmutes Spotify from Volume Mixer
+		public static void MuteUnMuteSpotify(bool mute) {
+			//Let's find the process ID for spotify (there can be multiple)
+			var processes = Process.GetProcessesByName("Spotify");
+			List<int> pids = new List<int>();
+			foreach (var p in processes) {
+				pids.Add(p.Id);
+			}
+
+			using (var sessionManager = GetDefaultAudioSessionManager2(DataFlow.Render)) {
+				using (var sessionEnumerator = sessionManager.GetSessionEnumerator()) {
+					foreach (var session in sessionEnumerator) {
+						using (var simpleVolume = session.QueryInterface<SimpleAudioVolume>())
+						using (var sessionControl = session.QueryInterface<AudioSessionControl2>()) {
+							// When we find the correct session for Spotify's process, set the volume to 0 or 1
+							if (pids.Contains(sessionControl.ProcessID)) {
+								if (mute)
+									simpleVolume.SetMuteNative(CSCore.Win32.NativeBool.True, Guid.Empty);
+									//simpleVolume.MasterVolume = 0.0f;
+								else
+									simpleVolume.SetMuteNative(CSCore.Win32.NativeBool.False, Guid.Empty);
+									//simpleVolume.MasterVolume = ((float)spotifyMixerMaxVolume) / 100.0f;
+							}
+						}
+					}
+				}
+			}
+		}
+
+		private static AudioSessionManager2 GetDefaultAudioSessionManager2(DataFlow dataFlow) {
+			using (var enumerator = new MMDeviceEnumerator()) {
+				// Find the Audiosource Spotify uses (We can't use the Default Device, if someone has set Spotify to play music on a specific Audiosource)
+				var source = enumerator.EnumAudioEndpoints(dataFlow, DeviceState.Active).Where(s => s.FriendlyName.Contains(spotifyAudioSourceName)).FirstOrDefault();
+
+				if (source != null)
+					return AudioSessionManager2.FromMMDevice(source);
+
+				// If for some reason we can't find the specified source, use the Default Device
+				using (var device = enumerator.GetDefaultAudioEndpoint(dataFlow, Role.Multimedia)) {
+					//Debug.WriteLine("DefaultDevice: " + device.FriendlyName);
+					var sessionManager = AudioSessionManager2.FromMMDevice(device);
+					return sessionManager;
+				}
+			}
+		}
+
 		// Change Radio based on pausing/unpausing
 		void RadioChangerPause(bool radioOff) {
 			radioActive = !radioOff;
@@ -829,7 +905,7 @@ namespace GTASARadioExternal {
 					keybd_event(0xAF, 0, 1, IntPtr.Zero);
 				}
 				keybd_event(0xAF, 0, 2, IntPtr.Zero);
-				
+
 
 				prevVolumeStatus = volumeStatus;
 				volumeStatus = checkMP3PlayerStatus();

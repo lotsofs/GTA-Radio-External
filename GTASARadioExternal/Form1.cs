@@ -9,11 +9,13 @@ using System.Threading.Tasks;
 using System.Windows.Forms;
 using System.Diagnostics;
 using System.Configuration;
+using CSCore.CoreAudioAPI;
 
 namespace GTASARadioExternal {
 	public partial class Form1 : Form {
-
 		Timer timer2;
+
+		string savedAudioSource = "";
 
 		public enum displayedTexts { Unitialized, Shutdown, Running, Unrecognized, Unconfirmed, NoMusicPlayer }
 		displayedTexts displayedText = displayedTexts.Unitialized;
@@ -52,8 +54,10 @@ namespace GTASARadioExternal {
 			else if (radioButtonOther.Checked) {
 				readMemory.DeterminePlayerVersionOther();
 			}
+			else if (radioButtonSpotify.Checked) {
+				readMemory.DeterminePlayerVersionOther();
+			}
 		}
-
 
 		void UpdateWindow() {
 			if (readMemory.actionToTake == ReadMemory.actions.None) {
@@ -153,6 +157,9 @@ namespace GTASARadioExternal {
 		}
 
 		private void radioButtonVolume_CheckedChanged(object sender, EventArgs e) {
+			comboBoxAudioSources.Enabled = false;
+			comboBoxAudioSources.Items.Clear();
+
 			readMemory.actionToTake = ReadMemory.actions.Volume;
 			checkBox1.Enabled = radioButtonVolume.Checked;
 			readMemory.maxVolumeWriteable = false;
@@ -162,6 +169,8 @@ namespace GTASARadioExternal {
 		private void radioButtonPause_CheckedChanged(object sender, EventArgs e) {
 			readMemory.isPaused = false;
 			if (radioButtonPause.Checked) {
+				comboBoxAudioSources.Enabled = false;
+				comboBoxAudioSources.Items.Clear();
 				readMemory.actionToTake = ReadMemory.actions.Pause;
 			}
 			readMemory.maxVolumeWriteable = false;
@@ -170,6 +179,9 @@ namespace GTASARadioExternal {
 		private void radioButtonMute_CheckedChanged(object sender, EventArgs e) {
 			readMemory.isMuted = false;
 			if (radioButtonMute.Checked) {
+				comboBoxAudioSources.Enabled = false;
+				comboBoxAudioSources.Items.Clear();
+				errorProvider1.Clear();
 				readMemory.actionToTake = ReadMemory.actions.Mute;
 			}
 			readMemory.maxVolumeWriteable = false;
@@ -177,19 +189,29 @@ namespace GTASARadioExternal {
 
 		private void radioButtonOther_CheckedChanged(object sender, EventArgs e) {
 			if (radioButtonOther.Checked) {
+				comboBoxAudioSources.Enabled = false;
+				comboBoxAudioSources.Items.Clear();
+				errorProvider1.Clear();
 				readMemory.musicP = ReadMemory.musicPlayers.Other;
 				radioButtonVolume.Enabled = !radioButtonOther.Checked;
 				radioButtonMute.Enabled = !radioButtonOther.Checked;
 				radioButtonPause.Enabled = radioButtonOther.Checked;
+				radioButtonPause.Checked = true; // Reset selection so the radiobuttons doesn't get fucky
+				radioButtonMuteSpotify.Enabled = !radioButtonOther.Checked;
 				readMemory.maxVolumeWriteable = false;
 			}
 		}
 
 		private void radioButtonWinamp_CheckedChanged(object sender, EventArgs e) {
 			if (radioButtonWinamp.Checked) {
+				comboBoxAudioSources.Enabled = false;
+				comboBoxAudioSources.Items.Clear();
+				errorProvider1.Clear();
 				radioButtonVolume.Enabled = radioButtonWinamp.Checked;
 				radioButtonMute.Enabled = radioButtonWinamp.Checked;
+				radioButtonMute.Checked = true; // Reset selection so the radiobuttons doesn't get fucky
 				radioButtonPause.Enabled = radioButtonWinamp.Checked;
+				radioButtonMuteSpotify.Enabled = !radioButtonWinamp.Checked;
 				readMemory.musicP = ReadMemory.musicPlayers.Winamp;
 				readMemory.maxVolumeWriteable = false;
 				readMemory.DeterminePlayerVersionWinamp();
@@ -199,9 +221,14 @@ namespace GTASARadioExternal {
 
 		private void radioButtonFoobar_CheckedChanged(object sender, EventArgs e) {
 			if (radioButtonFoobar.Checked) {
+				comboBoxAudioSources.Enabled = false;
+				comboBoxAudioSources.Items.Clear();
+				errorProvider1.Clear();
 				radioButtonVolume.Enabled = radioButtonFoobar.Checked;
 				radioButtonMute.Enabled = radioButtonFoobar.Checked;
+				radioButtonMute.Checked = true; // Reset selection so the radiobuttons doesn't get fucky
 				radioButtonPause.Enabled = radioButtonFoobar.Checked;
+				radioButtonMuteSpotify.Enabled = !radioButtonFoobar.Checked;
 				readMemory.musicP = ReadMemory.musicPlayers.Foobar;
 				readMemory.maxVolumeWriteable = false;
 				readMemory.DeterminePlayerVersionFoobar();
@@ -212,16 +239,80 @@ namespace GTASARadioExternal {
 
 		private void radioButtonVolume_EnabledChanged(object sender, EventArgs e) {
 			if (radioButtonVolume.Checked) {
+				comboBoxAudioSources.Enabled = false;
+				comboBoxAudioSources.Items.Clear();
+				errorProvider1.Clear();
 				radioButtonVolume.Checked = false;
 				readMemory.actionToTake = ReadMemory.actions.None;
 				radioButtonPause.Checked = true;
 				readMemory.DeterminePlayerVersionOther();
 			}
 		}
+
+		private void radioButtonSpotify_CheckedChanged(object sender, EventArgs e) {
+			if (radioButtonSpotify.Checked) {
+				readMemory.musicP = ReadMemory.musicPlayers.Other;
+				radioButtonVolume.Enabled = !radioButtonSpotify.Checked;
+				radioButtonMute.Enabled = !radioButtonSpotify.Checked;
+				radioButtonPause.Enabled = radioButtonSpotify.Checked;
+				radioButtonPause.Checked = true; // Reset selection so the radiobuttons doesn't get fucky
+				radioButtonMuteSpotify.Enabled = radioButtonSpotify.Checked;
+				readMemory.maxVolumeWriteable = false;
+			}
+		}
+
+		/// <summary>
+		/// Derived this Spotify-functionality from the pause method
+		/// </summary>
+		/// <param name="sender"></param>
+		/// <param name="e"></param>
+		private void radioButtonMuteSpotify_CheckedChanged(object sender, EventArgs e) {
+			readMemory.isPaused = false;
+			if (radioButtonMuteSpotify.Checked) {
+				comboBoxAudioSources.Enabled = radioButtonMuteSpotify.Checked;
+				comboBoxAudioSources.Items.Clear();
+				using (var enumerator = new MMDeviceEnumerator()) {
+					// Find all Audiosources for the combobox selection (We can't use the Default Device, if someone has set Spotify to play music on a specific Audiosource)
+					var sources = enumerator.EnumAudioEndpoints(DataFlow.Render, DeviceState.Active);
+
+					// Populate the ComboBox
+					foreach (var s in sources) {
+						comboBoxAudioSources.Items.Add(s.FriendlyName);
+					}
+					// Select saved audiosource (if any)
+					if (comboBoxAudioSources.Items.Contains(savedAudioSource))
+						comboBoxAudioSources.SelectedItem = savedAudioSource;
+				}
+
+				// The Audiosource selection is required so lets set an errorProvider to notify the user
+				errorProvider1.SetError(comboBoxAudioSources, "Select the AudioSource Spotify uses.");
+
+				readMemory.actionToTake = ReadMemory.actions.SpotifyMute;
+			}
+			// If we change the muting style, ensure that the volume on the mixer is set back to max
+			else {
+				Task.Run(() => ReadMemory.MuteUnMuteSpotify(false));
+			}
+			readMemory.maxVolumeWriteable = false;
+		}
+		private void comboBoxAudioSources_SelectedIndexChanged(object sender, EventArgs e) {
+			ReadMemory.spotifyAudioSourceName = comboBoxAudioSources.SelectedItem as string;
+
+			errorProvider1.Clear();
+		}
+
 		#endregion
 
 		#region game radio buttons
 		private void radioButtonIII_CheckedChanged(object sender, EventArgs e) {
+
+			// Spotify muting is enabled only on SA for now, since I haven't tested the other two.
+			if (radioButtonIII.Checked) {
+				radioButtonSpotify.Enabled = false;
+				if (radioButtonSpotify.Checked)
+					radioButtonWinamp.Checked = true;
+			}
+
 			readMemory.DetermineGameVersionIII();
 			readMemory.game = ReadMemory.games.III;
 			checkBoxA.Enabled = true;
@@ -242,6 +333,13 @@ namespace GTASARadioExternal {
 		}
 
 		private void radioButtonVC_CheckedChanged(object sender, EventArgs e) {
+
+			// Spotify muting is enabled only on SA for now, since I haven't tested the other two.
+			if (radioButtonVC.Checked) {
+				radioButtonSpotify.Enabled = false;
+				if (radioButtonSpotify.Checked)
+					radioButtonWinamp.Checked = true;
+			}
 			readMemory.DetermineGameVersionVC();
 			readMemory.game = ReadMemory.games.VC;
 			checkBoxA.Enabled = true;
@@ -262,6 +360,10 @@ namespace GTASARadioExternal {
 		}
 
 		private void radioButtonSA_CheckedChanged(object sender, EventArgs e) {
+			// Spotify muting is enabled only on SA for now, since I haven't tested the other two.
+			if (radioButtonSA.Checked)
+				radioButtonSpotify.Enabled = true;
+
 			readMemory.DetermineGameVersionSA();
 			readMemory.game = ReadMemory.games.SA;
 			checkBoxA.Enabled = false;
@@ -294,7 +396,6 @@ namespace GTASARadioExternal {
 		}
 
 		private void checkBoxC_CheckedChanged(object sender, EventArgs e) {
-
 		}
 
 		private void checkBoxD_CheckedChanged(object sender, EventArgs e) {
@@ -327,6 +428,8 @@ namespace GTASARadioExternal {
 		private void Form1_FormClosing(object sender, FormClosingEventArgs e) {
 
 			try {
+				Task.Run(() => ReadMemory.MuteUnMuteSpotify(false));
+
 				Configuration config = ConfigurationManager.OpenExeConfiguration(ConfigurationUserLevel.None);
 
 				if (radioButtonSA.Checked) {
@@ -351,8 +454,12 @@ namespace GTASARadioExternal {
 				else if (radioButtonFoobar.Checked) {
 					config.AppSettings.Settings["playerSet"].Value = "Foobar";
 				}
-				else if (radioButtonVolume.Checked) {
+				else if (radioButtonOther.Checked) // Here was a typo?
+				{
 					config.AppSettings.Settings["playerSet"].Value = "Other";
+				}
+				else if (radioButtonSpotify.Checked) {
+					config.AppSettings.Settings["playerSet"].Value = "Spotify";
 				}
 				//action
 				if (radioButtonMute.Checked) {
@@ -364,6 +471,9 @@ namespace GTASARadioExternal {
 				else if (radioButtonVolume.Checked) {
 					config.AppSettings.Settings["actionSet"].Value = "Volume";
 				}
+				else if (radioButtonMuteSpotify.Checked) {
+					config.AppSettings.Settings["actionSet"].Value = "Spotify";
+				}
 				//action-settings
 				config.AppSettings.Settings["quickvolumeSet"].Value = checkBox1.Checked.ToString();
 				config.AppSettings.Settings["ignoremodifiersSet"].Value = checkBox7.Checked.ToString();
@@ -374,6 +484,8 @@ namespace GTASARadioExternal {
 				config.AppSettings.Settings["announcerSet"].Value = checkBoxF.Checked.ToString();
 				config.AppSettings.Settings["kaufmanSet"].Value = checkBoxE.Checked.ToString();
 				config.AppSettings.Settings["menuSet"].Value = checkBoxD.Checked.ToString();
+
+				config.AppSettings.Settings["defaultAudioSource"].Value = (comboBoxAudioSources.SelectedItem != null) ? comboBoxAudioSources.SelectedItem.ToString() : "";
 
 				config.Save(ConfigurationSaveMode.Modified);
 			}
@@ -407,6 +519,9 @@ namespace GTASARadioExternal {
 					case "Other":
 						radioButtonOther.Checked = true;
 						break;
+					case "Spotify":
+						radioButtonSpotify.Checked = true;
+						break;
 					default:
 						break;
 				}
@@ -420,6 +535,9 @@ namespace GTASARadioExternal {
 					case "Volume":
 						radioButtonVolume.Checked = true;
 						break;
+					case "Spotify":
+						radioButtonMuteSpotify.Checked = true;
+						break;
 					default:
 						break;
 				}
@@ -431,19 +549,17 @@ namespace GTASARadioExternal {
 				checkBoxF.Checked = bool.Parse(ConfigurationManager.AppSettings["announcerSet"]);
 				checkBoxE.Checked = bool.Parse(ConfigurationManager.AppSettings["kaufmanSet"]);
 				checkBoxD.Checked = bool.Parse(ConfigurationManager.AppSettings["menuSet"]);
+
+				savedAudioSource = ConfigurationManager.AppSettings["defaultAudioSource"];
+				// Select saved audiosource (if any)
+				if (comboBoxAudioSources.Items.Contains(savedAudioSource))
+					comboBoxAudioSources.SelectedItem = savedAudioSource;
 			}
 
 			catch (NullReferenceException) {
 				Debug.WriteLine("Error reading app settings");
 			}
 		}
-
-
-
-
-
 		#endregion
-
-
 	}
 }
