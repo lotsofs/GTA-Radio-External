@@ -61,7 +61,6 @@ namespace GTASARadioExternal {
 
 		// Name for the AudioSource Spotify uses
 		public static string spotifyAudioSourceName = "";
-		public static int spotifyMixerMaxVolume = 100;
 
 		// Dont know what this does
 		const int PROCESS_WM_READ = 0x0010;
@@ -845,9 +844,11 @@ namespace GTASARadioExternal {
 							// When we find the correct session for Spotify's process, set the volume to 0 or 1
 							if (pids.Contains(sessionControl.ProcessID)) {
 								if (mute)
-									simpleVolume.MasterVolume = 0.0f;
+									simpleVolume.SetMuteNative(CSCore.Win32.NativeBool.True, Guid.Empty);
+									//simpleVolume.MasterVolume = 0.0f;
 								else
-									simpleVolume.MasterVolume = ((float)spotifyMixerMaxVolume) / 100.0f;
+									simpleVolume.SetMuteNative(CSCore.Win32.NativeBool.False, Guid.Empty);
+									//simpleVolume.MasterVolume = ((float)spotifyMixerMaxVolume) / 100.0f;
 							}
 						}
 					}

@@ -159,7 +159,6 @@ namespace GTASARadioExternal {
 		private void radioButtonVolume_CheckedChanged(object sender, EventArgs e) {
 			comboBoxAudioSources.Enabled = false;
 			comboBoxAudioSources.Items.Clear();
-			numericMixerMaxVolume.Enabled = false;
 
 			readMemory.actionToTake = ReadMemory.actions.Volume;
 			checkBox1.Enabled = radioButtonVolume.Checked;
@@ -172,7 +171,6 @@ namespace GTASARadioExternal {
 			if (radioButtonPause.Checked) {
 				comboBoxAudioSources.Enabled = false;
 				comboBoxAudioSources.Items.Clear();
-				numericMixerMaxVolume.Enabled = false;
 				readMemory.actionToTake = ReadMemory.actions.Pause;
 			}
 			readMemory.maxVolumeWriteable = false;
@@ -184,7 +182,6 @@ namespace GTASARadioExternal {
 				comboBoxAudioSources.Enabled = false;
 				comboBoxAudioSources.Items.Clear();
 				errorProvider1.Clear();
-				numericMixerMaxVolume.Enabled = false;
 				readMemory.actionToTake = ReadMemory.actions.Mute;
 			}
 			readMemory.maxVolumeWriteable = false;
@@ -195,7 +192,6 @@ namespace GTASARadioExternal {
 				comboBoxAudioSources.Enabled = false;
 				comboBoxAudioSources.Items.Clear();
 				errorProvider1.Clear();
-				numericMixerMaxVolume.Enabled = false;
 				readMemory.musicP = ReadMemory.musicPlayers.Other;
 				radioButtonVolume.Enabled = !radioButtonOther.Checked;
 				radioButtonMute.Enabled = !radioButtonOther.Checked;
@@ -211,7 +207,6 @@ namespace GTASARadioExternal {
 				comboBoxAudioSources.Enabled = false;
 				comboBoxAudioSources.Items.Clear();
 				errorProvider1.Clear();
-				numericMixerMaxVolume.Enabled = false;
 				radioButtonVolume.Enabled = radioButtonWinamp.Checked;
 				radioButtonMute.Enabled = radioButtonWinamp.Checked;
 				radioButtonMute.Checked = true; // Reset selection so the radiobuttons doesn't get fucky
@@ -229,7 +224,6 @@ namespace GTASARadioExternal {
 				comboBoxAudioSources.Enabled = false;
 				comboBoxAudioSources.Items.Clear();
 				errorProvider1.Clear();
-				numericMixerMaxVolume.Enabled = false;
 				radioButtonVolume.Enabled = radioButtonFoobar.Checked;
 				radioButtonMute.Enabled = radioButtonFoobar.Checked;
 				radioButtonMute.Checked = true; // Reset selection so the radiobuttons doesn't get fucky
@@ -248,7 +242,6 @@ namespace GTASARadioExternal {
 				comboBoxAudioSources.Enabled = false;
 				comboBoxAudioSources.Items.Clear();
 				errorProvider1.Clear();
-				numericMixerMaxVolume.Enabled = false;
 				radioButtonVolume.Checked = false;
 				readMemory.actionToTake = ReadMemory.actions.None;
 				radioButtonPause.Checked = true;
@@ -278,7 +271,6 @@ namespace GTASARadioExternal {
 			if (radioButtonMuteSpotify.Checked) {
 				comboBoxAudioSources.Enabled = radioButtonMuteSpotify.Checked;
 				comboBoxAudioSources.Items.Clear();
-				numericMixerMaxVolume.Enabled = true;
 				using (var enumerator = new MMDeviceEnumerator()) {
 					// Find all Audiosources for the combobox selection (We can't use the Default Device, if someone has set Spotify to play music on a specific Audiosource)
 					var sources = enumerator.EnumAudioEndpoints(DataFlow.Render, DeviceState.Active);
@@ -493,7 +485,6 @@ namespace GTASARadioExternal {
 				config.AppSettings.Settings["kaufmanSet"].Value = checkBoxE.Checked.ToString();
 				config.AppSettings.Settings["menuSet"].Value = checkBoxD.Checked.ToString();
 
-				config.AppSettings.Settings["spotifyMixerMaxVolume"].Value = numericMixerMaxVolume.Value.ToString();
 				config.AppSettings.Settings["defaultAudioSource"].Value = (comboBoxAudioSources.SelectedItem != null) ? comboBoxAudioSources.SelectedItem.ToString() : "";
 
 				config.Save(ConfigurationSaveMode.Modified);
@@ -563,14 +554,6 @@ namespace GTASARadioExternal {
 				// Select saved audiosource (if any)
 				if (comboBoxAudioSources.Items.Contains(savedAudioSource))
 					comboBoxAudioSources.SelectedItem = savedAudioSource;
-
-				int maxVolume;
-				bool success = int.TryParse(ConfigurationManager.AppSettings["spotifyMixerMaxVolume"], out maxVolume);
-
-				if (!success)
-					maxVolume = 100;
-				ReadMemory.spotifyMixerMaxVolume = maxVolume;
-				numericMixerMaxVolume.Value = maxVolume;
 			}
 
 			catch (NullReferenceException) {
@@ -578,11 +561,5 @@ namespace GTASARadioExternal {
 			}
 		}
 		#endregion
-
-		private void numericUpDown1_ValueChanged(object sender, EventArgs e) {
-			//Set the maximum Mixer volume from the selector
-			int volume = (int)numericMixerMaxVolume.Value;
-			ReadMemory.spotifyMixerMaxVolume = volume;
-		}
 	}
 }

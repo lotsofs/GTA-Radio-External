@@ -39,7 +39,6 @@
 			this.radioButtonFoobar = new System.Windows.Forms.RadioButton();
 			this.labelVolume = new System.Windows.Forms.Label();
 			this.groupBox3 = new System.Windows.Forms.GroupBox();
-			this.label4 = new System.Windows.Forms.Label();
 			this.comboBoxAudioSources = new System.Windows.Forms.ComboBox();
 			this.radioButtonMuteSpotify = new System.Windows.Forms.RadioButton();
 			this.checkBox7 = new System.Windows.Forms.CheckBox();
@@ -56,13 +55,11 @@
 			this.checkBoxB = new System.Windows.Forms.CheckBox();
 			this.checkBoxA = new System.Windows.Forms.CheckBox();
 			this.errorProvider1 = new System.Windows.Forms.ErrorProvider(this.components);
-			this.numericMixerMaxVolume = new System.Windows.Forms.NumericUpDown();
 			this.groupBox1.SuspendLayout();
 			this.groupBox2.SuspendLayout();
 			this.groupBox3.SuspendLayout();
 			this.groupBox4.SuspendLayout();
 			((System.ComponentModel.ISupportInitialize)(this.errorProvider1)).BeginInit();
-			((System.ComponentModel.ISupportInitialize)(this.numericMixerMaxVolume)).BeginInit();
 			this.SuspendLayout();
 			// 
 			// label1
@@ -79,7 +76,7 @@
 			// 
 			this.label3.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Right)));
 			this.label3.AutoSize = true;
-			this.label3.Location = new System.Drawing.Point(108, 417);
+			this.label3.Location = new System.Drawing.Point(102, 342);
 			this.label3.Name = "label3";
 			this.label3.Size = new System.Drawing.Size(207, 13);
 			this.label3.TabIndex = 4;
@@ -231,8 +228,6 @@
 			// 
 			// groupBox3
 			// 
-			this.groupBox3.Controls.Add(this.numericMixerMaxVolume);
-			this.groupBox3.Controls.Add(this.label4);
 			this.groupBox3.Controls.Add(this.comboBoxAudioSources);
 			this.groupBox3.Controls.Add(this.radioButtonMuteSpotify);
 			this.groupBox3.Controls.Add(this.checkBox7);
@@ -242,20 +237,11 @@
 			this.groupBox3.Controls.Add(this.radioButtonMute);
 			this.groupBox3.Location = new System.Drawing.Point(15, 148);
 			this.groupBox3.Name = "groupBox3";
-			this.groupBox3.Size = new System.Drawing.Size(300, 142);
+			this.groupBox3.Size = new System.Drawing.Size(300, 115);
 			this.groupBox3.TabIndex = 9;
 			this.groupBox3.TabStop = false;
 			this.groupBox3.Text = "Action";
 			this.toolTip1.SetToolTip(this.groupBox3, resources.GetString("groupBox3.ToolTip"));
-			// 
-			// label4
-			// 
-			this.label4.AutoSize = true;
-			this.label4.Location = new System.Drawing.Point(120, 115);
-			this.label4.Name = "label4";
-			this.label4.Size = new System.Drawing.Size(111, 13);
-			this.label4.TabIndex = 12;
-			this.label4.Text = "Spotify Mixer Max Vol.";
 			// 
 			// comboBoxAudioSources
 			// 
@@ -354,7 +340,7 @@
 			this.groupBox4.Controls.Add(this.checkBoxC);
 			this.groupBox4.Controls.Add(this.checkBoxB);
 			this.groupBox4.Controls.Add(this.checkBoxA);
-			this.groupBox4.Location = new System.Drawing.Point(15, 305);
+			this.groupBox4.Location = new System.Drawing.Point(15, 269);
 			this.groupBox4.Name = "groupBox4";
 			this.groupBox4.Size = new System.Drawing.Size(300, 65);
 			this.groupBox4.TabIndex = 10;
@@ -444,19 +430,11 @@
 			// 
 			this.errorProvider1.ContainerControl = this;
 			// 
-			// numericMixerMaxVolume
-			// 
-			this.numericMixerMaxVolume.Location = new System.Drawing.Point(230, 113);
-			this.numericMixerMaxVolume.Name = "numericMixerMaxVolume";
-			this.numericMixerMaxVolume.Size = new System.Drawing.Size(41, 20);
-			this.numericMixerMaxVolume.TabIndex = 13;
-			this.numericMixerMaxVolume.ValueChanged += new System.EventHandler(this.numericUpDown1_ValueChanged);
-			// 
 			// Form1
 			// 
 			this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
 			this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
-			this.ClientSize = new System.Drawing.Size(330, 436);
+			this.ClientSize = new System.Drawing.Size(324, 361);
 			this.Controls.Add(this.groupBox4);
 			this.Controls.Add(this.groupBox3);
 			this.Controls.Add(this.labelVolume);
@@ -465,6 +443,7 @@
 			this.Controls.Add(this.label3);
 			this.Controls.Add(this.label1);
 			this.Icon = ((System.Drawing.Icon)(resources.GetObject("$this.Icon")));
+			this.MinimumSize = new System.Drawing.Size(340, 400);
 			this.Name = "Form1";
 			this.Text = "GTA Radio External";
 			this.FormClosing += new System.Windows.Forms.FormClosingEventHandler(this.Form1_FormClosing);
@@ -478,7 +457,6 @@
 			this.groupBox4.ResumeLayout(false);
 			this.groupBox4.PerformLayout();
 			((System.ComponentModel.ISupportInitialize)(this.errorProvider1)).EndInit();
-			((System.ComponentModel.ISupportInitialize)(this.numericMixerMaxVolume)).EndInit();
 			this.ResumeLayout(false);
 			this.PerformLayout();
 
@@ -516,8 +494,6 @@
 		private System.Windows.Forms.RadioButton radioButtonSpotify;
 		private System.Windows.Forms.ComboBox comboBoxAudioSources;
 		private System.Windows.Forms.ErrorProvider errorProvider1;
-		private System.Windows.Forms.Label label4;
-		private System.Windows.Forms.NumericUpDown numericMixerMaxVolume;
 	}
 }
 
