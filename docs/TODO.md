@@ -14,8 +14,8 @@ Open work, one row per item. Within each group, rows are in suggested order of w
 | [HWN](issues.md#hwn--window-handle-handling) | Music players | The player's window is looked up once and never again, so a player whose window appears after its process never mutes while its status says `Running`; window handles are also declared as `int` in a 64-bit build | Medium |
 | [CWD](issues.md#cwd--input-is-found-through-the-current-directory) | Startup | `input/` is found through the current directory, so starting the exe from another folder breaks it | Medium |
 | [DOC](issues.md#doc--user-docs-describe-old-behaviour) | Docs | `README.md` and `readme.txt` describe old behaviour, the game JSON format is undocumented, and `readme.txt` doesn't reach the output folder | Medium |
-| [SPT](issues.md#spt--spotify-support) | Music players | Add Spotify: open PR #5 mutes it in the Windows Volume Mixer through CSCore, but it's written against the legacy code and for San Andreas only | Medium |
 | [HKY](issues.md#hky--configurable-mute-hotkey) | Music players | Issue #2: let users set a mute hotkey, so any player can work without memory addresses | Medium |
+| [SPT](issues.md#spt--answer-pr-5) | Music players | Reply to PR #5: its Spotify muting is ported to the active code as the `AudioSession` hook, so the PR itself can't be merged | Low |
 | [GMD](issues.md#gmd--radioaddressmodule-is-ignored) | Game config | `radioAddress.module` in game configs is ignored, because `Game` reads a top-level `moduleName` instead | Low |
 | [MXV](issues.md#mxv--maxvolume-is-ignored) | Config | `maxVolume` in both WACUP configs is ignored, because `MPData` has no such field | Low |
 | [MPR](issues.md#mpr--several-running-instances) | Processes | With several instances of a game or player running, `WinApi.GetProcess` takes the first without checking it | Low |

@@ -3,9 +3,10 @@
 For information about the JSON format, see www.json.org
 Please ensure each jason has a description, and the name of the process (without the .exe extension), as well as information about the method to send information to the music player (hook).
 
-Hook: There are two kinds of hooks, ProcessStart and SendMessage.
+Hook: There are three kinds of hooks, ProcessStart, SendMessage and AudioSession.
 ProcessStart will start the music player process but with certain arguments. If the music player supports it, this will instead send the argument to the existing process, as opposed to starting a duplicate process.
 SendMessage will have Windows send a message to the process, telling it to mute or unmute. A message requires a windowName, wMsg, wParam, and lParam.
+AudioSession will mute the process in the Windows Volume Mixer, so it works for anything listed there. It needs no other settings and doesn't use a volume object. The process has to have played something first, or there is nothing to mute yet.
 
 Volume:
 The volume object is used to determine what volume a program is set to. This allows for the unmuting of programs that do not support native muting by instead setting volume directly.

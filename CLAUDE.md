@@ -36,6 +36,7 @@ Two generations of code sit side by side, and only one of them runs.
 - The poll uses `System.Timers.Timer`, so it runs on a thread-pool thread, one poll at a time: `AutoReset` is off and `Check` restarts the timer. On .NET Framework that timer swallows exceptions from its handler, so `GetProcess` and `Radio.CheckRadio` catch theirs and show them in the labels. Any other failure inside the poll is silent.
 - `Game` and `MusicPlayer` deserialize their file into `GData` and `MPData`, look their process up again when it exits, and keep a `Status` text saying what they last found.
 - `WinApi` holds the P/Invoke declarations, process and module lookup, and typed memory reads.
+- `AudioSessions` holds the Core Audio COM declarations and mutes an app at the per-app level the Windows Volume Mixer shows. It matches every process with the app's name, because any of them can own the session, and it skips output devices that refuse to list their sessions.
 
 **Legacy, hardcoded, never run:** `Form1`, `ReadMemory`, `Settings` and the commented-out blocks in `Program.cs` still compile, but nothing instantiates `Form1`. `ReadMemory` is the reference for what hasn't been ported yet: GTA III and Vice City version detection, their radio status codes, and the pause and volume-key actions. `README.md` still describes this generation. What the active code supports is what's in `input/`.
 
@@ -56,9 +57,12 @@ The build targets x64 so it can read 64-bit games. `WinApi.GetModuleAddress` fal
 - A radio value in neither `onValues` nor `offValues` counts as off.
 - A new file under `input/` needs a `<None Include>` entry with `CopyToOutputDirectory` in `VGRadioExternal.csproj`, or it won't reach `bin/`.
 
-`MusicPlayer.Mute` only implements two hook combinations. `MemoryWrite` isn't implemented at all.
+`MusicPlayer.Mute` only implements the hook combinations below. `MemoryWrite` isn't implemented at all.
 
 | `setVolume.type` | With `readVolume` | Without `readVolume` |
 | --- | --- | --- |
 | `SendMessage` | Sets volume to `minVolume`, then restores the stored volume | Throws `NotImplementedException` |
 | `ProcessStart` | Throws `NotImplementedException` | Runs the player's exe with `arguments`, as a blind toggle |
+| `AudioSession` | Same as without: `readVolume` isn't used | Sets the mute state of the app's audio sessions on every output device |
+
+An app has no audio session until it has played something. With none, muting throws, so `Radio` shows the message and tries again every poll, and unmuting does nothing.

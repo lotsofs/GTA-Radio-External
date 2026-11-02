@@ -33,9 +33,10 @@ namespace VGRadioExternal {
 
     public enum HookMethods {
         None,
-        SendMessage,    // for winamp, spotify
+        SendMessage,    // for winamp
         ProcessStart,    // for foobar
-        MemoryWrite     // for anything else?
+        MemoryWrite,     // for anything else?
+        AudioSession    // for spotify, or any other app in the volume mixer
     }
 
 }

@@ -29,6 +29,7 @@ Use any game that passed above.
 - **LIV 5.** `Winamp.json` on Winamp 5.8 with the `out_ds.dll` output: base check.
 - **LIV 6.** `Wacup.json` on WACUP 1.0.20.7170: base check.
 - **LIV 7.** `Wacup - Not So Direct.json` on WACUP 1.0.20.7170 with the Not So Direct output: base check.
+- **LIV 10.** `Spotify.json` on Spotify 1.3.6.1921: base check, and if Spotify is paused while muted and played again, it stays silent until the radio comes back. Other apps keep playing throughout.
 
 ### After FOB and HOK
 

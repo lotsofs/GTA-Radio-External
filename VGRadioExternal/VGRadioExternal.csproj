@@ -88,6 +88,7 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="AudioSessions.cs" />
     <Compile Include="GData.cs" />
     <Compile Include="MPData.cs" />
     <Compile Include="FormRE.cs">
@@ -140,6 +141,9 @@
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </None>
     <None Include="input\music players\Foobar2000.json">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </None>
+    <None Include="input\music players\Spotify.json">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </None>
     <None Include="input\music players\Wacup - Not So Direct.json">

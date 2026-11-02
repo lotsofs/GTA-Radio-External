@@ -41,6 +41,7 @@ Detail for the items in [TODO.md](TODO.md).
 - **Tool closes while muted.** `FormRE` has no closing handler and `Radio` no shutdown, so the player stays at `minVolume`.
 - **Selection changes.** A new `Game` or `MusicPlayer` keeps the old `_on` and isn't told the current state. A new `MusicPlayer` also stores the volume it finds at startup, which is `minVolume` if the player is muted, and unmuting then restores that.
 - **Toggle configs.** `ToggleMute` assumes the player starts unmuted, as the description in `Windows Media Player.json` warns.
+- **Volume Mixer mutes.** The `AudioSession` hook has the gaps above, and they're harder to spot: the mute stays in the Mixer when the tool closes, and Spotify's own window doesn't show it. Whether it also survives restarting Spotify isn't known.
 
 **Evidence:** read 2026-11-02. Seeing these needs a real game and player.
 
@@ -103,17 +104,17 @@ The `FormRE` constructor builds `inputPath` from `Environment.CurrentDirectory`.
 
 **Docs when done:** this item is the docs. Mention it in the changelog if `readme.txt` starts shipping.
 
-## SPT — Spotify support
+## SPT — Answer PR #5
 
-[PR #5](https://github.com/lotsofs/GTA-Radio-External/pull/5) by Goldiedtv, open since 2023-05-17, mutes Spotify in the Windows Volume Mixer. It finds Spotify's audio session by process ID using CSCore, and adds a dropdown for the audio device. It targets `master`, so it's written against `Form1` and `ReadMemory`, and only works for San Andreas. It can't be merged into the active code as it stands.
+[PR #5](https://github.com/lotsofs/GTA-Radio-External/pull/5) by Goldiedtv, open since 2023-05-17, adds Spotify muting to the legacy code. It targets `master`, written against `Form1` and `ReadMemory`, so it can't be merged. Its idea is in the active code now as the `AudioSession` hook, and the PR still needs a reply.
 
-**Evidence:** read 2026-11-02 from the PR's description and file list. Not run.
+**Evidence:** read 2026-11-02 from the PR's description and diff.
 
-**Plan:** port the idea rather than the patch: add a `HookMethods` value that mutes a process's audio session by name, which would work for any player, not just Spotify. Decide between CSCore and direct Core Audio interop. Then answer the PR.
+**Plan:** thank them, say how the idea was ported and that no audio device setting is needed any more, and close the PR once the active code reaches `master`.
 
-**Verify:** with Spotify as the player, it mutes in the Volume Mixer when the radio goes off and returns when it comes on, and other apps are untouched.
+**Verify:** the PR has a reply.
 
-**Docs when done:** the hook table in `CLAUDE.md`, `readme.txt`, and an Added entry in the changelog.
+**Docs when done:** none.
 
 ## HKY — Configurable mute hotkey
 

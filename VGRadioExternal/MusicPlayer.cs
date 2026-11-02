@@ -112,6 +112,14 @@ namespace VGRadioExternal
             if (!IsRunning()) {
                 //throw new WarningException("No music player is running.");
             }
+            if (_mp.SetVolume.Type == HookMethods.AudioSession) {
+                // an app only has a session once it has played something, so there may be nothing to unmute
+                if (AudioSessions.SetMute(_mp.ProcessName, mute) == 0 && mute) {
+                    // Radio tries again every poll, so a session that appears later still gets muted
+                    throw new InvalidOperationException("No audio session yet. Play something in " + _mp.ProcessName + ".");
+                }
+                return;
+            }
             if (_mp.ReadVolume == null) {
                 ToggleMute();
                 return;
