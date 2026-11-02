@@ -6,7 +6,6 @@ Open work, one row per item. Within each group, rows are in suggested order of w
 
 | Code | Area | Summary | Severity |
 |---|---|---|---|
-| [FOB](issues.md#fob--foobar2000json-fails-to-load) | Music players | `Foobar2000.json` fails to load because its `addressOffset` is a quoted string | High |
 | [SYN](issues.md#syn--mute-state-drifts-from-the-player) | Radio | The player doesn't mute if the game starts with the radio off, and stays muted after the game or the tool closes or the selection changes | High |
 | [VAL](issues.md#val--configs-arent-validated-on-load) | Config | Nothing validates a config on load: a bad file throws on the UI thread, and bad `wMsg`, `wParam` or `type` values only fail later in the poll | Medium |
 | [RDF](issues.md#rdf--failed-reads-are-treated-as-real-values) | Memory | A failed read counts as radio off, and a failed volume read stores `int.MinValue`, which unmuting then sends to the player | Medium |

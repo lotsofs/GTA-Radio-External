@@ -21,7 +21,7 @@ What changed for users of GTA Radio External, per release, newest first. Downloa
 ### Changed
 
 - **The program is now `VGRadioExternal.exe`, and its window is called Radio External**, with a new layout. It shows `V0.3.0 WIP`.
-- **Winamp now means v5.8 and Foobar2000 now means v1.4.8**, instead of v5.666 and v1.3.14. Foobar2000 doesn't load yet: that's a known bug.
+- **Winamp now means v5.8 and Foobar2000 now means v1.4.8**, instead of v5.666 and v1.3.14.
 - **The game and the music player each have their own status.** It says whether each one is selected and running, which file is missing, or what went wrong, and the game's status also says whether the radio is on. If a message is cut off, hover over it to read the rest.
 
 ### Removed

@@ -90,6 +90,7 @@
   <ItemGroup>
     <Compile Include="AudioSessions.cs" />
     <Compile Include="GData.cs" />
+    <Compile Include="HexIntConverter.cs" />
     <Compile Include="MPData.cs" />
     <Compile Include="FormRE.cs">
       <SubType>Form</SubType>

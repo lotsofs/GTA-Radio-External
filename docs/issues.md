@@ -4,18 +4,6 @@ Detail for the items in [TODO.md](TODO.md).
 
 **Dependencies:** SHR is easier once VAL and RDF have settled what the two classes do.
 
-## FOB — Foobar2000.json fails to load
-
-`readVolume.addressOffset` in [Foobar2000.json](../VGRadioExternal/input/music%20players/Foobar2000.json) is the quoted string `"0x1BE9E8"`, and `ReadVolume.AddressOffset` is an `int`, so deserializing it throws when the file is picked in the Music Player list.
-
-**Evidence:** reproduced 2026-11-02 by deserializing the shipped file into `MPData` from the built assembly: `JsonReaderException: Could not convert string to integer: 0x1BE9E8`. How that reaches the user is only read: `FormRE.ComboBox_MusicPlayer_SelectedIndexChanged` has no `try`, so it should land in the WinForms unhandled exception dialog.
-
-**Plan:** write the value as the number `0x1BE9E8`.
-
-**Verify:** the file deserializes, and picking it in the list raises no error. Then [LIV 8](live-checks.md#after-fob).
-
-**Docs when done:** the Foobar2000 entry under Unreleased in the changelog.
-
 ## SYN — Mute state drifts from the player
 
 `Radio` keeps one `_on` flag, false at the start, and acts only when `Game.IsRadioOn()` differs from it. Several situations leave the player in the wrong state:
@@ -43,7 +31,7 @@ Values that are used later aren't checked at all. `ReadVolume.Type` and `RadioAd
 
 A `setVolume` with no `type` becomes `None`, which does nothing and shows no error. `{volume}` in a config with no `readVolume` sends `minVolume` for both muting and unmuting.
 
-**Evidence:** the load failure reproduced 2026-11-02, as in [FOB](#fob--foobar2000json-fails-to-load). The rest read 2026-11-02.
+**Evidence:** the load failure reproduced 2026-11-03 by deserializing a bad `addressOffset` into `MPData` from the built assembly: `"banana"` throws `FormatException`. How that reaches the user is only read: `FormRE.ComboBox_MusicPlayer_SelectedIndexChanged` has no `try`, so it should land in the WinForms unhandled exception dialog. The rest read 2026-11-02.
 
 **Plan:** add one load step that deserializes, checks required fields, and parses the enum and integer values once into typed fields. On failure, show a message naming the file and field, and keep the previous selection.
 

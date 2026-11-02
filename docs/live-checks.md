@@ -32,9 +32,4 @@ Use any game that passed above.
 - **LIV 10.** `Spotify.json` on Spotify 1.3.6.1921: base check, and if Spotify is paused while muted and played again, it stays silent until the radio comes back. Other apps keep playing throughout.
 - **LIV 11.** A `KeyPress` config for WACUP, with `keys` set to `Ctrl+Shift+P`, on WACUP with that key set as a global hotkey, starting unmuted: base check, and the game doesn't react to the key press.
 - **LIV 9.** `Windows Media Player.json` on Windows Media Player 12: base check, starting with the player unmuted.
-
-### After FOB
-
-This can't pass until [FOB](issues.md#fob--foobar2000json-fails-to-load) is done.
-
 - **LIV 8.** `Foobar2000.json` on Foobar2000 1.4.8: base check, and the mute stays in step with the radio over several changes.

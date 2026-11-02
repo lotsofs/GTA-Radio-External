@@ -48,7 +48,7 @@ The build targets x64 so it can read 64-bit games. `WinApi.GetModuleAddress` fal
 
 `VGRadioExternal/readme.txt` documents the music player format for users. Where it differs from the code, the code is right.
 
-- Keys match `GData` and `MPData` fields case-insensitively. Hex literals such as `0xB0A0` parse even though they aren't standard JSON, but a quoted `"0xB0A0"` fails.
+- Keys match `GData` and `MPData` fields case-insensitively. Hex literals such as `0xB0A0` parse even though they aren't standard JSON. `addressOffset` also takes them quoted, as `"0xB0A0"`, but other integers don't.
 - An address is the module base plus one static `addressOffset`. Pointer chains aren't supported.
 - `type` must name a `WinApi.Types` value, `setVolume.type` a `HookMethods` value, and `wMsg` a `WinApi.wMsg` value. `WinApi.wMsg` is incomplete, so add any message that's missing.
 - `wParam` and `lParam` are integers or the literal `"{volume}"`.

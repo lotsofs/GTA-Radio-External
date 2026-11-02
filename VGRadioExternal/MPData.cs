@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using Newtonsoft.Json;
 
 namespace VGRadioExternal {
 
@@ -18,6 +19,7 @@ namespace VGRadioExternal {
 
     class ReadVolume {
         public string Module;
+        [JsonConverter(typeof(HexIntConverter))]
         public int AddressOffset;
         public string Type;
     }
