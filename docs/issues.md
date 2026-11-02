@@ -2,7 +2,7 @@
 
 Detail for the items in [TODO.md](TODO.md).
 
-**Dependencies:** FOB needs HOK, or the stopgap in its plan. HKY shares its key sending with [ACT](porting.md#act--pause-and-volume-actions). SHR is easier once VAL and RDF have settled what the two classes do.
+**Dependencies:** FOB needs HOK, or the stopgap in its plan. SHR is easier once VAL and RDF have settled what the two classes do.
 
 ## FOB — Foobar2000.json fails to load
 
@@ -40,7 +40,7 @@ Detail for the items in [TODO.md](TODO.md).
 - **Game closes while muted.** `Radio.Check` only touches the player while the game is running, so the player stays muted.
 - **Tool closes while muted.** `FormRE` has no closing handler and `Radio` no shutdown, so the player stays at `minVolume`.
 - **Selection changes.** A new `Game` or `MusicPlayer` keeps the old `_on` and isn't told the current state. A new `MusicPlayer` also stores the volume it finds at startup, which is `minVolume` if the player is muted, and unmuting then restores that.
-- **Toggle configs.** `ToggleMute` assumes the player starts unmuted, as the description in `Windows Media Player.json` warns.
+- **Toggle configs.** `ToggleMute` assumes the player starts unmuted and that nothing else toggles it, as the description in `Windows Media Player.json` warns. Starting muted, or pressing a `KeyPress` hotkey by hand, inverts the player until it's fixed by hand. A new `MusicPlayer` also forgets that it had muted the player.
 - **Volume Mixer mutes.** The `AudioSession` hook has the gaps above, and they're harder to spot: the mute stays in the Mixer when the tool closes, and Spotify's own window doesn't show it. Whether it also survives restarting Spotify isn't known.
 
 **Evidence:** read 2026-11-02. Seeing these needs a real game and player.
@@ -116,17 +116,17 @@ The `FormRE` constructor builds `inputPath` from `Environment.CurrentDirectory`.
 
 **Docs when done:** none.
 
-## HKY — Configurable mute hotkey
+## HKY — Answer issue #2
 
-[Issue #2](https://github.com/lotsofs/GTA-Radio-External/issues/2) by MhmdFVC, 2021-03-24, asks for a user-set mute hotkey, which would work across most players with no version-specific addresses. The issue also reports an unhandled exception with Foobar2000 1.6.4 in the legacy code.
+[Issue #2](https://github.com/lotsofs/GTA-Radio-External/issues/2) by MhmdFVC, 2021-03-24, asks for a user-set mute hotkey, so that muting works across most players and version differences stop mattering. The issue also reports an unhandled exception with Foobar2000 1.6.4 in the legacy code. The `KeyPress` hook adds the hotkey, and the issue still needs a reply. `wacup_test.json`, the config it was tested with, was added for manual inspection and isn't meant to ship under that name.
 
-**Evidence:** read 2026-11-02 from the issue. Not run.
+**Evidence:** the issue read 2026-11-02.
 
-**Plan:** add a key-press `HookMethods` value with the key in the config, sharing key sending with [ACT](porting.md#act--pause-and-volume-actions). It's a blind toggle, so it has the toggle problem in [SYN](#syn--mute-state-drifts-from-the-player).
+**Plan:** rename `wacup_test.json` or delete it with its `.csproj` entry, updating [LIV 11](live-checks.md#with-each-music-player). Reply to the issue, and close it once the active code reaches `master`.
 
-**Verify:** bind a key in a player, set it in a config, and the player mutes and unmutes with the radio.
+**Verify:** the issue has a reply, and no test config is in the Music Player list.
 
-**Docs when done:** the hook table in `CLAUDE.md`, `readme.txt`, and an Added entry in the changelog. Close the issue.
+**Docs when done:** none.
 
 ## GMD — radioAddress.module is ignored
 

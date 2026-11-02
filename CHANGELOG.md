@@ -15,6 +15,7 @@ What changed for users of GTA Radio External, per release, newest first. Downloa
 - **WACUP and Windows Media Player** are now supported. Windows Media Player doesn't mute yet: that's a known bug.
 - **Spotify** is now supported. It's muted in the Windows Volume Mixer, so other programs keep playing. Play something in Spotify first: until you do, there's nothing to mute, and its status says so when the radio goes off. If you close this program while Spotify is muted, unmute it in the Volume Mixer.
 - **Any other program in the Volume Mixer can be muted the same way.** Set `type` under `setVolume` to `AudioSession` in its JSON file, as `Spotify.json` does.
+- **Any music player with a global mute hotkey can now be used.** Under `setVolume` in its JSON file, set `type` to `KeyPress` and `keys` to the hotkey, such as `Ctrl+Shift+P`. Start with the player unmuted, and pick a key your game doesn't use. If you're holding another Shift, Ctrl or Alt, the key waits until you let go, and the status says so.
 
 ### Changed
 

@@ -2,7 +2,7 @@
 
 Detail for the items in [TODO.md](TODO.md). `Form1` and `ReadMemory` hold features the active code doesn't have yet. See `CLAUDE.md` § Architecture for how the two generations relate.
 
-**Dependencies:** VDT comes before SAV, III, GVC and SRT. WHN needs III or GVC, because San Andreas only has on and off. ACT shares key sending with [HKY](issues.md#hky--configurable-mute-hotkey). LEG comes last.
+**Dependencies:** VDT comes before SAV, III, GVC and SRT. WHN needs III or GVC, because San Andreas only has on and off. LEG comes last.
 
 All addresses below were read on 2026-11-02 from [ReadMemory.cs](../VGRadioExternal/ReadMemory.cs). They're absolute, so each table also gives the `addressOffset` for a config, which subtracts the `0x400000` image base. That offset is confirmed for San Andreas 1.0, where it matches the shipped config, and assumed for the rest.
 
@@ -106,7 +106,7 @@ The legacy window let users choose whether music plays during Radio, Emergency, 
 
 **Evidence:** read 2026-11-02.
 
-**Plan:** add a key-press `HookMethods` value for pause, shared with [HKY](issues.md#hky--configurable-mute-hotkey). Decide whether Volume Keypress is worth porting at all, given that Windows volume keys can affect the whole system, and move the item to the log with the decision if not.
+**Plan:** use the `KeyPress` hook for pause, with `MediaPlayPause` as its `keys`, which should only need a config. Decide whether Volume Keypress is worth porting at all, given that Windows volume keys can affect the whole system, and move the item to the log with the decision if not.
 
 **Verify:** with a player that takes media keys, music pauses and resumes with the radio.
 

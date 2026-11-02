@@ -26,6 +26,7 @@ namespace VGRadioExternal
 
         int _window;
         string _executableFile;
+        bool _toggledMuted;
 
         public string Status { get; private set; }
 
@@ -46,6 +47,7 @@ namespace VGRadioExternal
                 Process process = WinApi.GetProcess(_mp.ProcessName);
                 if (process == null || process.HasExited) {
                     _process = null;
+                    _toggledMuted = false;
                     Status = "Not running";
                     return false;
                 }
@@ -120,8 +122,8 @@ namespace VGRadioExternal
                 }
                 return;
             }
-            if (_mp.ReadVolume == null) {
-                ToggleMute();
+            if (_mp.ReadVolume == null || _mp.SetVolume.Type == HookMethods.KeyPress) {
+                ToggleMute(mute);
                 return;
             }
 
@@ -154,9 +156,16 @@ namespace VGRadioExternal
             }
         }
 
-        public void ToggleMute() {
+        /// <summary>
+        /// Mutes or unmutes a player that can only be toggled. Nothing says which state it's in, so this assumes it starts unmuted and that only this tool toggles it.
+        /// </summary>
+        /// <param name="mute">whether the player should end up muted</param>
+        public void ToggleMute(bool mute) {
             if (!IsRunning()) {
                 //
+            }
+            if (mute == _toggledMuted) {
+                return;
             }
             int wParam = 0;
             switch (_mp.SetVolume.Type) {
@@ -166,7 +175,11 @@ namespace VGRadioExternal
                 case HookMethods.ProcessStart:
                     Process.Start(_processStartInfo);
                     break;
+                case HookMethods.KeyPress:
+                    WinApi.PressKeys(_mp.SetVolume.Keys);
+                    break;
             }
+            _toggledMuted = mute;
         }
 
         int ReadVolume() {

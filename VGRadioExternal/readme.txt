@@ -3,10 +3,11 @@
 For information about the JSON format, see www.json.org
 Please ensure each jason has a description, and the name of the process (without the .exe extension), as well as information about the method to send information to the music player (hook).
 
-Hook: There are three kinds of hooks, ProcessStart, SendMessage and AudioSession.
+Hook: There are four kinds of hooks, ProcessStart, SendMessage, AudioSession and KeyPress.
 ProcessStart will start the music player process but with certain arguments. If the music player supports it, this will instead send the argument to the existing process, as opposed to starting a duplicate process.
 SendMessage will have Windows send a message to the process, telling it to mute or unmute. A message requires a windowName, wMsg, wParam, and lParam.
 AudioSession will mute the process in the Windows Volume Mixer, so it works for anything listed there. It needs no other settings and doesn't use a volume object. The process has to have played something first, or there is nothing to mute yet.
+KeyPress will press a hotkey to toggle the music player's mute. Set it as a global hotkey in the music player, and put the same key in keys, for example Ctrl+Shift+P. It doesn't use a volume object. Start with the music player unmuted. Pick a key the game doesn't use: the game still sees Shift, Ctrl and Alt, so a key without them, like F13, is best. If you hold another Shift, Ctrl or Alt, the key waits until you let go.
 
 Volume:
 The volume object is used to determine what volume a program is set to. This allows for the unmuting of programs that do not support native muting by instead setting volume directly.

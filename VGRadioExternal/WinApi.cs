@@ -6,6 +6,7 @@ using System.Linq;
 using System.Runtime.InteropServices;
 using System.Text;
 using System.Threading.Tasks;
+using System.Windows.Forms;
 
 namespace VGRadioExternal {
     static class WinApi {
@@ -50,6 +51,12 @@ namespace VGRadioExternal {
         [DllImport("user32.dll")]
         public static extern int FindWindow(string lpClassName, String lpWindowName);
 
+        [DllImport("user32.dll")]
+        public static extern void keybd_event(byte virtualKey, byte scanCode, uint flags, IntPtr extraInfo);
+
+        [DllImport("user32.dll")]
+        public static extern short GetAsyncKeyState(int virtualKey);
+
         [DllImport("psapi.dll")]
         public static extern bool EnumProcessModulesEx(IntPtr hProcess, IntPtr[] lphModule, int cb, out int lpcbNeeded, uint dwFilterFlag);
 
@@ -62,6 +69,13 @@ namespace VGRadioExternal {
 
 
         public const int MAX_PATH = 260;
+        public const uint KEYEVENTF_KEYUP = 0x0002;
+
+        static readonly Dictionary<Keys, Keys> Modifiers = new Dictionary<Keys, Keys> {
+            { Keys.Shift, Keys.ShiftKey },
+            { Keys.Control, Keys.ControlKey },
+            { Keys.Alt, Keys.Menu }
+        };
 
         public struct ModuleInformation {
             public IntPtr lpBaseOfDll;
@@ -100,6 +114,36 @@ namespace VGRadioExternal {
                 case Types.FourBytes:
                 default:
                     return BitConverter.ToInt32(buffer, 0);
+            }
+        }
+
+        /// <summary>
+        /// Presses and releases keys as if on the keyboard. They go to the window in front, unless a program has claimed them as a global hotkey.
+        /// </summary>
+        /// <param name="keys">the keys as KeysConverter reads them, such as Ctrl+Shift+P</param>
+        public static void PressKeys(string keys) {
+            Keys combination = (Keys)new KeysConverter().ConvertFromInvariantString(keys);
+            List<byte> toPress = new List<byte>();
+            foreach (KeyValuePair<Keys, Keys> modifier in Modifiers) {
+                bool wanted = combination.HasFlag(modifier.Key);
+                bool held = GetAsyncKeyState((int)modifier.Value) < 0;
+                if (held && !wanted) {
+                    // this would make it a different combination. Throwing leaves it to the next poll
+                    throw new InvalidOperationException("Waiting for " + modifier.Key + " to be released");
+                }
+                if (wanted && !held) {
+                    toPress.Add((byte)modifier.Value);
+                }
+            }
+
+            byte key = (byte)(combination & Keys.KeyCode);
+            foreach (byte modifier in toPress) {
+                keybd_event(modifier, 0, 0, IntPtr.Zero);
+            }
+            keybd_event(key, 0, 0, IntPtr.Zero);
+            keybd_event(key, 0, KEYEVENTF_KEYUP, IntPtr.Zero);
+            foreach (byte modifier in toPress) {
+                keybd_event(modifier, 0, KEYEVENTF_KEYUP, IntPtr.Zero);
             }
         }
 

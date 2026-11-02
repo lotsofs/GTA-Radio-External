@@ -35,7 +35,7 @@ Two generations of code sit side by side, and only one of them runs.
 - `Radio` raises `StatusChanged` when either status text changes, and `FormRE` shows both in its labels through `BeginInvoke`. `FormRE` starts the timer from `Load`, because `BeginInvoke` needs the window handle and a status is only reported when it changes.
 - The poll uses `System.Timers.Timer`, so it runs on a thread-pool thread, one poll at a time: `AutoReset` is off and `Check` restarts the timer. On .NET Framework that timer swallows exceptions from its handler, so `GetProcess` and `Radio.CheckRadio` catch theirs and show them in the labels. Any other failure inside the poll is silent.
 - `Game` and `MusicPlayer` deserialize their file into `GData` and `MPData`, look their process up again when it exits, and keep a `Status` text saying what they last found.
-- `WinApi` holds the P/Invoke declarations, process and module lookup, and typed memory reads.
+- `WinApi` holds the P/Invoke declarations, process and module lookup, typed memory reads, and simulated key presses.
 - `AudioSessions` holds the Core Audio COM declarations and mutes an app at the per-app level the Windows Volume Mixer shows. It matches every process with the app's name, because any of them can own the session, and it skips output devices that refuse to list their sessions.
 
 **Legacy, hardcoded, never run:** `Form1`, `ReadMemory`, `Settings` and the commented-out blocks in `Program.cs` still compile, but nothing instantiates `Form1`. `ReadMemory` is the reference for what hasn't been ported yet: GTA III and Vice City version detection, their radio status codes, and the pause and volume-key actions. `README.md` still describes this generation. What the active code supports is what's in `input/`.
@@ -52,6 +52,7 @@ The build targets x64 so it can read 64-bit games. `WinApi.GetModuleAddress` fal
 - An address is the module base plus one static `addressOffset`. Pointer chains aren't supported.
 - `type` must name a `WinApi.Types` value, `setVolume.type` a `HookMethods` value, and `wMsg` a `WinApi.wMsg` value. `WinApi.wMsg` is incomplete, so add any message that's missing.
 - `wParam` and `lParam` are integers or the literal `"{volume}"`.
+- `setVolume.keys` takes what `KeysConverter` reads, such as `Ctrl+Shift+P`, `F13` or `VolumeMute`. The keys go to the window in front unless a program has claimed them, so the player must have them set as a global hotkey.
 - Each file has one `processName`, so a variant executable name needs its own file (`gta_sa` and `gta-sa`).
 - `radioAddress.module` is ignored: `Game` reads a top-level `moduleName` instead. `maxVolume` is ignored too.
 - A radio value in neither `onValues` nor `offValues` counts as off.
@@ -64,5 +65,8 @@ The build targets x64 so it can read 64-bit games. `WinApi.GetModuleAddress` fal
 | `SendMessage` | Sets volume to `minVolume`, then restores the stored volume | Throws `NotImplementedException` |
 | `ProcessStart` | Throws `NotImplementedException` | Runs the player's exe with `arguments`, as a blind toggle |
 | `AudioSession` | Same as without: `readVolume` isn't used | Sets the mute state of the app's audio sessions on every output device |
+| `KeyPress` | Same as without: `readVolume` isn't used | Presses `keys`, as a blind toggle |
 
 An app has no audio session until it has played something. With none, muting throws, so `Radio` shows the message and tries again every poll, and unmuting does nothing.
+
+A blind toggle can't see the player's state. `MusicPlayer.ToggleMute` remembers what it last set and only acts when that changes, assuming the player starts unmuted and nothing else toggles it. `KeyPress` throws, and so retries, while a Shift, Ctrl or Alt outside `keys` is held, because the hotkey wouldn't match.
