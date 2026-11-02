@@ -5,7 +5,7 @@ using System.Text;
 using System.Threading.Tasks;
 
 namespace VGRadioExternal {
-    public class Module {   // todo: FRAMEWORK
+    public class Module {
         public Module(string moduleName, IntPtr baseAddress, uint size) {
             ModuleName = moduleName;
             BaseAddress = baseAddress;

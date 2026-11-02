@@ -21,10 +21,10 @@ namespace VGRadioExternal {
         bool _musicPlayerRunning;
         
         public Radio() {
-            //string path = Path.GetFullPath(".\\input\\music players\\Wacup - Not So Direct.json");   // todo: Nice hardcode
+            //string path = Path.GetFullPath(".\\input\\music players\\Wacup - Not So Direct.json");
             //string json = File.ReadAllText(path);
 
-            //JsonObject json = Json.OpenFile(path);      // todo: move this to some dedicated json handler for the tool, or at least a load script
+            //JsonObject json = Json.OpenFile(path);
 
             //_musicPlayer = new MusicPlayer(json);
             //_game = new Game();
@@ -72,7 +72,7 @@ namespace VGRadioExternal {
         /// <returns></returns>
         bool CheckProcesses() {
             _gameRunning = _game != null && _game.IsRunning();
-            _musicPlayerRunning = _musicPlayer != null && _musicPlayer.IsRunning();   // todo: call an event when these change, inside a set { thing?
+            _musicPlayerRunning = _musicPlayer != null && _musicPlayer.IsRunning();
             return _gameRunning && _musicPlayerRunning;
         }
 

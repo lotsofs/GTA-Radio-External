@@ -20,7 +20,7 @@ namespace VGRadioExternal {
         //public static string PROCESSNAME = "GTAIV";
         //public static string MODULENAME = "";
         //public static int ADDRESSOFFSET = 0xE8463C;
-        //public static WinApi.Types ADDRESSTYPE = WinApi.Types.FourBytes;    // TODO: This doesnt go in winapi.
+        //public static WinApi.Types ADDRESSTYPE = WinApi.Types.FourBytes;
         //public List<int> LISTONVALUES = new List<int> { 2 };
         //public List<int> LISTOFFVALUES = new List<int> { 0, 1, 4 };
 
@@ -45,7 +45,7 @@ namespace VGRadioExternal {
 
             long moduleAddress = WinApi.GetModuleAddress(process, _gameData.ModuleName);
             if (moduleAddress == -1) {
-                // requested module not found. This can happen while the process boots, or if it's not configured properly. TODO: Message
+                // requested module not found. This can happen while the process boots, or if it's not configured properly.
                 _process = null;
                 return false;
             }
@@ -71,7 +71,7 @@ namespace VGRadioExternal {
 
         public bool IsRadioOn() {
             if (!IsRunning()) {
-                //throw new WarningException("No game is running.");      // move htis to Running() TODO:
+                //throw new WarningException("No game is running.");
                 return false;
             }
 
@@ -81,7 +81,7 @@ namespace VGRadioExternal {
                 radio = WinApi.ReadValue(_process, _addressRadio, radioValueType);
             }
             catch {
-                // TODO: catch errors
+                // a failed read leaves radio at -1
             }
             if (_gameData.RadioAddress.OnValues.Contains(radio)) {
                 return true;

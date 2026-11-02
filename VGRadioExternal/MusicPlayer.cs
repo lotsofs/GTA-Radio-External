@@ -50,9 +50,8 @@ namespace VGRadioExternal
             if (_mp.ReadVolume != null) {
                 // find the required addresses
                 long moduleAddress = WinApi.GetModuleAddress(process, _mp.ReadVolume.Module);
-                // todo: There's overlap in this code with Game.cs , maybe make them inherit this from somewhere
                 if (moduleAddress == -1) {
-                    // TODO: requested module not found. This can happen while the process boots, or if it's not configured properly. Display a Message
+                    // requested module not found. This can happen while the process boots, or if it's not configured properly.
                     _process = null;
                     return false;
                 }
@@ -106,7 +105,6 @@ namespace VGRadioExternal
             }
 
             switch (_mp.SetVolume.Type) {
-                // TODO: take care of all the other hookmethods for these methods
                 case HookMethods.SendMessage:
                     int destinationVolume;
                     if (!mute) {
@@ -122,7 +120,7 @@ namespace VGRadioExternal
                     int wParam;
                     int lParam;
                     if (_mp.SetVolume.WParam == "{volume}") { wParam = destinationVolume; }
-                    else { wParam = int.Parse(_mp.SetVolume.WParam); } // todo: Validate? Or is that done in the json reader?
+                    else { wParam = int.Parse(_mp.SetVolume.WParam); }
                     if (_mp.SetVolume.LParam == "{volume}") { lParam = destinationVolume; }
                     else { lParam = int.Parse(_mp.SetVolume.LParam); }
                     
@@ -130,7 +128,7 @@ namespace VGRadioExternal
                     WinApi.SendMessage(_window, wMsg, wParam, lParam);
                     break;
                 case HookMethods.ProcessStart:
-                    throw new NotImplementedException("ProcessStart hookmethod hasn't been implemented for volume control yet"); //todo:
+                    throw new NotImplementedException("ProcessStart hookmethod hasn't been implemented for volume control yet");
                     break;
             }
         }
@@ -139,10 +137,10 @@ namespace VGRadioExternal
             if (!IsRunning()) {
                 //
             }
-            int wParam = 0;     // todo: configure wParam
+            int wParam = 0;
             switch (_mp.SetVolume.Type) {
                 case HookMethods.SendMessage:
-                    throw new NotImplementedException("SendMessage hookmethod can only be used if combination with volume reading so far"); //todo:
+                    throw new NotImplementedException("SendMessage hookmethod can only be used if combination with volume reading so far");
                     break;
                 case HookMethods.ProcessStart:
                     Process.Start(_processStartInfo);
@@ -161,7 +159,7 @@ namespace VGRadioExternal
                 volume = WinApi.ReadValue(_process, _addressVolume, volumeValueType);
             }
             catch {
-                // TODO: catch errors
+                // a failed read leaves volume at int.MinValue
             }
             Debug.WriteLine(volume);
             return volume;

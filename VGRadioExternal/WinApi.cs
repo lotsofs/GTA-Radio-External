@@ -26,7 +26,6 @@ namespace VGRadioExternal {
             WM_GETTEXTLENGTH = 0x000E,
             WM_PAINT = 0x000F,
             WM_CLOSE = 0x0010,
-            // todo: fill this in
             WM_COMMAND = 0x0111,
             WM_USER = 0x0400,
         }
@@ -81,7 +80,7 @@ namespace VGRadioExternal {
         /// <returns></returns>
         public static int ReadValue(Process process, long address, Types type) {
             byte[] buffer;
-            switch (type) {     // todo: read the amount of bytes first, and do the conversion elsewhere
+            switch (type) {
                 case Types.Byte:
                     buffer = new byte[1];
                     break;
@@ -117,7 +116,6 @@ namespace VGRadioExternal {
             }
             else if (processes.Length > 1) {
                 // Multiple instances of the player are running
-                // TODO: Check if the process is not null
                 return processes[0];
             }
             else {
@@ -142,7 +140,7 @@ namespace VGRadioExternal {
                     return pm.BaseAddress.ToInt64();
                 }
             }
-            // Module not found, are we running 64 bit? Lets try another method. TODO: Tidy this
+            // Module not found, are we running 64 bit? Lets try another method.
             List<Module> w64Modules = CollectModules(process);
             foreach (Module m in w64Modules) {
                 if (m.ModuleName == name) {
@@ -158,7 +156,6 @@ namespace VGRadioExternal {
 
 
 
-        // TODO: What happens if I run this from x86 mode?
         public static List<Module> CollectModules(Process process) {
             List<Module> modules = new List<Module>();
             

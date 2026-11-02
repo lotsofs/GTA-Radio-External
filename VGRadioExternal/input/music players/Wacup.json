@@ -1,0 +1,18 @@
+﻿{
+	"description": "Tested with WACUP 1.0.20.7170 with default output 'Not So Direct'.",
+	"processName": "WACUP",
+	"minVolume": 0,
+	"maxVolume": 255,
+	"readVolume": {
+		"module": "Winamp.dll",
+		"addressOffset": 0x161B40,
+		"type": "FourBytes"
+	},
+	"setVolume": {
+		"type": "SendMessage",
+		"windowName": "Winamp v1.x",
+		"wMsg": "WM_USER",
+		"lParam": 122,
+		"wParam": "{volume}"
+	}
+}

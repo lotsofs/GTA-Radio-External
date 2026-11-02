@@ -247,7 +247,7 @@ namespace VGRadioExternal {
 				{
 					if (i.ModuleName == "out_ds.dll")
 					{
-						address_volume = i.BaseAddress.ToInt32() + 0xB0A0;      // TODO: Make this modular or something so this isn't hardcoded and adding new programs is easy.
+						address_volume = i.BaseAddress.ToInt32() + 0xB0A0;
 						break;
 					}										
 				}
