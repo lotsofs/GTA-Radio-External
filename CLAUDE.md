@@ -58,15 +58,18 @@ The build targets x64 so it can read 64-bit games. `WinApi.GetModuleAddress` fal
 - A radio value in neither `onValues` nor `offValues` counts as off.
 - A new file under `input/` needs a `<None Include>` entry with `CopyToOutputDirectory` in `VGRadioExternal.csproj`, or it won't reach `bin/`.
 
-`MusicPlayer.Mute` only implements the hook combinations below. `MemoryWrite` isn't implemented at all.
+`MusicPlayer.Mute` handles each hook as below.
 
 | `setVolume.type` | With `readVolume` | Without `readVolume` |
 | --- | --- | --- |
-| `SendMessage` | Sets volume to `minVolume`, then restores the stored volume | Throws `NotImplementedException` |
-| `ProcessStart` | Throws `NotImplementedException` | Runs the player's exe with `arguments`, as a blind toggle |
+| `SendMessage` with `{volume}` in `wParam` or `lParam` | Sets volume to `minVolume`, then restores the stored volume | Sends `minVolume` both ways, as a blind toggle |
+| `SendMessage` with a fixed message | Sends the message, as a read toggle | Sends the message, as a blind toggle |
+| `ProcessStart` | Runs the player's exe with `arguments`, as a read toggle | Runs the player's exe with `arguments`, as a blind toggle |
 | `AudioSession` | Same as without: `readVolume` isn't used | Sets the mute state of the app's audio sessions on every output device |
-| `KeyPress` | Same as without: `readVolume` isn't used | Presses `keys`, as a blind toggle |
+| `KeyPress` | Presses `keys`, as a read toggle | Presses `keys`, as a blind toggle |
 
 An app has no audio session until it has played something. With none, muting throws, so `Radio` shows the message and tries again every poll, and unmuting does nothing.
+
+A read toggle reads the volume and only acts if the player isn't already in the wanted state, counting `minVolume` or below as muted. It can't end up inverted, but it only suits a player whose value at that address drops to `minVolume` when muted. If the value doesn't move, the player mutes once and never unmutes.
 
 A blind toggle can't see the player's state. `MusicPlayer.ToggleMute` remembers what it last set and only acts when that changes, assuming the player starts unmuted and nothing else toggles it. `KeyPress` throws, and so retries, while a Shift, Ctrl or Alt outside `keys` is held, because the hotkey wouldn't match.

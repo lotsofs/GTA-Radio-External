@@ -36,7 +36,6 @@ namespace VGRadioExternal {
         None,
         SendMessage,    // for winamp
         ProcessStart,    // for foobar
-        MemoryWrite,     // for anything else?
         AudioSession,    // for spotify, or any other app in the volume mixer
         KeyPress    // for any player with a global mute hotkey
     }

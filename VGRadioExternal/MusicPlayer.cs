@@ -122,37 +122,27 @@ namespace VGRadioExternal
                 }
                 return;
             }
-            if (_mp.ReadVolume == null || _mp.SetVolume.Type == HookMethods.KeyPress) {
+            if (_mp.ReadVolume == null) {
                 ToggleMute(mute);
                 return;
             }
-
-            switch (_mp.SetVolume.Type) {
-                case HookMethods.SendMessage:
-                    int destinationVolume;
-                    if (!mute) {
-                        // turn radio on
-                        destinationVolume = _volume;
-                    }
-                    else {
-                        // turn radio off, store old volume
-                        _volume = ReadVolume();
-                        destinationVolume = _mp.MinVolume;
-					}
-
-                    int wParam;
-                    int lParam;
-                    if (_mp.SetVolume.WParam == "{volume}") { wParam = destinationVolume; }
-                    else { wParam = int.Parse(_mp.SetVolume.WParam); }
-                    if (_mp.SetVolume.LParam == "{volume}") { lParam = destinationVolume; }
-                    else { lParam = int.Parse(_mp.SetVolume.LParam); }
-                    
-                    int wMsg = (int)Enum.Parse(typeof(WinApi.wMsg), _mp.SetVolume.WMsg);
-                    WinApi.SendMessage(_window, wMsg, wParam, lParam);
-                    break;
-                case HookMethods.ProcessStart:
-                    throw new NotImplementedException("ProcessStart hookmethod hasn't been implemented for volume control yet");
-                    break;
+            if (_mp.SetVolume.Type == HookMethods.SendMessage && CarriesVolume()) {
+                int destinationVolume;
+                if (!mute) {
+                    // turn radio on
+                    destinationVolume = _volume;
+                }
+                else {
+                    // turn radio off, store old volume
+                    _volume = ReadVolume();
+                    destinationVolume = _mp.MinVolume;
+                }
+                SendConfiguredMessage(destinationVolume);
+                return;
+            }
+            // the volume shows which state the player is in, so unlike a blind toggle this can't end up inverted
+            if ((ReadVolume() <= _mp.MinVolume) != mute) {
+                Toggle();
             }
         }
 
@@ -167,10 +157,17 @@ namespace VGRadioExternal
             if (mute == _toggledMuted) {
                 return;
             }
-            int wParam = 0;
+            Toggle();
+            _toggledMuted = mute;
+        }
+
+        /// <summary>
+        /// Flips the player's mute through the hook the config names
+        /// </summary>
+        void Toggle() {
             switch (_mp.SetVolume.Type) {
                 case HookMethods.SendMessage:
-                    throw new NotImplementedException("SendMessage hookmethod can only be used if combination with volume reading so far");
+                    SendConfiguredMessage(_mp.MinVolume);
                     break;
                 case HookMethods.ProcessStart:
                     Process.Start(_processStartInfo);
@@ -179,7 +176,26 @@ namespace VGRadioExternal
                     WinApi.PressKeys(_mp.SetVolume.Keys);
                     break;
             }
-            _toggledMuted = mute;
+        }
+
+        bool CarriesVolume() {
+            return _mp.SetVolume.WParam == "{volume}" || _mp.SetVolume.LParam == "{volume}";
+        }
+
+        /// <summary>
+        /// Sends the window message from the config
+        /// </summary>
+        /// <param name="volume">what {volume} stands for in wParam and lParam</param>
+        void SendConfiguredMessage(int volume) {
+            int wParam = MessageParameter(_mp.SetVolume.WParam, volume);
+            int lParam = MessageParameter(_mp.SetVolume.LParam, volume);
+            int wMsg = (int)Enum.Parse(typeof(WinApi.wMsg), _mp.SetVolume.WMsg);
+            WinApi.SendMessage(_window, wMsg, wParam, lParam);
+        }
+
+        int MessageParameter(string parameter, int volume) {
+            if (parameter == "{volume}") { return volume; }
+            return int.Parse(parameter);
         }
 
         int ReadVolume() {

@@ -2,7 +2,7 @@
 
 Detail for the items in [TODO.md](TODO.md).
 
-**Dependencies:** FOB needs HOK, or the stopgap in its plan. SHR is easier once VAL and RDF have settled what the two classes do.
+**Dependencies:** SHR is easier once VAL and RDF have settled what the two classes do.
 
 ## FOB — Foobar2000.json fails to load
 
@@ -10,27 +10,11 @@ Detail for the items in [TODO.md](TODO.md).
 
 **Evidence:** reproduced 2026-11-02 by deserializing the shipped file into `MPData` from the built assembly: `JsonReaderException: Could not convert string to integer: 0x1BE9E8`. How that reaches the user is only read: `FormRE.ComboBox_MusicPlayer_SelectedIndexChanged` has no `try`, so it should land in the WinForms unhandled exception dialog.
 
-**Plan:** write the value as the number `0x1BE9E8`. The file then reaches the `ProcessStart` with `readVolume` gap in [HOK](#hok--two-hook-combinations-throw), so either do HOK in the same change, or remove `readVolume` from the file for now, which makes it a blind toggle.
+**Plan:** write the value as the number `0x1BE9E8`.
 
-**Verify:** the file deserializes, and picking it in the list raises no error. Then [LIV 8](live-checks.md#after-fob-and-hok).
+**Verify:** the file deserializes, and picking it in the list raises no error. Then [LIV 8](live-checks.md#after-fob).
 
 **Docs when done:** the Foobar2000 entry under Unreleased in the changelog.
-
-## HOK — Two hook combinations throw
-
-`MusicPlayer.Mute` calls `ToggleMute` when a config has no `readVolume`, and `ToggleMute` throws `NotImplementedException` for `SendMessage`. `Mute` itself throws it for `ProcessStart` when there is a `readVolume`. So [Windows Media Player.json](../VGRadioExternal/input/music%20players/Windows%20Media%20Player.json) never mutes, and neither would `Foobar2000.json` once it loads. `MemoryWrite` and `None` fall through both switches and do nothing.
-
-`Radio.CheckRadio` catches the exception and shows its message in the music player status. It sets `_on` after `Mute`, so a throw leaves `_on` unchanged and the poll throws again every 40 ms until the radio state changes back.
-
-`ToggleMute` also declares a `wParam` it never uses.
-
-**Evidence:** reproduced 2026-11-02 by calling `Mute(true)` through the built assembly on configs with no running process: both combinations throw `NotImplementedException`. The `SendMessage` one also reproduced 2026-11-02 in the running tool with stand-in processes: the music player status shows the message. The repeat is only read.
-
-**Plan:** move the `wParam` and `lParam` parsing out of `Mute` into a helper, and have `ToggleMute` use it to send the configured message. For `ProcessStart` with `readVolume`, read the volume to decide whether a toggle is needed. Implement `MemoryWrite` or remove it from `HookMethods`.
-
-**Verify:** `Mute(true)` no longer throws for either combination. Then [LIV 8 and LIV 9](live-checks.md#after-fob-and-hok).
-
-**Docs when done:** the hook table in `CLAUDE.md`, and the Windows Media Player and Foobar2000 entries under Unreleased in the changelog.
 
 ## SYN — Mute state drifts from the player
 
@@ -57,6 +41,8 @@ Detail for the items in [TODO.md](TODO.md).
 
 Values that are used later aren't checked at all. `ReadVolume.Type` and `RadioAddress.Type` go through `Enum.Parse` in catch-all blocks, and `WMsg`, `WParam` and `LParam` go through `Enum.Parse` and `int.Parse` in `Mute`, on the timer thread. A misspelt `type` fails quietly every poll, and a misspelt `wMsg`, `wParam` or `lParam` only shows as a raw `Error:` status once the radio changes.
 
+A `setVolume` with no `type` becomes `None`, which does nothing and shows no error. `{volume}` in a config with no `readVolume` sends `minVolume` for both muting and unmuting.
+
 **Evidence:** the load failure reproduced 2026-11-02, as in [FOB](#fob--foobar2000json-fails-to-load). The rest read 2026-11-02.
 
 **Plan:** add one load step that deserializes, checks required fields, and parses the enum and integer values once into typed fields. On failure, show a message naming the file and field, and keep the previous selection.
@@ -69,9 +55,11 @@ Values that are used later aren't checked at all. `ReadVolume.Type` and `RadioAd
 
 `Game.IsRadioOn` catches everything and leaves `radio` at -1, which is in neither `onValues` nor `offValues`, so a failed read means "radio off" and mutes the player. An unknown value does the same. `MusicPlayer.ReadVolume` returns `int.MinValue` on an exception, `Mute(true)` stores it in `_volume`, and `Mute(false)` sends it as the volume. `WinApi.ReadValue` also ignores the result of `ReadProcessMemory`, so a failed read looks like the value 0.
 
+Read toggles decide from the same read, so a failure can skip a toggle: `int.MinValue` counts as already muted, and 0 counts as already unmuted when `minVolume` is below 0.
+
 **Evidence:** read 2026-11-02.
 
-**Plan:** have `WinApi.ReadValue` report failure. On a failed read or unknown value, `IsRadioOn` keeps the last known state, `ReadVolume` keeps the stored volume, and both report through `Game.Status` and `MusicPlayer.Status`.
+**Plan:** have `WinApi.ReadValue` report failure. On a failed read or unknown value, `IsRadioOn` keeps the last known state, `ReadVolume` keeps the stored volume, and both report through `Game.Status` and `MusicPlayer.Status`. A read toggle must not decide from a failed read.
 
 **Verify:** point a config at an unreadable address: the player's state doesn't change, the volume isn't touched, and the status says the read failed.
 
@@ -118,13 +106,13 @@ The `FormRE` constructor builds `inputPath` from `Environment.CurrentDirectory`.
 
 ## HKY — Answer issue #2
 
-[Issue #2](https://github.com/lotsofs/GTA-Radio-External/issues/2) by MhmdFVC, 2021-03-24, asks for a user-set mute hotkey, so that muting works across most players and version differences stop mattering. The issue also reports an unhandled exception with Foobar2000 1.6.4 in the legacy code. The `KeyPress` hook adds the hotkey, and the issue still needs a reply. `wacup_test.json`, the config it was tested with, was added for manual inspection and isn't meant to ship under that name.
+[Issue #2](https://github.com/lotsofs/GTA-Radio-External/issues/2) by MhmdFVC, 2021-03-24, asks for a user-set mute hotkey, so that muting works across most players and version differences stop mattering. The issue also reports an unhandled exception with Foobar2000 1.6.4 in the legacy code. The `KeyPress` hook adds the hotkey, and the issue still needs a reply.
 
 **Evidence:** the issue read 2026-11-02.
 
-**Plan:** rename `wacup_test.json` or delete it with its `.csproj` entry, updating [LIV 11](live-checks.md#with-each-music-player). Reply to the issue, and close it once the active code reaches `master`.
+**Plan:** reply to the issue, and close it once the active code reaches `master`.
 
-**Verify:** the issue has a reply, and no test config is in the Music Player list.
+**Verify:** the issue has a reply.
 
 **Docs when done:** none.
 
@@ -217,7 +205,7 @@ The `FormRE` constructor builds `inputPath` from `Environment.CurrentDirectory`.
 ## CLN — Code cleanup
 
 - Commented-out code in `FormRE`, `Game`, `Radio` and `MusicPlayer`. The blocks in `Program.cs` go with [LEG](porting.md#leg--delete-the-legacy-code).
-- Unused members: `Game._window`, `Game._volume`, `Game._addressRunning`, `FormRE.GetClassName`, and the `wParam` local in `MusicPlayer.ToggleMute`.
+- Unused members: `Game._window`, `Game._volume`, `Game._addressRunning` and `FormRE.GetClassName`.
 - `WinApi.GetProcess(object)` is a stub that throws. It's only avoided because callers pass a `string`.
 - `WinApi.Types` describes config values and doesn't belong in `WinApi`.
 - `WinApi.ReadValue` mixes reading bytes and converting them, and the fallback in `GetModuleAddress` could be tidier.

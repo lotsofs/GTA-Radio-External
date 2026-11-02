@@ -7,7 +7,6 @@ Open work, one row per item. Within each group, rows are in suggested order of w
 | Code | Area | Summary | Severity |
 |---|---|---|---|
 | [FOB](issues.md#fob--foobar2000json-fails-to-load) | Music players | `Foobar2000.json` fails to load because its `addressOffset` is a quoted string | High |
-| [HOK](issues.md#hok--two-hook-combinations-throw) | Music players | `SendMessage` without `readVolume` (Windows Media Player) and `ProcessStart` with it (Foobar2000) throw `NotImplementedException` inside the poll, so the player never mutes and its status shows the error; `MemoryWrite` does nothing | High |
 | [SYN](issues.md#syn--mute-state-drifts-from-the-player) | Radio | The player doesn't mute if the game starts with the radio off, and stays muted after the game or the tool closes or the selection changes | High |
 | [VAL](issues.md#val--configs-arent-validated-on-load) | Config | Nothing validates a config on load: a bad file throws on the UI thread, and bad `wMsg`, `wParam` or `type` values only fail later in the poll | Medium |
 | [RDF](issues.md#rdf--failed-reads-are-treated-as-real-values) | Memory | A failed read counts as radio off, and a failed volume read stores `int.MinValue`, which unmuting then sends to the player | Medium |
@@ -15,7 +14,7 @@ Open work, one row per item. Within each group, rows are in suggested order of w
 | [CWD](issues.md#cwd--input-is-found-through-the-current-directory) | Startup | `input/` is found through the current directory, so starting the exe from another folder breaks it | Medium |
 | [DOC](issues.md#doc--user-docs-describe-old-behaviour) | Docs | `README.md` and `readme.txt` describe old behaviour, the game JSON format is undocumented, and `readme.txt` doesn't reach the output folder | Medium |
 | [SPT](issues.md#spt--answer-pr-5) | Music players | Reply to PR #5: its Spotify muting is ported to the active code as the `AudioSession` hook, so the PR itself can't be merged | Low |
-| [HKY](issues.md#hky--answer-issue-2) | Music players | Reply to issue #2 now that the `KeyPress` hook adds the mute hotkey it asks for, and rename or delete the `wacup_test.json` config used to test it | Low |
+| [HKY](issues.md#hky--answer-issue-2) | Music players | Reply to issue #2 now that the `KeyPress` hook adds the mute hotkey it asks for | Low |
 | [GMD](issues.md#gmd--radioaddressmodule-is-ignored) | Game config | `radioAddress.module` in game configs is ignored, because `Game` reads a top-level `moduleName` instead | Low |
 | [MXV](issues.md#mxv--maxvolume-is-ignored) | Config | `maxVolume` in both WACUP configs is ignored, because `MPData` has no such field | Low |
 | [MPR](issues.md#mpr--several-running-instances) | Processes | With several instances of a game or player running, `WinApi.GetProcess` takes the first without checking it | Low |
