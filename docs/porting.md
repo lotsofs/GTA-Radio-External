@@ -12,7 +12,7 @@ A game config has one `processName` and one offset. `ReadMemory.DetermineGameVer
 
 **Evidence:** read 2026-11-02.
 
-**Plan:** use one file per version, as the `gta_sa` and `gta-sa` files already do per executable name, which needs no code. Add an optional signature to `GData` (offset and expected value), so `Game` can report a mismatch through [STS](issues.md#sts--status-labels-never-change) instead of reading the wrong address. The signatures are in the `DetermineGameVersion*` methods.
+**Plan:** use one file per version, as the `gta_sa` and `gta-sa` files already do per executable name, which needs no code. Add an optional signature to `GData` (offset and expected value), so `Game` can report a mismatch through `Status` instead of reading the wrong address. The signatures are in the `DetermineGameVersion*` methods.
 
 **Verify:** a config with a signature for another version reports the mismatch and doesn't touch the player.
 

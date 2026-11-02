@@ -39,6 +39,18 @@ namespace VGRadioExternal {
 
         private void FormRE_Load(object sender, EventArgs e) {
             RefreshLists();
+            radio.StatusChanged += Radio_StatusChanged;
+            radio.StartTimer();
+        }
+
+        /// <summary>
+        /// Shows the status. Radio raises this on the timer thread, so the labels are set through BeginInvoke.
+        /// </summary>
+        private void Radio_StatusChanged(string game, string musicPlayer) {
+            BeginInvoke((Action)(() => {
+                Label_StatusGame.Text = game;
+                Label_StatusMusicPlayer.Text = musicPlayer;
+            }));
         }
 
         private void RefreshLists() {

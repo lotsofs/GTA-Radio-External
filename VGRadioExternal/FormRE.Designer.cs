@@ -97,19 +97,23 @@
 			// 
 			// Label_StatusGame
 			// 
-			this.Label_StatusGame.AutoSize = true;
-			this.Label_StatusGame.Location = new System.Drawing.Point(100, 56);
+			this.Label_StatusGame.Anchor = ((System.Windows.Forms.AnchorStyles)(((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Left)
+            | System.Windows.Forms.AnchorStyles.Right)));
+			this.Label_StatusGame.AutoEllipsis = true;
+			this.Label_StatusGame.Location = new System.Drawing.Point(76, 56);
 			this.Label_StatusGame.Name = "Label_StatusGame";
-			this.Label_StatusGame.Size = new System.Drawing.Size(10, 13);
+			this.Label_StatusGame.Size = new System.Drawing.Size(155, 13);
 			this.Label_StatusGame.TabIndex = 6;
 			this.Label_StatusGame.Text = "-";
 			// 
 			// Label_StatusMusicPlayer
 			// 
-			this.Label_StatusMusicPlayer.AutoSize = true;
-			this.Label_StatusMusicPlayer.Location = new System.Drawing.Point(100, 16);
+			this.Label_StatusMusicPlayer.Anchor = ((System.Windows.Forms.AnchorStyles)(((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Left)
+            | System.Windows.Forms.AnchorStyles.Right)));
+			this.Label_StatusMusicPlayer.AutoEllipsis = true;
+			this.Label_StatusMusicPlayer.Location = new System.Drawing.Point(76, 16);
 			this.Label_StatusMusicPlayer.Name = "Label_StatusMusicPlayer";
-			this.Label_StatusMusicPlayer.Size = new System.Drawing.Size(10, 13);
+			this.Label_StatusMusicPlayer.Size = new System.Drawing.Size(155, 13);
 			this.Label_StatusMusicPlayer.TabIndex = 5;
 			this.Label_StatusMusicPlayer.Text = "-";
 			// 

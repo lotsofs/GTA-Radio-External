@@ -27,6 +27,8 @@ namespace VGRadioExternal
         int _window;
         string _executableFile;
 
+        public string Status { get; private set; }
+
         public MusicPlayer(string json) {
             _mp = JsonConvert.DeserializeObject<MPData>(json);
             GetProcess();
@@ -39,39 +41,50 @@ namespace VGRadioExternal
         /// <returns></returns>
         public bool GetProcess()
 		{
-            // get the process
-            Process process = WinApi.GetProcess(_mp.ProcessName);
-            if (process == null || process.HasExited) {
-                _process = null;
-                return false;
-            }
-            _process = process;
-
-            if (_mp.ReadVolume != null) {
-                // find the required addresses
-                long moduleAddress = WinApi.GetModuleAddress(process, _mp.ReadVolume.Module);
-                if (moduleAddress == -1) {
-                    // requested module not found. This can happen while the process boots, or if it's not configured properly.
+            try {
+                // get the process
+                Process process = WinApi.GetProcess(_mp.ProcessName);
+                if (process == null || process.HasExited) {
                     _process = null;
+                    Status = "Not running";
                     return false;
                 }
-                _addressVolume = moduleAddress + _mp.ReadVolume.AddressOffset;
-                _volume = ReadVolume();
-            }
+                _process = process;
 
-            if (_mp.SetVolume.Type == HookMethods.SendMessage) {
-                _window = WinApi.FindWindow(_mp.SetVolume.WindowName, null);
-            }
-            else if (_mp.SetVolume.Type == HookMethods.ProcessStart) {
-                _executableFile = _process.MainModule.FileName;
-				_processStartInfo = new ProcessStartInfo {
-					FileName = Path.GetFileName(_executableFile),
-					WorkingDirectory = Path.GetDirectoryName(_executableFile),
-					Arguments = _mp.SetVolume.Arguments
-				};
-			}
+                if (_mp.ReadVolume != null) {
+                    // find the required addresses
+                    long moduleAddress = WinApi.GetModuleAddress(process, _mp.ReadVolume.Module);
+                    if (moduleAddress == -1) {
+                        // requested module not found. This can happen while the process boots, or if it's not configured properly.
+                        _process = null;
+                        Status = "Missing " + _mp.ReadVolume.Module;
+                        return false;
+                    }
+                    _addressVolume = moduleAddress + _mp.ReadVolume.AddressOffset;
+                    _volume = ReadVolume();
+                }
 
-            return true;
+                if (_mp.SetVolume.Type == HookMethods.SendMessage) {
+                    _window = WinApi.FindWindow(_mp.SetVolume.WindowName, null);
+                }
+                else if (_mp.SetVolume.Type == HookMethods.ProcessStart) {
+                    _executableFile = _process.MainModule.FileName;
+                    _processStartInfo = new ProcessStartInfo {
+                        FileName = Path.GetFileName(_executableFile),
+                        WorkingDirectory = Path.GetDirectoryName(_executableFile),
+                        Arguments = _mp.SetVolume.Arguments
+                    };
+                }
+
+                Status = "Running";
+                return true;
+            }
+            catch (Exception ex) {
+                // for example access denied, if the process runs elevated
+                _process = null;
+                Status = "Error: " + ex.Message;
+                return false;
+            }
         }
 
         public bool IsRunning() {

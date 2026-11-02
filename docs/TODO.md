@@ -7,18 +7,17 @@ Open work, one row per item. Within each group, rows are in suggested order of w
 | Code | Area | Summary | Severity |
 |---|---|---|---|
 | [FOB](issues.md#fob--foobar2000json-fails-to-load) | Music players | `Foobar2000.json` fails to load because its `addressOffset` is a quoted string | High |
-| [HOK](issues.md#hok--two-hook-combinations-throw) | Music players | `SendMessage` without `readVolume` (Windows Media Player) and `ProcessStart` with it (Foobar2000) throw `NotImplementedException` inside the poll, where nobody sees it; `MemoryWrite` does nothing | High |
+| [HOK](issues.md#hok--two-hook-combinations-throw) | Music players | `SendMessage` without `readVolume` (Windows Media Player) and `ProcessStart` with it (Foobar2000) throw `NotImplementedException` inside the poll, so the player never mutes and its status shows the error; `MemoryWrite` does nothing | High |
 | [SYN](issues.md#syn--mute-state-drifts-from-the-player) | Radio | The player doesn't mute if the game starts with the radio off, and stays muted after the game or the tool closes or the selection changes | High |
-| [STS](issues.md#sts--status-labels-never-change) | UI | The status labels always show `-`, so nothing says whether the game and player were found or why muting isn't happening | Medium |
-| [VAL](issues.md#val--configs-arent-validated-on-load) | Config | Nothing validates a config on load: a bad file throws on the UI thread, and bad `wMsg`, `wParam` or `type` values fail later and silently in the poll | Medium |
+| [VAL](issues.md#val--configs-arent-validated-on-load) | Config | Nothing validates a config on load: a bad file throws on the UI thread, and bad `wMsg`, `wParam` or `type` values only fail later in the poll | Medium |
 | [RDF](issues.md#rdf--failed-reads-are-treated-as-real-values) | Memory | A failed read counts as radio off, and a failed volume read stores `int.MinValue`, which unmuting then sends to the player | Medium |
+| [HWN](issues.md#hwn--window-handle-handling) | Music players | The player's window is looked up once and never again, so a player whose window appears after its process never mutes while its status says `Running`; window handles are also declared as `int` in a 64-bit build | Medium |
 | [CWD](issues.md#cwd--input-is-found-through-the-current-directory) | Startup | `input/` is found through the current directory, so starting the exe from another folder breaks it | Medium |
 | [DOC](issues.md#doc--user-docs-describe-old-behaviour) | Docs | `README.md` and `readme.txt` describe old behaviour, the game JSON format is undocumented, and `readme.txt` doesn't reach the output folder | Medium |
 | [SPT](issues.md#spt--spotify-support) | Music players | Add Spotify: open PR #5 mutes it in the Windows Volume Mixer through CSCore, but it's written against the legacy code and for San Andreas only | Medium |
 | [HKY](issues.md#hky--configurable-mute-hotkey) | Music players | Issue #2: let users set a mute hotkey, so any player can work without memory addresses | Medium |
 | [GMD](issues.md#gmd--radioaddressmodule-is-ignored) | Game config | `radioAddress.module` in game configs is ignored, because `Game` reads a top-level `moduleName` instead | Low |
 | [MXV](issues.md#mxv--maxvolume-is-ignored) | Config | `maxVolume` in both WACUP configs is ignored, because `MPData` has no such field | Low |
-| [HWN](issues.md#hwn--window-handle-handling) | Music players | The player's window is looked up once and never again, and window handles are declared as `int` in a 64-bit build | Low |
 | [MPR](issues.md#mpr--several-running-instances) | Processes | With several instances of a game or player running, `WinApi.GetProcess` takes the first without checking it | Low |
 | [VER](issues.md#ver--stale-file-properties-and-project-settings) | Project | File properties are stale (`GTASARadioExternal`, 1.0.0.0, 2017), and ClickOnce publish settings and `App.config` leftovers remain | Low |
 | [VST](issues.md#vst--publish-the-vice-city-set-file) | Docs | Issue #3: publish the Vice City `.set` file that fixes 0-volume radio detection, which isn't in this repo | Low |

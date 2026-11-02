@@ -6,7 +6,7 @@ Detail for the item in [TODO.md](TODO.md).
 
 These need the real software, and nothing records them passing on the current build. Several configs say "Untested" in their own description, and the ones that say "Tested" don't say on which build.
 
-**Base check:** pick the game and player, then play. In a car with the radio on, the music plays at its normal volume. Out of the car, the player goes silent. Back in the car, the volume returns to where it was.
+**Base check:** pick the game and player, then play. In a car with the radio on, the music plays at its normal volume. Out of the car, the player goes silent. Back in the car, the volume returns to where it was. The game's status reads `Radio on` and `Radio off` to match, and the player's reads `Running`.
 
 A check keeps its number for good. When one passes, delete it and log it by number in [DONE.md](DONE.md). When none are left, delete this doc and the index row, and log `LIV` as finished.
 

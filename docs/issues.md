@@ -2,7 +2,7 @@
 
 Detail for the items in [TODO.md](TODO.md).
 
-**Dependencies:** FOB needs HOK, or the stopgap in its plan. VAL and RDF report through STS, so STS comes first. HKY shares its key sending with [ACT](porting.md#act--pause-and-volume-actions). SHR is easier once VAL and RDF have settled what the two classes do.
+**Dependencies:** FOB needs HOK, or the stopgap in its plan. HKY shares its key sending with [ACT](porting.md#act--pause-and-volume-actions). SHR is easier once VAL and RDF have settled what the two classes do.
 
 ## FOB — Foobar2000.json fails to load
 
@@ -20,11 +20,11 @@ Detail for the items in [TODO.md](TODO.md).
 
 `MusicPlayer.Mute` calls `ToggleMute` when a config has no `readVolume`, and `ToggleMute` throws `NotImplementedException` for `SendMessage`. `Mute` itself throws it for `ProcessStart` when there is a `readVolume`. So [Windows Media Player.json](../VGRadioExternal/input/music%20players/Windows%20Media%20Player.json) never mutes, and neither would `Foobar2000.json` once it loads. `MemoryWrite` and `None` fall through both switches and do nothing.
 
-`Mute` runs on the poll's `System.Timers.Timer` thread, and on .NET Framework that timer swallows exceptions from its handler. `Radio.CheckRadio` sets `_on` after `Mute`, so a throw leaves `_on` unchanged and the poll throws again every 40 ms until the radio state changes back.
+`Radio.CheckRadio` catches the exception and shows its message in the music player status. It sets `_on` after `Mute`, so a throw leaves `_on` unchanged and the poll throws again every 40 ms until the radio state changes back.
 
 `ToggleMute` also declares a `wParam` it never uses.
 
-**Evidence:** reproduced 2026-11-02 by calling `Mute(true)` through the built assembly on configs with no running process: both combinations throw `NotImplementedException`. The timer swallowing it and the repeat are only read.
+**Evidence:** reproduced 2026-11-02 by calling `Mute(true)` through the built assembly on configs with no running process: both combinations throw `NotImplementedException`. The `SendMessage` one also reproduced 2026-11-02 in the running tool with stand-in processes: the music player status shows the message. The repeat is only read.
 
 **Plan:** move the `wParam` and `lParam` parsing out of `Mute` into a helper, and have `ToggleMute` use it to send the configured message. For `ProcessStart` with `readVolume`, read the volume to decide whether a toggle is needed. Implement `MemoryWrite` or remove it from `HookMethods`.
 
@@ -37,7 +37,7 @@ Detail for the items in [TODO.md](TODO.md).
 `Radio` keeps one `_on` flag, false at the start, and acts only when `Game.IsRadioOn()` differs from it. Several situations leave the player in the wrong state:
 
 - **Game starts with the radio off.** `_on` is already false, so nothing is sent, and the player keeps playing until the radio has come on and gone off once.
-- **Game closes while muted.** `Radio.Check` returns early when a process is gone, so the player stays muted.
+- **Game closes while muted.** `Radio.Check` only touches the player while the game is running, so the player stays muted.
 - **Tool closes while muted.** `FormRE` has no closing handler and `Radio` no shutdown, so the player stays at `minVolume`.
 - **Selection changes.** A new `Game` or `MusicPlayer` keeps the old `_on` and isn't told the current state. A new `MusicPlayer` also stores the volume it finds at startup, which is `minVolume` if the player is muted, and unmuting then restores that.
 - **Toggle configs.** `ToggleMute` assumes the player starts unmuted, as the description in `Windows Media Player.json` warns.
@@ -50,23 +50,11 @@ Detail for the items in [TODO.md](TODO.md).
 
 **Docs when done:** `CLAUDE.md` § Architecture if `Radio` gains a shutdown step.
 
-## STS — Status labels never change
-
-`Label_StatusGame` and `Label_StatusMusicPlayer` are designer placeholders showing `-`, and `FormRE` never sets them. `Radio` works out `_gameRunning` and `_musicPlayerRunning`, but nothing reads them. When `WinApi.GetModuleAddress` can't find a module, `Game.GetProcess` and `MusicPlayer.GetProcess` clear the process and return false with no message, so a player using a different output plugin looks the same as no player. `Form1.UpdateWindow` showed all of this in the legacy window.
-
-**Evidence:** read 2026-11-02.
-
-**Plan:** have `Game` and `MusicPlayer` expose why they aren't ready: no process, or module not found. Have `Radio` raise an event when its state changes, and have `FormRE` update the labels through `BeginInvoke`, because the event comes from the timer thread.
-
-**Verify:** with nothing running, the labels say so. Start the game and player: they change. Pick `Winamp.json` with an output plugin other than `out_ds.dll`: the label names the missing module.
-
-**Docs when done:** `CLAUDE.md` § Architecture, and the status display entry under Unreleased in the changelog.
-
 ## VAL — Configs aren't validated on load
 
-`Radio.MusicPlayerChanged` and `Radio.GameChanged` read and deserialize on the UI thread with no `try`, so a malformed file throws from the combo box handler. A missing `setVolume` throws `NullReferenceException` in `MusicPlayer.GetProcess` as soon as the player's process is found.
+`Radio.MusicPlayerChanged` and `Radio.GameChanged` read and deserialize on the UI thread with no `try`, so a malformed file throws from the combo box handler. A missing `setVolume` only shows as an `Error:` status with a `NullReferenceException` message, once the player's process is found.
 
-Values that are used later aren't checked at all. `ReadVolume.Type` and `RadioAddress.Type` go through `Enum.Parse` in catch-all blocks, and `WMsg`, `WParam` and `LParam` go through `Enum.Parse` and `int.Parse` in `Mute`, on the timer thread. A misspelt value fails quietly every poll.
+Values that are used later aren't checked at all. `ReadVolume.Type` and `RadioAddress.Type` go through `Enum.Parse` in catch-all blocks, and `WMsg`, `WParam` and `LParam` go through `Enum.Parse` and `int.Parse` in `Mute`, on the timer thread. A misspelt `type` fails quietly every poll, and a misspelt `wMsg`, `wParam` or `lParam` only shows as a raw `Error:` status once the radio changes.
 
 **Evidence:** the load failure reproduced 2026-11-02, as in [FOB](#fob--foobar2000json-fails-to-load). The rest read 2026-11-02.
 
@@ -82,7 +70,7 @@ Values that are used later aren't checked at all. `ReadVolume.Type` and `RadioAd
 
 **Evidence:** read 2026-11-02.
 
-**Plan:** have `WinApi.ReadValue` report failure. On a failed read or unknown value, `IsRadioOn` keeps the last known state, `ReadVolume` keeps the stored volume, and both report through [STS](#sts--status-labels-never-change).
+**Plan:** have `WinApi.ReadValue` report failure. On a failed read or unknown value, `IsRadioOn` keeps the last known state, `ReadVolume` keeps the stored volume, and both report through `Game.Status` and `MusicPlayer.Status`.
 
 **Verify:** point a config at an unreadable address: the player's state doesn't change, the volume isn't touched, and the status says the read failed.
 
@@ -165,9 +153,9 @@ The `FormRE` constructor builds `inputPath` from `Environment.CurrentDirectory`.
 
 ## HWN — Window handle handling
 
-`MusicPlayer.GetProcess` calls `FindWindow` once. If the player's window doesn't exist yet, `_window` stays 0 and is never looked up again, because `_process` is already set. `WinApi.SendMessage` and `FindWindow` declare handles and parameters as `int` in an x64 build, and `CollectModules` passes the wrong size to `GetModuleInformation`.
+`MusicPlayer.GetProcess` calls `FindWindow` once. If the player's window doesn't exist yet, `_window` stays 0 and is never looked up again, because `_process` is already set. Muting then does nothing, with no error, and the status says `Running`. `WinApi.SendMessage` and `FindWindow` declare handles and parameters as `int` in an x64 build, and `CollectModules` passes the wrong size to `GetModuleInformation`.
 
-**Evidence:** read 2026-11-02.
+**Evidence:** the missed window reproduced 2026-11-02 with a stand-in player that creates its window 1.5 seconds after starting: it received no messages, while one with its window already up was muted and restored. Whether a real player's window lags enough to hit this isn't known. The rest read 2026-11-02.
 
 **Plan:** declare handles as `IntPtr`, look the window up again before sending if it's missing or no longer valid, and pass the size of `ModuleInformation`.
 

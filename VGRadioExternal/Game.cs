@@ -17,6 +17,8 @@ namespace VGRadioExternal {
         long _addressRadio = 0x0;
         long _addressRunning = 0x0;
 
+        public string Status { get; private set; }
+
         //public static string PROCESSNAME = "GTAIV";
         //public static string MODULENAME = "";
         //public static int ADDRESSOFFSET = 0xE8463C;
@@ -36,21 +38,32 @@ namespace VGRadioExternal {
          /// </summary>
          /// <returns></returns>
         public bool GetProcess() {
-            Process process = WinApi.GetProcess(_gameData.ProcessName);
-            if (process == null || process.HasExited) {
-                _process = null;
-                return false;
-            }
-            _process = process;
+            try {
+                Process process = WinApi.GetProcess(_gameData.ProcessName);
+                if (process == null || process.HasExited) {
+                    _process = null;
+                    Status = "Not running";
+                    return false;
+                }
+                _process = process;
 
-            long moduleAddress = WinApi.GetModuleAddress(process, _gameData.ModuleName);
-            if (moduleAddress == -1) {
-                // requested module not found. This can happen while the process boots, or if it's not configured properly.
+                long moduleAddress = WinApi.GetModuleAddress(process, _gameData.ModuleName);
+                if (moduleAddress == -1) {
+                    // requested module not found. This can happen while the process boots, or if it's not configured properly.
+                    _process = null;
+                    Status = "Missing " + _gameData.ModuleName;
+                    return false;
+                }
+                _addressRadio = moduleAddress + _gameData.RadioAddress.AddressOffset;
+                Status = "Running";
+                return true;
+            }
+            catch (Exception ex) {
+                // for example access denied, if the process runs elevated
                 _process = null;
+                Status = "Error: " + ex.Message;
                 return false;
             }
-            _addressRadio = moduleAddress + _gameData.RadioAddress.AddressOffset;
-            return true;
         }
 
         public bool IsRunning() {
@@ -84,8 +97,10 @@ namespace VGRadioExternal {
                 // a failed read leaves radio at -1
             }
             if (_gameData.RadioAddress.OnValues.Contains(radio)) {
+                Status = "Radio on";
                 return true;
             }
+            Status = "Radio off";
             if (_gameData.RadioAddress.OffValues.Contains(radio)) {
                 return false;
             }

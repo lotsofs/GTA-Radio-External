@@ -32,8 +32,9 @@ Two generations of code sit side by side, and only one of them runs.
 
 - `FormRE` lists the JSON files in `input/games` and `input/music players` in two combo boxes and passes the selected path to `Radio`.
 - `Radio` builds a `Game` and a `MusicPlayer` from those files and polls every 40 ms. When `Game.IsRadioOn()` changes, it calls `MusicPlayer.Mute()`.
-- The poll uses `System.Timers.Timer`, so it runs on a thread-pool thread, and on .NET Framework that timer swallows exceptions from its handler. A failure inside the poll is silent.
-- `Game` and `MusicPlayer` deserialize their file into `GData` and `MPData`, and look their process up again when it exits.
+- `Radio` raises `StatusChanged` when either status text changes, and `FormRE` shows both in its labels through `BeginInvoke`. `FormRE` starts the timer from `Load`, because `BeginInvoke` needs the window handle and a status is only reported when it changes.
+- The poll uses `System.Timers.Timer`, so it runs on a thread-pool thread, one poll at a time: `AutoReset` is off and `Check` restarts the timer. On .NET Framework that timer swallows exceptions from its handler, so `GetProcess` and `Radio.CheckRadio` catch theirs and show them in the labels. Any other failure inside the poll is silent.
+- `Game` and `MusicPlayer` deserialize their file into `GData` and `MPData`, look their process up again when it exits, and keep a `Status` text saying what they last found.
 - `WinApi` holds the P/Invoke declarations, process and module lookup, and typed memory reads.
 
 **Legacy, hardcoded, never run:** `Form1`, `ReadMemory`, `Settings` and the commented-out blocks in `Program.cs` still compile, but nothing instantiates `Form1`. `ReadMemory` is the reference for what hasn't been ported yet: GTA III and Vice City version detection, their radio status codes, and the pause and volume-key actions. `README.md` still describes this generation. What the active code supports is what's in `input/`.
