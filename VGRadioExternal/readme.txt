@@ -12,7 +12,7 @@ KeyPress will press a hotkey to toggle the music player's mute. Set it as a glob
 Volume:
 The volume object is used to determine what volume a program is set to. This allows for the unmuting of programs that do not support native muting by instead setting volume directly.
 With the SendMessage hook, "{volume}" in wParam or lParam stands for the volume to set. It needs a volume object, so the program knows what volume to put back.
-The volume object requires a memory address to watch, which consists of a module (dll) and an addressoffset. Leave module blank if the offset is to the main module (exe). Write the addressoffset as a number, or as hex in quotes, for example "0x1BE9E8".
+The volume object requires a memory address to watch, which consists of a module (dll) and an addressoffset. Leave module blank if the offset is to the main module (exe). Write the addressoffset as a number, or as hex in quotes, for example "0x1BE9E8". If the address can't be read, the music player is left alone, and its status says so.
 minVolume is the minimum volume of the music player. Typically this is 0, but some players might set volume below this for muted. The number can be raised to instead of muting, simply lower music volume.
 With a hook that toggles mute, the volume object shows whether the music player is already muted: minVolume or below counts as muted. Only use one if the value really drops that low when muted. If it doesn't, the music player will mute and never unmute.
 Type means the kind of value type is stored in the address. Currently supported are Byte, FourBytes & Float. These work the same as they do in Cheat Engine, which you might find handy to use if you wish to add your own music player.

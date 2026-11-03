@@ -81,31 +81,32 @@ namespace VGRadioExternal {
             return true;
         }
 
-        public bool IsRadioOn() {
+        /// <summary>
+        /// Reads whether the radio is on. Returns null when it can't tell, because the game has gone, the read failed, or the value is in neither list. The status says which.
+        /// </summary>
+        public bool? IsRadioOn() {
             if (!IsRunning()) {
-                //throw new WarningException("No game is running.");
-                return false;
+                return null;
             }
 
-            int radio = -1;
+            int radio;
             try {
                 radio = WinApi.ReadValue(_process, _addressRadio, _gameData.RadioAddress.Type);
             }
-            catch {
-                // a failed read leaves radio at -1
+            catch (Exception ex) {
+                Status = "Can't read the radio: " + ex.Message;
+                return null;
             }
             if (_gameData.RadioAddress.OnValues.Contains(radio)) {
                 Status = "Radio on";
                 return true;
             }
-            Status = "Radio off";
             if (_gameData.RadioAddress.OffValues.Contains(radio)) {
+                Status = "Radio off";
                 return false;
             }
-            else {
-                return false;
-                //throw new WarningException("Game radio address was an unrecognized value");
-            }
+            Status = "Unknown radio value " + radio;
+            return null;
         }
     }
 }

@@ -105,21 +105,23 @@ namespace VGRadioExternal {
         void CheckRadio() {
             // the music plays when there's no radio to follow, and a player that's being let go of is left playing
             bool releasing = _stopping || _selectedMusicPlayer != _musicPlayer;
-            bool on = releasing || !_gameRunning || _game.IsRadioOn();
+            bool? on = (releasing || !_gameRunning) ? true : _game.IsRadioOn();
             if (!_musicPlayerRunning) {
                 // a player that comes back starts in its own state, so it has to be told again
                 _on = null;
                 return;
             }
-            if (on != _on) {
-                try {
-                    _musicPlayer.Mute(!on);
-                    _on = on;
-                }
-                catch (Exception ex) {
-                    // the timer would swallow this, so show it instead
-                    _muteError = "Error: " + ex.Message;
-                }
+            // when the game can't tell whether the radio is on, the player stays as it is
+            if (on == null || on == _on) {
+                return;
+            }
+            try {
+                _musicPlayer.Mute(!on.Value);
+                _on = on;
+            }
+            catch (Exception ex) {
+                // the timer would swallow this, so show it instead
+                _muteError = "Error: " + ex.Message;
             }
         }
 

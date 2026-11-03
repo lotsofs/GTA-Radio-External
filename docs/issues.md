@@ -2,22 +2,6 @@
 
 Detail for the items in [TODO.md](TODO.md).
 
-**Dependencies:** SHR is easier once RDF has settled what the two classes do.
-
-## RDF — Failed reads are treated as real values
-
-`Game.IsRadioOn` catches everything and leaves `radio` at -1, which is in neither `onValues` nor `offValues`, so a failed read means "radio off" and mutes the player. An unknown value does the same. `MusicPlayer.ReadVolume` returns `int.MinValue` on an exception, `Mute(true)` stores it in `_volume`, and `Mute(false)` sends it as the volume. `WinApi.ReadValue` also ignores the result of `ReadProcessMemory`, so a failed read looks like the value 0.
-
-Read toggles decide from the same read, so a failure can skip a toggle: `int.MinValue` counts as already muted, and 0 counts as already unmuted when `minVolume` is below 0.
-
-**Evidence:** read 2026-11-02.
-
-**Plan:** have `WinApi.ReadValue` report failure. On a failed read or unknown value, `IsRadioOn` keeps the last known state, `ReadVolume` keeps the stored volume, and both report through `Game.Status` and `MusicPlayer.Status`. A read toggle must not decide from a failed read.
-
-**Verify:** point a config at an unreadable address: the player's state doesn't change, the volume isn't touched, and the status says the read failed.
-
-**Docs when done:** the "counts as off" bullet in `CLAUDE.md` § JSON config files.
-
 ## CWD — input is found through the current directory
 
 The `FormRE` constructor builds `inputPath` from `Environment.CurrentDirectory`. Starting the exe from a shortcut with another start folder, or from a terminal elsewhere, makes `RefreshLists` throw when it reads the missing folder.
@@ -149,7 +133,7 @@ The `FormRE` constructor builds `inputPath` from `Environment.CurrentDirectory`.
 
 **Evidence:** read 2026-11-02.
 
-**Plan:** move them into a small base class that owns the process and resolves addresses, after [RDF](#rdf--failed-reads-are-treated-as-real-values).
+**Plan:** move them into a small base class that owns the process and resolves addresses.
 
 **Verify:** the solution builds, and [LIV 1](live-checks.md#with-san-andreas-and-a-working-player) still passes.
 

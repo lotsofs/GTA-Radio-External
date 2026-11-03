@@ -194,17 +194,20 @@ namespace VGRadioExternal
             WinApi.SendMessage(_window, (int)setVolume.WMsg.Value, setVolume.WParam.Value(volume), setVolume.LParam.Value(volume));
         }
 
+        /// <summary>
+        /// Reads the player's volume. Throws if it can't, so nothing is stored or toggled from a made-up value, and Radio shows the error and tries again.
+        /// </summary>
         int ReadVolume() {
             if (!IsRunning()) {
                 //throw new WarningException("No music player is running.");
             }
 
-            int volume = int.MinValue;
+            int volume;
             try {
                 volume = WinApi.ReadValue(_process, _addressVolume, _mp.ReadVolume.Type);
             }
-            catch {
-                // a failed read leaves volume at int.MinValue
+            catch (Exception ex) {
+                throw new InvalidOperationException("Can't read the volume: " + ex.Message, ex);
             }
             Debug.WriteLine(volume);
             return volume;

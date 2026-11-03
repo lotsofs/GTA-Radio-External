@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.ComponentModel;
 using System.Diagnostics;
 using System.IO;
 using System.Linq;
@@ -41,7 +42,7 @@ namespace VGRadioExternal {
             FourBytes
         }
 
-        [DllImport("kernel32.dll")]
+        [DllImport("kernel32.dll", SetLastError = true)]
         public static extern Int32 ReadProcessMemory(IntPtr hProcess, IntPtr lpBaseAddress,
             [In, Out] byte[] buffer, UInt32 size, out IntPtr lpNumberOfBytesRead);
 
@@ -86,7 +87,7 @@ namespace VGRadioExternal {
 
 
         /// <summary>
-        /// Reads a value of bytes in a process
+        /// Reads a value of bytes in a process. Throws Win32Exception if the read fails, so a failure can't pass for a value.
         /// </summary>
         /// <param name="process"></param>
         /// <param name="address"></param>
@@ -104,7 +105,10 @@ namespace VGRadioExternal {
                     buffer = new byte[4];
                     break;
             }
-            ReadProcessMemory(process.Handle, new IntPtr(address), buffer, (uint)buffer.Length, out IntPtr lpNumberOfBytesRead);
+            if (ReadProcessMemory(process.Handle, new IntPtr(address), buffer, (uint)buffer.Length, out IntPtr lpNumberOfBytesRead) == 0) {
+                // for example an address nothing is at, which a wrong version or offset gives
+                throw new Win32Exception(Marshal.GetLastWin32Error());
+            }
             switch (type) {
                 case Types.Byte:
                     return (int)buffer[0];
