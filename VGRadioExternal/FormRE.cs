@@ -17,7 +17,11 @@ namespace VGRadioExternal {
         static string inputPath;
 
         Radio radio;
-        
+        // the file each list has loaded, to go back to when a newly picked one can't be used
+        string gameFile;
+        string musicPlayerFile;
+        bool reverting;
+
         [DllImport("user32.dll", SetLastError = true, CharSet = CharSet.Auto)]
         static extern int GetClassName(IntPtr hWnd, StringBuilder lpClassName, int nMaxCount);
 
@@ -81,13 +85,37 @@ namespace VGRadioExternal {
 		}
 
 		private void ComboBox_MusicPlayer_SelectedIndexChanged(object sender, EventArgs e) {
-            string path = Path.Combine(inputPath, "music players", ComboBox_MusicPlayer.Text);
-            radio.MusicPlayerChanged(path);
+            musicPlayerFile = LoadPicked(ComboBox_MusicPlayer, musicPlayerFile, "music players", radio.MusicPlayerChanged);
 		}
 
 		private void ComboBox_Game_SelectedIndexChanged(object sender, EventArgs e) {
-            string path = Path.Combine(inputPath, "games", ComboBox_Game.Text);
-            radio.GameChanged(path);
+            gameFile = LoadPicked(ComboBox_Game, gameFile, "games", radio.GameChanged);
+        }
+
+        /// <summary>
+        /// Loads the file picked in a list. If it can't be used, says why and picks the loaded file again. Returns the file that's loaded.
+        /// </summary>
+        string LoadPicked(ComboBox list, string loadedFile, string folder, Action<string> load) {
+            if (reverting || list.SelectedIndex < 0) {
+                return loadedFile;
+            }
+            string file = (string)list.SelectedItem;
+            try {
+                load(Path.Combine(inputPath, folder, file));
+                return file;
+            }
+            catch (InvalidDataException ex) {
+                MessageBox.Show(this, file + " can't be used.\n\n" + ex.Message, Text, MessageBoxButtons.OK, MessageBoxIcon.Warning);
+                // the loaded file is still in use, so the list shows it again. Picking it this way doesn't load it again
+                reverting = true;
+                try {
+                    list.SelectedIndex = loadedFile == null ? -1 : list.Items.IndexOf(loadedFile);
+                }
+                finally {
+                    reverting = false;
+                }
+                return loadedFile;
+            }
         }
     }
 }

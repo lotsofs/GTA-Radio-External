@@ -47,14 +47,18 @@ namespace VGRadioExternal {
             //_game = new Game();
         }
 
+        /// <summary>
+        /// Loads a music player file, for the poll to swap in. Throws InvalidDataException if the file can't be used, and keeps the player there was.
+        /// </summary>
         public void MusicPlayerChanged(string path) {
-            string json = File.ReadAllText(path);
-            _selectedMusicPlayer = new MusicPlayer(json);
+            _selectedMusicPlayer = new MusicPlayer(MPData.Load(path));
 		}
 
+        /// <summary>
+        /// Loads a game file. Throws InvalidDataException if the file can't be used, and keeps the game there was.
+        /// </summary>
         public void GameChanged(string path) {
-            string json = File.ReadAllText(path);
-            _game = new Game(json);
+            _game = new Game(GData.Load(path));
 		}
 
         /// <summary>

@@ -30,12 +30,12 @@ Two generations of code sit side by side, and only one of them runs.
 
 **Active, config-driven:** `Program` starts `FormRE`, which owns a `Radio`.
 
-- `FormRE` lists the JSON files in `input/games` and `input/music players` in two combo boxes and passes the selected path to `Radio`.
+- `FormRE` lists the JSON files in `input/games` and `input/music players` in two combo boxes and passes the selected path to `Radio`, which loads it through `GData.Load` or `MPData.Load`. A file that can't be used throws `InvalidDataException`. `FormRE` shows its message and puts the list back on the loaded file, which stays in use.
 - `Radio` builds a `Game` and a `MusicPlayer` from those files and polls every 40 ms. `_on` holds what the player was last told, and `Radio` calls `MusicPlayer.Mute()` whenever the radio differs from it. With no game running, the radio counts as on, so closing the game restores the player. `_on` is null while the player hasn't been told anything, which includes after it restarts, so the next poll tells it. `Mute` has to be safe to repeat, because the player can already be in the state it's told.
 - Only the poll sends anything to the player. A newly selected `MusicPlayer` waits in `_selectedMusicPlayer` until the poll has restored the old one. When `FormRE` closes, it calls `Radio.Stop`, which waits up to a second for the poll to restore the player. The wait gives a held Alt from Alt+F4 time to be let go, because a `KeyPress` hook waits for that.
 - `Radio` raises `StatusChanged` when either status text changes, and `FormRE` shows both in its labels through `BeginInvoke`. `FormRE` starts the timer from `Load`, because `BeginInvoke` needs the window handle and a status is only reported when it changes.
 - The poll uses `System.Timers.Timer`, so it runs on a thread-pool thread, one poll at a time: `AutoReset` is off and `Check` restarts the timer. On .NET Framework that timer swallows exceptions from its handler, so `GetProcess` and `Radio.CheckRadio` catch theirs and show them in the labels. Any other failure inside the poll is silent.
-- `Game` and `MusicPlayer` deserialize their file into `GData` and `MPData`, look their process up again when it exits, and keep a `Status` text saying what they last found. `MusicPlayer` treats a process as not running for its first 3 seconds, with the status `Starting`. A player that has only just started can lose what it's sent, and a lost toggle would leave it inverted.
+- `Game` and `MusicPlayer` take the loaded `GData` and `MPData`, look their process up again when it exits, and keep a `Status` text saying what they last found. `MusicPlayer` treats a process as not running for its first 3 seconds, with the status `Starting`. A player that has only just started can lose what it's sent, and a lost toggle would leave it inverted.
 - `WinApi` holds the P/Invoke declarations, process and module lookup, typed memory reads, and simulated key presses.
 - `AudioSessions` holds the Core Audio COM declarations and mutes an app at the per-app level the Windows Volume Mixer shows. It matches every process with the app's name, because any of them can own the session, and it skips output devices that refuse to list their sessions.
 
@@ -49,21 +49,22 @@ The build targets x64 so it can read 64-bit games. `WinApi.GetModuleAddress` fal
 
 `VGRadioExternal/readme.txt` documents the music player format for users. Where it differs from the code, the code is right.
 
-- Keys match `GData` and `MPData` fields case-insensitively. Hex literals such as `0xB0A0` parse even though they aren't standard JSON. `addressOffset` also takes them quoted, as `"0xB0A0"`, but other integers don't.
+- A file is checked when it's picked, so a mistake shows then and not in the poll. `ConfigFile.Read` deserializes it, and `Required.Always` on a field's `[JsonProperty]` makes every file need that field. `GData.Load` and `MPData.Load` check the rest, such as the fields each hook needs. A new field needs its check in one of those places.
+- Keys match `GData` and `MPData` fields case-insensitively. Hex literals such as `0xB0A0` parse even though they aren't standard JSON. `addressOffset`, `wParam` and `lParam` also take them quoted, as `"0xB0A0"`, but other integers don't.
 - An address is the module base plus one static `addressOffset`. Pointer chains aren't supported.
-- `type` must name a `WinApi.Types` value, `setVolume.type` a `HookMethods` value, and `wMsg` a `WinApi.wMsg` value. `WinApi.wMsg` is incomplete, so add any message that's missing.
-- `wParam` and `lParam` are integers or the literal `"{volume}"`.
-- `setVolume.keys` takes what `KeysConverter` reads, such as `Ctrl+Shift+P`, `F13` or `VolumeMute`. The keys go to the window in front unless a program has claimed them, so the player must have them set as a global hotkey.
-- Each file has one `processName`, so a variant executable name needs its own file (`gta_sa` and `gta-sa`).
-- `radioAddress.module` is ignored: `Game` reads a top-level `moduleName` instead. `maxVolume` is ignored too.
-- A radio value in neither `onValues` nor `offValues` counts as off.
+- `type` must name a `WinApi.Types` value, `setVolume.type` a `HookMethods` value, and `wMsg` a `WinApi.wMsg` value, in any case. `EnumNameConverter` rejects numbers, even ones the enum has. `WinApi.wMsg` is incomplete, so add any message that's missing.
+- `wParam` and `lParam` are integers or the literal `"{volume}"`, which needs `readVolume` so the volume can be restored. `MessageParameter` holds either.
+- `setVolume.keys` takes what `KeysConverter` reads, such as `Ctrl+Shift+P`, `F13` or `VolumeMute`, and needs a key besides Shift, Ctrl and Alt. The keys go to the window in front unless a program has claimed them, so the player must have them set as a global hotkey.
+- Each file has one `processName`, without `.exe`, so a variant executable name needs its own file (`gta_sa` and `gta-sa`).
+- `radioAddress.module` is ignored: `Game` reads a top-level `moduleName` instead. `maxVolume` is ignored too, and so is any other unknown key.
+- `onValues` and `offValues` each need a value. A radio value in neither counts as off.
 - A new file under `input/` needs a `<None Include>` entry with `CopyToOutputDirectory` in `VGRadioExternal.csproj`, or it won't reach `bin/`.
 
 `MusicPlayer.Mute` handles each hook as below.
 
 | `setVolume.type` | With `readVolume` | Without `readVolume` |
 | --- | --- | --- |
-| `SendMessage` with `{volume}` in `wParam` or `lParam` | Sets volume to `minVolume`, then restores the stored volume | Sends `minVolume` both ways, as a blind toggle |
+| `SendMessage` with `{volume}` in `wParam` or `lParam` | Sets volume to `minVolume`, then restores the stored volume | Rejected when the file is picked |
 | `SendMessage` with a fixed message | Sends the message, as a read toggle | Sends the message, as a blind toggle |
 | `ProcessStart` | Runs the player's exe with `arguments`, as a read toggle | Runs the player's exe with `arguments`, as a blind toggle |
 | `AudioSession` | Same as without: `readVolume` isn't used | Sets the mute state of the app's audio sessions on every output device |

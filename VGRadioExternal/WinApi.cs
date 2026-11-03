@@ -120,9 +120,8 @@ namespace VGRadioExternal {
         /// <summary>
         /// Presses and releases keys as if on the keyboard. They go to the window in front, unless a program has claimed them as a global hotkey.
         /// </summary>
-        /// <param name="keys">the keys as KeysConverter reads them, such as Ctrl+Shift+P</param>
-        public static void PressKeys(string keys) {
-            Keys combination = (Keys)new KeysConverter().ConvertFromInvariantString(keys);
+        /// <param name="combination">a key, with any of Shift, Ctrl and Alt</param>
+        public static void PressKeys(Keys combination) {
             List<byte> toPress = new List<byte>();
             foreach (KeyValuePair<Keys, Keys> modifier in Modifiers) {
                 bool wanted = combination.HasFlag(modifier.Key);

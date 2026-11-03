@@ -8,12 +8,11 @@ using System.Linq;
 using System.Runtime.InteropServices;
 using System.Text;
 using System.Threading.Tasks;
-using Newtonsoft.Json;
 
 
 namespace VGRadioExternal
 {
-    public class MusicPlayer
+    class MusicPlayer
 	{
         // how long a new process gets to set up its window, hotkey and volume before it's told anything
         static readonly TimeSpan StartupDelay = TimeSpan.FromSeconds(3);
@@ -33,8 +32,8 @@ namespace VGRadioExternal
 
         public string Status { get; private set; }
 
-        public MusicPlayer(string json) {
-            _mp = JsonConvert.DeserializeObject<MPData>(json);
+        public MusicPlayer(MPData mp) {
+            _mp = mp;
             GetProcess();
             //Mute();
         }
@@ -135,7 +134,7 @@ namespace VGRadioExternal
                 ToggleMute(mute);
                 return;
             }
-            if (_mp.SetVolume.Type == HookMethods.SendMessage && CarriesVolume()) {
+            if (_mp.SetVolume.Type == HookMethods.SendMessage && _mp.SetVolume.CarriesVolume()) {
                 if (mute) {
                     // turn radio off, store old volume. A second mute keeps it, because the player is at minVolume by then
                     _volume = _volume ?? ReadVolume();
@@ -186,24 +185,13 @@ namespace VGRadioExternal
             }
         }
 
-        bool CarriesVolume() {
-            return _mp.SetVolume.WParam == "{volume}" || _mp.SetVolume.LParam == "{volume}";
-        }
-
         /// <summary>
         /// Sends the window message from the config
         /// </summary>
         /// <param name="volume">what {volume} stands for in wParam and lParam</param>
         void SendConfiguredMessage(int volume) {
-            int wParam = MessageParameter(_mp.SetVolume.WParam, volume);
-            int lParam = MessageParameter(_mp.SetVolume.LParam, volume);
-            int wMsg = (int)Enum.Parse(typeof(WinApi.wMsg), _mp.SetVolume.WMsg);
-            WinApi.SendMessage(_window, wMsg, wParam, lParam);
-        }
-
-        int MessageParameter(string parameter, int volume) {
-            if (parameter == "{volume}") { return volume; }
-            return int.Parse(parameter);
+            SetVolume setVolume = _mp.SetVolume;
+            WinApi.SendMessage(_window, (int)setVolume.WMsg.Value, setVolume.WParam.Value(volume), setVolume.LParam.Value(volume));
         }
 
         int ReadVolume() {
@@ -213,8 +201,7 @@ namespace VGRadioExternal
 
             int volume = int.MinValue;
             try {
-                WinApi.Types volumeValueType = (WinApi.Types)Enum.Parse(typeof(WinApi.Types), _mp.ReadVolume.Type);
-                volume = WinApi.ReadValue(_process, _addressVolume, volumeValueType);
+                volume = WinApi.ReadValue(_process, _addressVolume, _mp.ReadVolume.Type);
             }
             catch {
                 // a failed read leaves volume at int.MinValue

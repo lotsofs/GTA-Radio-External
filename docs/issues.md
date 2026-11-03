@@ -2,23 +2,7 @@
 
 Detail for the items in [TODO.md](TODO.md).
 
-**Dependencies:** SHR is easier once VAL and RDF have settled what the two classes do.
-
-## VAL — Configs aren't validated on load
-
-`Radio.MusicPlayerChanged` and `Radio.GameChanged` read and deserialize on the UI thread with no `try`, so a malformed file throws from the combo box handler. A missing `setVolume` only shows as an `Error:` status with a `NullReferenceException` message, once the player's process is found.
-
-Values that are used later aren't checked at all. `ReadVolume.Type` and `RadioAddress.Type` go through `Enum.Parse` in catch-all blocks, and `WMsg`, `WParam` and `LParam` go through `Enum.Parse` and `int.Parse` in `Mute`, on the timer thread. A misspelt `type` fails quietly every poll, and a misspelt `wMsg`, `wParam` or `lParam` only shows as a raw `Error:` status once the radio changes.
-
-A `setVolume` with no `type` becomes `None`, which does nothing and shows no error. `{volume}` in a config with no `readVolume` sends `minVolume` for both muting and unmuting.
-
-**Evidence:** the load failure reproduced 2026-11-03 by deserializing a bad `addressOffset` into `MPData` from the built assembly: `"banana"` throws `FormatException`. How that reaches the user is only read: `FormRE.ComboBox_MusicPlayer_SelectedIndexChanged` has no `try`, so it should land in the WinForms unhandled exception dialog. The rest read 2026-11-02.
-
-**Plan:** add one load step that deserializes, checks required fields, and parses the enum and integer values once into typed fields. On failure, show a message naming the file and field, and keep the previous selection.
-
-**Verify:** try malformed JSON, a misspelt `wMsg`, and a missing `setVolume`: each gives a clear message and the tool keeps running.
-
-**Docs when done:** `CLAUDE.md` § JSON config files, and `readme.txt`.
+**Dependencies:** SHR is easier once RDF has settled what the two classes do.
 
 ## RDF — Failed reads are treated as real values
 
@@ -49,7 +33,7 @@ The `FormRE` constructor builds `inputPath` from `Environment.CurrentDirectory`.
 ## DOC — User docs describe old behaviour
 
 - [README.md](../README.md) lists GTA III, Vice City, Winamp 5.666, Foobar2000 1.3.14, and mute or pause, which is the legacy feature set. Its "To add" list only says "Cool stuff", and open work lives in [TODO.md](TODO.md) now.
-- [readme.txt](../VGRadioExternal/readme.txt) says the volume goes in `wParam` automatically, but the code needs the literal `"{volume}"`. It talks about a `volume` object where the files have `readVolume` and `setVolume`, and says "jason" for JSON.
+- [readme.txt](../VGRadioExternal/readme.txt) talks about a `volume` object where the files have `readVolume` and `setVolume`, and says "jason" for JSON.
 - Nothing documents the game config format.
 - `readme.txt` is a `Content` item without `CopyToOutputDirectory`, so it never reaches the output folder, where people would add their own files.
 
@@ -165,7 +149,7 @@ The `FormRE` constructor builds `inputPath` from `Environment.CurrentDirectory`.
 
 **Evidence:** read 2026-11-02.
 
-**Plan:** move them into a small base class that owns the process and resolves addresses, after [VAL](#val--configs-arent-validated-on-load) and [RDF](#rdf--failed-reads-are-treated-as-real-values).
+**Plan:** move them into a small base class that owns the process and resolves addresses, after [RDF](#rdf--failed-reads-are-treated-as-real-values).
 
 **Verify:** the solution builds, and [LIV 1](live-checks.md#with-san-andreas-and-a-working-player) still passes.
 

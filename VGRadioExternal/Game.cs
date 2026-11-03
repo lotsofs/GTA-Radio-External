@@ -1,5 +1,4 @@
-﻿using Newtonsoft.Json;
-using System;
+﻿using System;
 using System.Collections.Generic;
 using System.ComponentModel;
 using System.Diagnostics;
@@ -26,8 +25,8 @@ namespace VGRadioExternal {
         //public List<int> LISTONVALUES = new List<int> { 2 };
         //public List<int> LISTOFFVALUES = new List<int> { 0, 1, 4 };
 
-        public Game(string json) {
-            _gameData = JsonConvert.DeserializeObject<GData>(json);
+        public Game(GData gameData) {
+            _gameData = gameData;
             GetProcess();
             //Configure();
             //GetProcess();
@@ -90,8 +89,7 @@ namespace VGRadioExternal {
 
             int radio = -1;
             try {
-                WinApi.Types radioValueType = (WinApi.Types)Enum.Parse(typeof(WinApi.Types), _gameData.RadioAddress.Type);
-                radio = WinApi.ReadValue(_process, _addressRadio, radioValueType);
+                radio = WinApi.ReadValue(_process, _addressRadio, _gameData.RadioAddress.Type);
             }
             catch {
                 // a failed read leaves radio at -1

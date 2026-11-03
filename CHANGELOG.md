@@ -10,7 +10,7 @@ What changed for users of GTA Radio External, per release, newest first. Downloa
 
 ### Added
 
-- **Pick your game and music player from lists.** The lists show the JSON files in the `input` folder, so you can add your own games and players. *Open Directory* opens that folder, and *Refresh* reloads the lists.
+- **Pick your game and music player from lists.** The lists show the JSON files in the `input` folder, so you can add your own games and players. *Open Directory* opens that folder, and *Refresh* reloads the lists. If a file has a mistake, picking it shows what's wrong, and the game or player you had picked stays in use.
 - **GTA IV and GTA San Andreas: The Definitive Edition** are now supported.
 - **WACUP and Windows Media Player** are now supported. Start with Windows Media Player unmuted.
 - **Spotify** is now supported. It's muted in the Windows Volume Mixer, so other programs keep playing. Play something in Spotify first: until you do, there's nothing to mute, and its status says so when the radio goes off.
