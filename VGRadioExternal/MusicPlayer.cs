@@ -26,7 +26,7 @@ namespace VGRadioExternal
         
         ProcessStartInfo _processStartInfo;
 
-        int _window;
+        IntPtr _window;
         string _executableFile;
         bool _toggledMuted;
 
@@ -75,7 +75,8 @@ namespace VGRadioExternal
                 }
 
                 if (_mp.SetVolume.Type == HookMethods.SendMessage) {
-                    _window = WinApi.FindWindow(_mp.SetVolume.WindowName, null);
+                    // a new process has a new window, which may not be up yet. Sending finds it
+                    _window = IntPtr.Zero;
                 }
                 else if (_mp.SetVolume.Type == HookMethods.ProcessStart) {
                     _executableFile = _process.MainModule.FileName;
@@ -137,8 +138,10 @@ namespace VGRadioExternal
             if (_mp.SetVolume.Type == HookMethods.SendMessage && _mp.SetVolume.CarriesVolume()) {
                 if (mute) {
                     // turn radio off, store old volume. A second mute keeps it, because the player is at minVolume by then
-                    _volume = _volume ?? ReadVolume();
+                    int volume = _volume ?? ReadVolume();
                     SendConfiguredMessage(_mp.MinVolume);
+                    // stored only once it's sent, so a failed send can't leave an old volume to restore later
+                    _volume = volume;
                 }
                 else if (_volume != null) {
                     // turn radio on. Without a stored volume this tool hasn't lowered it, so there's nothing to undo
@@ -191,7 +194,15 @@ namespace VGRadioExternal
         /// <param name="volume">what {volume} stands for in wParam and lParam</param>
         void SendConfiguredMessage(int volume) {
             SetVolume setVolume = _mp.SetVolume;
-            WinApi.SendMessage(_window, (int)setVolume.WMsg.Value, setVolume.WParam.Value(volume), setVolume.LParam.Value(volume));
+            if (_window == IntPtr.Zero || !WinApi.IsWindow(_window)) {
+                // the window can appear after the process, or be recreated
+                _window = WinApi.FindWindow(setVolume.WindowName, null);
+                if (_window == IntPtr.Zero) {
+                    // Radio tries again every poll, so a window that appears later still gets the message
+                    throw new InvalidOperationException("No window " + setVolume.WindowName + " yet");
+                }
+            }
+            WinApi.SendMessage(_window, (int)setVolume.WMsg.Value, new IntPtr(setVolume.WParam.Value(volume)), new IntPtr(setVolume.LParam.Value(volume)));
         }
 
         /// <summary>

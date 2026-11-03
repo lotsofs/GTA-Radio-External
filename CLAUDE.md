@@ -53,6 +53,7 @@ The build targets x64 so it can read 64-bit games. `WinApi.GetModuleAddress` fal
 - Keys match `GData` and `MPData` fields case-insensitively. Hex literals such as `0xB0A0` parse even though they aren't standard JSON. `addressOffset`, `wParam` and `lParam` also take them quoted, as `"0xB0A0"`, but other integers don't.
 - An address is the module base plus one static `addressOffset`. Pointer chains aren't supported.
 - `type` must name a `WinApi.Types` value, `setVolume.type` a `HookMethods` value, and `wMsg` a `WinApi.wMsg` value, in any case. `EnumNameConverter` rejects numbers, even ones the enum has. `WinApi.wMsg` is incomplete, so add any message that's missing.
+- `windowName` is the window's class, not its title: it goes to `FindWindow` as the class name.
 - `wParam` and `lParam` are integers or the literal `"{volume}"`, which needs `readVolume` so the volume can be restored. `MessageParameter` holds either.
 - `setVolume.keys` takes what `KeysConverter` reads, such as `Ctrl+Shift+P`, `F13` or `VolumeMute`, and needs a key besides Shift, Ctrl and Alt. The keys go to the window in front unless a program has claimed them, so the player must have them set as a global hotkey.
 - Each file has one `processName`, without `.exe`, so a variant executable name needs its own file (`gta_sa` and `gta-sa`).
@@ -69,6 +70,8 @@ The build targets x64 so it can read 64-bit games. `WinApi.GetModuleAddress` fal
 | `ProcessStart` | Runs the player's exe with `arguments`, as a read toggle | Runs the player's exe with `arguments`, as a blind toggle |
 | `AudioSession` | Same as without: `readVolume` isn't used | Sets the mute state of the app's audio sessions on every output device |
 | `KeyPress` | Presses `keys`, as a read toggle | Presses `keys`, as a blind toggle |
+
+`SendMessage` looks the window up when it sends, if it has none yet or the one it had is gone, so a window that appears late or is recreated is still found. With none, `Mute` throws, so `Radio` shows it and tries again every poll.
 
 An app has no audio session until it has played something. With none, muting throws, so `Radio` shows the message and tries again every poll, and unmuting does nothing.
 

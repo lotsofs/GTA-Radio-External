@@ -6,7 +6,6 @@ Open work, one row per item. Within each group, rows are in suggested order of w
 
 | Code | Area | Summary | Severity |
 |---|---|---|---|
-| [HWN](issues.md#hwn--window-handle-handling) | Music players | The player's window is looked up once, 3 seconds after its process starts, so a player whose window appears later never mutes while its status says `Running`; window handles are also declared as `int` in a 64-bit build | Medium |
 | [CWD](issues.md#cwd--input-is-found-through-the-current-directory) | Startup | `input/` is found through the current directory, so starting the exe from another folder breaks it | Medium |
 | [DOC](issues.md#doc--user-docs-describe-old-behaviour) | Docs | `README.md` and `readme.txt` describe old behaviour, the game JSON format is undocumented, and `readme.txt` doesn't reach the output folder | Medium |
 | [SPT](issues.md#spt--answer-pr-5) | Music players | Reply to PR #5: its Spotify muting is ported to the active code as the `AudioSession` hook, so the PR itself can't be merged | Low |

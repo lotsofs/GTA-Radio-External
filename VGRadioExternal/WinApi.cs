@@ -47,10 +47,13 @@ namespace VGRadioExternal {
             [In, Out] byte[] buffer, UInt32 size, out IntPtr lpNumberOfBytesRead);
 
         [DllImport("user32.dll")]
-        public static extern int SendMessage(int hwnd, int wMsg, int wParam, int lParam);
+        public static extern IntPtr SendMessage(IntPtr hWnd, int wMsg, IntPtr wParam, IntPtr lParam);
+
+        [DllImport("user32.dll", CharSet = CharSet.Unicode)]
+        public static extern IntPtr FindWindow(string lpClassName, string lpWindowName);
 
         [DllImport("user32.dll")]
-        public static extern int FindWindow(string lpClassName, String lpWindowName);
+        public static extern bool IsWindow(IntPtr hWnd);
 
         [DllImport("user32.dll")]
         public static extern void keybd_event(byte virtualKey, byte scanCode, uint flags, IntPtr extraInfo);
@@ -224,7 +227,10 @@ namespace VGRadioExternal {
                     
                     string moduleName = Path.GetFileName(moduleFilePath.ToString());
                     ModuleInformation moduleInformation;
-                    GetModuleInformation(process.Handle, modulePointers[i], out moduleInformation, (uint)(modulePointers.Length * IntPtr.Size));
+                    if (!GetModuleInformation(process.Handle, modulePointers[i], out moduleInformation, (uint)Marshal.SizeOf(typeof(ModuleInformation)))) {
+                        // without it the module would look like it starts at 0
+                        continue;
+                    }
 
                     Module module = new Module(moduleName, moduleInformation.lpBaseOfDll, moduleInformation.SizeOfImage);
                     modules.Add(module);

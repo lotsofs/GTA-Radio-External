@@ -17,7 +17,7 @@ The `FormRE` constructor builds `inputPath` from `Environment.CurrentDirectory`.
 ## DOC — User docs describe old behaviour
 
 - [README.md](../README.md) lists GTA III, Vice City, Winamp 5.666, Foobar2000 1.3.14, and mute or pause, which is the legacy feature set. Its "To add" list only says "Cool stuff", and open work lives in [TODO.md](TODO.md) now.
-- [readme.txt](../VGRadioExternal/readme.txt) talks about a `volume` object where the files have `readVolume` and `setVolume`, and says "jason" for JSON.
+- [readme.txt](../VGRadioExternal/readme.txt) talks about a `volume` object where the files have `readVolume` and `setVolume`, and says "jason" for JSON. It asks for a `windowName` without saying that it's the window's class, not its title.
 - Nothing documents the game config format.
 - `readme.txt` is a `Content` item without `CopyToOutputDirectory`, so it never reaches the output folder, where people would add their own files.
 
@@ -76,18 +76,6 @@ The `FormRE` constructor builds `inputPath` from `Environment.CurrentDirectory`.
 **Verify:** both files load and behave the same.
 
 **Docs when done:** the bullet in `CLAUDE.md` § JSON config files.
-
-## HWN — Window handle handling
-
-`MusicPlayer.GetProcess` calls `FindWindow` once, when the process is 3 seconds old. If the player's window doesn't exist by then, `_window` stays 0 and is never looked up again, because `_process` is already set. Muting then does nothing, with no error, and the status says `Running`. `WinApi.SendMessage` and `FindWindow` declare handles and parameters as `int` in an x64 build, and `CollectModules` passes the wrong size to `GetModuleInformation`.
-
-**Evidence:** the missed window reproduced 2026-11-02 with a stand-in player that creates its window 1.5 seconds after starting: it received no messages, while one with its window already up was muted and restored. The 3-second wait came later, so that stand-in would now be found. A window later than 3 seconds should still be missed, but that's only read. Whether a real player's window lags that much isn't known. The rest read 2026-11-02.
-
-**Plan:** declare handles as `IntPtr`, look the window up again before sending if it's missing or no longer valid, and pass the size of `ModuleInformation`.
-
-**Verify:** start the tool while the player is still loading: muting works once it's up.
-
-**Docs when done:** none.
 
 ## MPR — Several running instances
 
