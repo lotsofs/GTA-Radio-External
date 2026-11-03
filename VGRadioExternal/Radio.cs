@@ -11,19 +11,26 @@ using Newtonsoft.Json;
 namespace VGRadioExternal {
     class Radio {
         const string NotSelected = "Not selected";
+        // Alt+F4 leaves Alt held while closing, and a KeyPress hook waits for it to be let go
+        const int StopTimeout = 1000;
 
         /// <summary>
         /// Raised on the timer thread with the game's and the music player's status, when either changes
         /// </summary>
         public event Action<string, string> StatusChanged;
 
+        // the poll does all the work on the player, so it swaps the selected one in itself
         MusicPlayer _musicPlayer;
+        volatile MusicPlayer _selectedMusicPlayer;
         Game _game;
 
         int _timerInterval = 40;
         Timer _timer;
+        volatile bool _stopping;
+        System.Threading.ManualResetEventSlim _stopped = new System.Threading.ManualResetEventSlim();
 
-        bool _on;
+        // what the player was last told. Null when it hasn't been told anything, so the next poll tells it
+        bool? _on;
         bool _gameRunning;
         bool _musicPlayerRunning;
         string _gameStatus;
@@ -42,7 +49,7 @@ namespace VGRadioExternal {
 
         public void MusicPlayerChanged(string path) {
             string json = File.ReadAllText(path);
-            _musicPlayer = new MusicPlayer(json);
+            _selectedMusicPlayer = new MusicPlayer(json);
 		}
 
         public void GameChanged(string path) {
@@ -61,18 +68,30 @@ namespace VGRadioExternal {
             _timer.Start();
         }
 
+        /// <summary>
+        /// Stops polling once the poll has left the music player playing, or after a moment if it can't
+        /// </summary>
+        public void Stop() {
+            _stopping = true;
+            _stopped.Wait(StopTimeout);
+        }
+
         void Check(Object source, EventArgs e) {
             try {
                 _muteError = null;
                 CheckProcesses();
-                if (_gameRunning) {
-                    CheckRadio();
-                }
+                CheckRadio();
+                ReplaceMusicPlayer();
                 ReportStatus();
             }
             finally {
-                // AutoReset is off, so a slow poll can't overlap the next one
-                _timer.Start();
+                if (_stopping && _on != false) {
+                    _stopped.Set();
+                }
+                else {
+                    // AutoReset is off, so a slow poll can't overlap the next one
+                    _timer.Start();
+                }
             }
         }
 
@@ -80,8 +99,15 @@ namespace VGRadioExternal {
         /// Checks if the radio should be playing, and changes it if it's doing the opposite
         /// </summary>
         void CheckRadio() {
-            bool on = _game.IsRadioOn();
-            if (_musicPlayerRunning && on != _on) {
+            // the music plays when there's no radio to follow, and a player that's being let go of is left playing
+            bool releasing = _stopping || _selectedMusicPlayer != _musicPlayer;
+            bool on = releasing || !_gameRunning || _game.IsRadioOn();
+            if (!_musicPlayerRunning) {
+                // a player that comes back starts in its own state, so it has to be told again
+                _on = null;
+                return;
+            }
+            if (on != _on) {
                 try {
                     _musicPlayer.Mute(!on);
                     _on = on;
@@ -90,6 +116,16 @@ namespace VGRadioExternal {
                     // the timer would swallow this, so show it instead
                     _muteError = "Error: " + ex.Message;
                 }
+            }
+        }
+
+        /// <summary>
+        /// Swaps in the selected music player once the old one is playing, because nothing will tell the old one again
+        /// </summary>
+        void ReplaceMusicPlayer() {
+            if (_selectedMusicPlayer != _musicPlayer && _on != false) {
+                _musicPlayer = _selectedMusicPlayer;
+                _on = null;
             }
         }
 

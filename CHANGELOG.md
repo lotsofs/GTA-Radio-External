@@ -13,7 +13,7 @@ What changed for users of GTA Radio External, per release, newest first. Downloa
 - **Pick your game and music player from lists.** The lists show the JSON files in the `input` folder, so you can add your own games and players. *Open Directory* opens that folder, and *Refresh* reloads the lists.
 - **GTA IV and GTA San Andreas: The Definitive Edition** are now supported.
 - **WACUP and Windows Media Player** are now supported. Start with Windows Media Player unmuted.
-- **Spotify** is now supported. It's muted in the Windows Volume Mixer, so other programs keep playing. Play something in Spotify first: until you do, there's nothing to mute, and its status says so when the radio goes off. If you close this program while Spotify is muted, unmute it in the Volume Mixer.
+- **Spotify** is now supported. It's muted in the Windows Volume Mixer, so other programs keep playing. Play something in Spotify first: until you do, there's nothing to mute, and its status says so when the radio goes off.
 - **Any other program in the Volume Mixer can be muted the same way.** Set `type` under `setVolume` to `AudioSession` in its JSON file, as `Spotify.json` does.
 - **Any music player with a global mute hotkey can now be used.** Under `setVolume` in its JSON file, set `type` to `KeyPress` and `keys` to the hotkey, such as `Ctrl+Shift+P`. Start with the player unmuted, and pick a key your game doesn't use. If you're holding another Shift, Ctrl or Alt, the key waits until you let go, and the status says so.
 - **A player that can only toggle mute no longer has to start unmuted.** Give its JSON file a `readVolume`, and the program checks the volume before toggling. Only do this if the volume drops to `minVolume` when muted. If it doesn't, the player mutes and never unmutes.
@@ -22,7 +22,12 @@ What changed for users of GTA Radio External, per release, newest first. Downloa
 
 - **The program is now `VGRadioExternal.exe`, and its window is called Radio External**, with a new layout. It shows `V0.3.0 WIP`.
 - **Winamp now means v5.8 and Foobar2000 now means v1.4.8**, instead of v5.666 and v1.3.14.
-- **The game and the music player each have their own status.** It says whether each one is selected and running, which file is missing, or what went wrong, and the game's status also says whether the radio is on. If a message is cut off, hover over it to read the rest.
+- **The game and the music player each have their own status.** It says whether each one is selected and running, whether the music player is still starting, which file is missing, or what went wrong, and the game's status also says whether the radio is on. If a message is cut off, hover over it to read the rest.
+
+### Fixed
+
+- **The music player no longer stays muted after you close the game or this program.** It also comes back when you pick another music player. While no game is running, the music plays: picking a player that's muted unmutes it, if the program can tell it's muted, as with Spotify.
+- **A music player you start while the radio is off now goes silent too**, a few seconds after it starts.
 
 ### Removed
 

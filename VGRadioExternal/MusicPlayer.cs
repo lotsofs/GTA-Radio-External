@@ -15,12 +15,15 @@ namespace VGRadioExternal
 {
     public class MusicPlayer
 	{
+        // how long a new process gets to set up its window, hotkey and volume before it's told anything
+        static readonly TimeSpan StartupDelay = TimeSpan.FromSeconds(3);
 
         MPData _mp;
 
         Process _process;
         long _addressVolume;
-        int _volume;
+        // the volume to go back to, while this tool has the player at minVolume. It outlives the process, in case the player saves minVolume on exit
+        int? _volume;
         
         ProcessStartInfo _processStartInfo;
 
@@ -42,13 +45,20 @@ namespace VGRadioExternal
         /// <returns></returns>
         public bool GetProcess()
 		{
+            // this only runs once any process it toggled has exited, and a new one starts unmuted
+            _toggledMuted = false;
             try {
                 // get the process
                 Process process = WinApi.GetProcess(_mp.ProcessName);
                 if (process == null || process.HasExited) {
                     _process = null;
-                    _toggledMuted = false;
                     Status = "Not running";
+                    return false;
+                }
+                if (DateTime.Now - process.StartTime < StartupDelay) {
+                    // anything sent before the player is ready is lost, and a lost toggle would leave it inverted
+                    _process = null;
+                    Status = "Starting";
                     return false;
                 }
                 _process = process;
@@ -63,7 +73,6 @@ namespace VGRadioExternal
                         return false;
                     }
                     _addressVolume = moduleAddress + _mp.ReadVolume.AddressOffset;
-                    _volume = ReadVolume();
                 }
 
                 if (_mp.SetVolume.Type == HookMethods.SendMessage) {
@@ -127,17 +136,16 @@ namespace VGRadioExternal
                 return;
             }
             if (_mp.SetVolume.Type == HookMethods.SendMessage && CarriesVolume()) {
-                int destinationVolume;
-                if (!mute) {
-                    // turn radio on
-                    destinationVolume = _volume;
+                if (mute) {
+                    // turn radio off, store old volume. A second mute keeps it, because the player is at minVolume by then
+                    _volume = _volume ?? ReadVolume();
+                    SendConfiguredMessage(_mp.MinVolume);
                 }
-                else {
-                    // turn radio off, store old volume
-                    _volume = ReadVolume();
-                    destinationVolume = _mp.MinVolume;
+                else if (_volume != null) {
+                    // turn radio on. Without a stored volume this tool hasn't lowered it, so there's nothing to undo
+                    SendConfiguredMessage(_volume.Value);
+                    _volume = null;
                 }
-                SendConfiguredMessage(destinationVolume);
                 return;
             }
             // the volume shows which state the player is in, so unlike a blind toggle this can't end up inverted

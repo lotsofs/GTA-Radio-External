@@ -265,6 +265,7 @@
 			this.Icon = ((System.Drawing.Icon)(resources.GetObject("$this.Icon")));
 			this.Name = "FormRE";
 			this.Text = "Radio External";
+			this.FormClosing += new System.Windows.Forms.FormClosingEventHandler(this.FormRE_FormClosing);
 			this.Load += new System.EventHandler(this.FormRE_Load);
 			this.GroupBox_Processes.ResumeLayout(false);
 			this.GroupBox_Processes.PerformLayout();

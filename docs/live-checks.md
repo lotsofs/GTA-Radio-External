@@ -6,7 +6,7 @@ Detail for the item in [TODO.md](TODO.md).
 
 These need the real software, and nothing records them passing on the current build. Several configs say "Untested" in their own description, and the ones that say "Tested" don't say on which build.
 
-**Base check:** pick the game and player, then play. In a car with the radio on, the music plays at its normal volume. Out of the car, the player goes silent. Back in the car, the volume returns to where it was. The game's status reads `Radio on` and `Radio off` to match, and the player's reads `Running`.
+**Base check:** pick the game and player, then play. In a car with the radio on, the music plays at its normal volume. Out of the car, the player goes silent. Back in the car, the volume returns to where it was. The game's status reads `Radio on` and `Radio off` to match, and the player's reads `Running`. Then start the tool while the game is on foot with no radio: the player goes silent. Close the game while it's silent: the music returns. Do the same with the tool instead of the game.
 
 A check keeps its number for good. When one passes, delete it and log it by number in [DONE.md](DONE.md). When none are left, delete this doc and the index row, and log `LIV` as finished.
 
@@ -30,6 +30,7 @@ Use any game that passed above.
 - **LIV 6.** `Wacup.json` on WACUP 1.0.20.7170: base check.
 - **LIV 7.** `Wacup - Not So Direct.json` on WACUP 1.0.20.7170 with the Not So Direct output: base check.
 - **LIV 10.** `Spotify.json` on Spotify 1.3.6.1921: base check, and if Spotify is paused while muted and played again, it stays silent until the radio comes back. Other apps keep playing throughout.
+- **LIV 12.** `Spotify.json`: close Spotify while it's muted, close the game, then start Spotify and play something. It should play. If it stays muted in the Volume Mixer, Windows kept the mute across the restart. The tool unmutes Spotify when it comes back, but that finds no session until Spotify plays, so a kept mute stays.
 - **LIV 11.** A `KeyPress` config for WACUP, with `keys` set to `Ctrl+Shift+P`, on WACUP with that key set as a global hotkey, starting unmuted: base check, and the game doesn't react to the key press.
 - **LIV 9.** `Windows Media Player.json` on Windows Media Player 12: base check, starting with the player unmuted.
 - **LIV 8.** `Foobar2000.json` on Foobar2000 1.4.8: base check, and the mute stays in step with the radio over several changes.

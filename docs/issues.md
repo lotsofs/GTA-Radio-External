@@ -4,25 +4,6 @@ Detail for the items in [TODO.md](TODO.md).
 
 **Dependencies:** SHR is easier once VAL and RDF have settled what the two classes do.
 
-## SYN — Mute state drifts from the player
-
-`Radio` keeps one `_on` flag, false at the start, and acts only when `Game.IsRadioOn()` differs from it. Several situations leave the player in the wrong state:
-
-- **Game starts with the radio off.** `_on` is already false, so nothing is sent, and the player keeps playing until the radio has come on and gone off once.
-- **Game closes while muted.** `Radio.Check` only touches the player while the game is running, so the player stays muted.
-- **Tool closes while muted.** `FormRE` has no closing handler and `Radio` no shutdown, so the player stays at `minVolume`.
-- **Selection changes.** A new `Game` or `MusicPlayer` keeps the old `_on` and isn't told the current state. A new `MusicPlayer` also stores the volume it finds at startup, which is `minVolume` if the player is muted, and unmuting then restores that.
-- **Toggle configs.** `ToggleMute` assumes the player starts unmuted and that nothing else toggles it, as the description in `Windows Media Player.json` warns. Starting muted, or pressing a `KeyPress` hotkey by hand, inverts the player until it's fixed by hand. A new `MusicPlayer` also forgets that it had muted the player.
-- **Volume Mixer mutes.** The `AudioSession` hook has the gaps above, and they're harder to spot: the mute stays in the Mixer when the tool closes, and Spotify's own window doesn't show it. Whether it also survives restarting Spotify isn't known.
-
-**Evidence:** read 2026-11-02. Seeing these needs a real game and player.
-
-**Plan:** make `_on` nullable so the first poll always applies the state, and reset it when the game or player changes. When the game's process is gone, and when `FormRE` closes, restore the player. Keep the stored volume across a `MusicPlayer` swap only if it's the same player.
-
-**Verify:** start the game with the radio off: the player mutes. Mute it, then close the game: the volume returns. Mute it, then close the tool: the volume returns. Pick another config while muted: the state stays correct.
-
-**Docs when done:** `CLAUDE.md` § Architecture if `Radio` gains a shutdown step.
-
 ## VAL — Configs aren't validated on load
 
 `Radio.MusicPlayerChanged` and `Radio.GameChanged` read and deserialize on the UI thread with no `try`, so a malformed file throws from the combo box handler. A missing `setVolume` only shows as an `Error:` status with a `NullReferenceException` message, once the player's process is found.
@@ -130,9 +111,9 @@ The `FormRE` constructor builds `inputPath` from `Environment.CurrentDirectory`.
 
 ## HWN — Window handle handling
 
-`MusicPlayer.GetProcess` calls `FindWindow` once. If the player's window doesn't exist yet, `_window` stays 0 and is never looked up again, because `_process` is already set. Muting then does nothing, with no error, and the status says `Running`. `WinApi.SendMessage` and `FindWindow` declare handles and parameters as `int` in an x64 build, and `CollectModules` passes the wrong size to `GetModuleInformation`.
+`MusicPlayer.GetProcess` calls `FindWindow` once, when the process is 3 seconds old. If the player's window doesn't exist by then, `_window` stays 0 and is never looked up again, because `_process` is already set. Muting then does nothing, with no error, and the status says `Running`. `WinApi.SendMessage` and `FindWindow` declare handles and parameters as `int` in an x64 build, and `CollectModules` passes the wrong size to `GetModuleInformation`.
 
-**Evidence:** the missed window reproduced 2026-11-02 with a stand-in player that creates its window 1.5 seconds after starting: it received no messages, while one with its window already up was muted and restored. Whether a real player's window lags enough to hit this isn't known. The rest read 2026-11-02.
+**Evidence:** the missed window reproduced 2026-11-02 with a stand-in player that creates its window 1.5 seconds after starting: it received no messages, while one with its window already up was muted and restored. The 3-second wait came later, so that stand-in would now be found. A window later than 3 seconds should still be missed, but that's only read. Whether a real player's window lags that much isn't known. The rest read 2026-11-02.
 
 **Plan:** declare handles as `IntPtr`, look the window up again before sending if it's missing or no longer valid, and pass the size of `ModuleInformation`.
 

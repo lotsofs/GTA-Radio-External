@@ -6,10 +6,9 @@ Open work, one row per item. Within each group, rows are in suggested order of w
 
 | Code | Area | Summary | Severity |
 |---|---|---|---|
-| [SYN](issues.md#syn--mute-state-drifts-from-the-player) | Radio | The player doesn't mute if the game starts with the radio off, and stays muted after the game or the tool closes or the selection changes | High |
 | [VAL](issues.md#val--configs-arent-validated-on-load) | Config | Nothing validates a config on load: a bad file throws on the UI thread, and bad `wMsg`, `wParam` or `type` values only fail later in the poll | Medium |
 | [RDF](issues.md#rdf--failed-reads-are-treated-as-real-values) | Memory | A failed read counts as radio off, and a failed volume read stores `int.MinValue`, which unmuting then sends to the player | Medium |
-| [HWN](issues.md#hwn--window-handle-handling) | Music players | The player's window is looked up once and never again, so a player whose window appears after its process never mutes while its status says `Running`; window handles are also declared as `int` in a 64-bit build | Medium |
+| [HWN](issues.md#hwn--window-handle-handling) | Music players | The player's window is looked up once, 3 seconds after its process starts, so a player whose window appears later never mutes while its status says `Running`; window handles are also declared as `int` in a 64-bit build | Medium |
 | [CWD](issues.md#cwd--input-is-found-through-the-current-directory) | Startup | `input/` is found through the current directory, so starting the exe from another folder breaks it | Medium |
 | [DOC](issues.md#doc--user-docs-describe-old-behaviour) | Docs | `README.md` and `readme.txt` describe old behaviour, the game JSON format is undocumented, and `readme.txt` doesn't reach the output folder | Medium |
 | [SPT](issues.md#spt--answer-pr-5) | Music players | Reply to PR #5: its Spotify muting is ported to the active code as the `AudioSession` hook, so the PR itself can't be merged | Low |

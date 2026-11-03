@@ -43,6 +43,11 @@ namespace VGRadioExternal {
             radio.StartTimer();
         }
 
+        private void FormRE_FormClosing(object sender, FormClosingEventArgs e) {
+            // leave the music player playing
+            radio.Stop();
+        }
+
         /// <summary>
         /// Shows the status. Radio raises this on the timer thread, so the labels are set through BeginInvoke.
         /// </summary>
