@@ -2,6 +2,7 @@
 
 For information about the JSON format, see www.json.org
 Please ensure each jason has a description, and the name of the process (without the .exe extension), as well as information about the method to send information to the music player (hook).
+A game file can give a list of process names instead, for a game whose exe goes by more than one name, as the San Andreas file does: [ "gta_sa", "gta-sa" ].
 
 Hook: There are four kinds of hooks, ProcessStart, SendMessage, AudioSession and KeyPress.
 ProcessStart will start the music player process but with certain arguments. If the music player supports it, this will instead send the argument to the existing process, as opposed to starting a duplicate process. The argument should toggle mute. Without a volume object, start with the music player unmuted. With one, it only runs when needed.

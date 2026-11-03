@@ -57,7 +57,7 @@ The build targets x64 so it can read 64-bit games. `WinApi.GetModuleAddress` fal
 - `windowName` is the window's class, not its title: it goes to `FindWindow` as the class name.
 - `wParam` and `lParam` are integers or the literal `"{volume}"`, which needs `readVolume` so the volume can be restored. `MessageParameter` holds either.
 - `setVolume.keys` takes what `KeysConverter` reads, such as `Ctrl+Shift+P`, `F13` or `VolumeMute`, and needs a key besides Shift, Ctrl and Alt. The keys go to the window in front unless a program has claimed them, so the player must have them set as a global hotkey.
-- Each file has one `processName`, without `.exe`, so a variant executable name needs its own file (`gta_sa` and `gta-sa`).
+- `processName` is the name without `.exe`. In a game file it can also be a list, for an exe that goes by several names (`gta_sa` and `gta-sa`), and `Game` takes the first one that's running. A music player file has one.
 - `radioAddress.module` is ignored: `Game` reads a top-level `moduleName` instead. `maxVolume` is ignored too, and so is any other unknown key.
 - `onValues` and `offValues` each need a value. A radio value in neither, or a failed read, makes `Game.IsRadioOn` return null: the player is left as it is, and the game's status shows the value or the error.
 - A new file under `input/` needs a `<None Include>` entry with `CopyToOutputDirectory` in `VGRadioExternal.csproj`, or it won't reach `bin/`.

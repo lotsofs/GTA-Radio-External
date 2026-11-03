@@ -15,7 +15,7 @@ A check keeps its number for good. When one passes, delete it and log it by numb
 Use any player from the next group.
 
 - **LIV 1.** `Grand Theft Auto San Andreas.json` on version 1.0 as `gta_sa`: base check.
-- **LIV 2.** `Grand Theft Auto Dash San Andreas.json` on version 1.0 as `gta-sa`: base check.
+- **LIV 2.** `Grand Theft Auto San Andreas.json` on version 1.0 as `gta-sa`: base check.
 
 ### With other games
 

@@ -38,8 +38,8 @@ namespace VGRadioExternal {
          /// <returns></returns>
         public bool GetProcess() {
             try {
-                Process process = WinApi.GetProcess(_gameData.ProcessName);
-                if (process == null || process.HasExited) {
+                Process process = _gameData.ProcessNames.Select(name => WinApi.GetProcess(name)).FirstOrDefault(p => p != null && !p.HasExited);
+                if (process == null) {
                     _process = null;
                     Status = "Not running";
                     return false;

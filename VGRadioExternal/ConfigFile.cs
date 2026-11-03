@@ -1,4 +1,5 @@
 using System;
+using System.Collections.Generic;
 using System.IO;
 using System.Linq;
 using System.Windows.Forms;
@@ -125,6 +126,37 @@ namespace VGRadioExternal {
         }
 
         public override void WriteJson(JsonWriter writer, Keys value, JsonSerializer serializer) {
+            throw new NotSupportedException();
+        }
+    }
+
+    /// <summary>
+    /// Reads a name, or a list of names, as a list
+    /// </summary>
+    class NameListConverter : JsonConverter<string[]> {
+        public override bool CanWrite => false;
+
+        public override string[] ReadJson(JsonReader reader, Type objectType, string[] existingValue, bool hasExistingValue, JsonSerializer serializer) {
+            if (reader.TokenType == JsonToken.String) {
+                return new[] { (string)reader.Value };
+            }
+            if (reader.TokenType != JsonToken.StartArray) {
+                throw ConfigFile.Error(reader, "a name or a list of names");
+            }
+            List<string> names = new List<string>();
+            while (reader.Read() && reader.TokenType != JsonToken.EndArray) {
+                if (reader.TokenType == JsonToken.Comment) {
+                    continue;
+                }
+                if (reader.TokenType != JsonToken.String) {
+                    throw ConfigFile.Error(reader, "a name");
+                }
+                names.Add((string)reader.Value);
+            }
+            return names.ToArray();
+        }
+
+        public override void WriteJson(JsonWriter writer, string[] value, JsonSerializer serializer) {
             throw new NotSupportedException();
         }
     }

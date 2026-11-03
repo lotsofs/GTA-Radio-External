@@ -8,7 +8,7 @@ All addresses below were read on 2026-11-02 from [ReadMemory.cs](../VGRadioExter
 
 ## SAV — Other San Andreas versions
 
-The two shipped San Andreas configs are for 1.0, US or EU, and their signatures say so. The legacy code also handled these, with `FourBytes` values, 2 for on and 7 for off:
+The shipped San Andreas config is for 1.0, US or EU, and its signatures say so. The legacy code also handled these, with `FourBytes` values, 2 for on and 7 for off:
 
 | Version | Legacy address | `addressOffset` | Signature offset | Legacy status |
 |---|---|---|---|---|
@@ -20,7 +20,7 @@ Each signature's value is 38079. None of these signatures has been checked again
 
 **Evidence:** read 2026-11-02.
 
-**Plan:** add a config for each version, and for each executable name as 1.0 has, with 1.1 taking both its signatures. Name every San Andreas file by version, the two 1.0 ones included, and add the new ones to `VGRadioExternal.csproj`.
+**Plan:** add a config for each version, with both executable names as 1.0 has, and with 1.1 taking both its signatures. Name every San Andreas file by version, the 1.0 one included, and add the new ones to `VGRadioExternal.csproj`.
 
 **Verify:** on each version, the base check in [LIV](live-checks.md#liv--configs-not-yet-seen-working-live) passes.
 
