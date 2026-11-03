@@ -53,6 +53,12 @@ namespace VGRadioExternal {
                     Status = "Missing " + _gameData.ModuleName;
                     return false;
                 }
+                if (!IsVersion(process, moduleAddress)) {
+                    // the radio's address would hold something else. Not keeping the process checks it again next poll, because a game can decrypt its code after it starts
+                    _process = null;
+                    Status = "Not the version this file is for";
+                    return false;
+                }
                 _addressRadio = moduleAddress + _gameData.RadioAddress.AddressOffset;
                 Status = "Running";
                 return true;
@@ -63,6 +69,26 @@ namespace VGRadioExternal {
                 Status = "Error: " + ex.Message;
                 return false;
             }
+        }
+
+        /// <summary>
+        /// Whether the process matches one of the file's signatures, or the file has none
+        /// </summary>
+        bool IsVersion(Process process, long moduleAddress) {
+            if (_gameData.Signatures == null) {
+                return true;
+            }
+            foreach (Signature signature in _gameData.Signatures) {
+                try {
+                    if (WinApi.ReadValue(process, moduleAddress + signature.AddressOffset, signature.Type) == signature.Value) {
+                        return true;
+                    }
+                }
+                catch (Win32Exception) {
+                    // nothing at that address, which is what another version can give
+                }
+            }
+            return false;
         }
 
         public bool IsRunning() {

@@ -22,7 +22,6 @@ Open work, one row per item. Within each group, rows are in suggested order of w
 
 | Code | Area | Summary | Severity |
 |---|---|---|---|
-| [VDT](porting.md#vdt--tell-game-versions-apart) | Games | Configs have one process name and one offset, and can't tell game versions apart the way `ReadMemory` does | Medium |
 | [SAV](porting.md#sav--other-san-andreas-versions) | Games | Add San Andreas 1.1 and Steam 3.0; only 1.0 has a config | Medium |
 | [III](porting.md#iii--gta-iii) | Games | Add GTA III configs for 1.0, 1.1 and 1.1 Steam | Medium |
 | [GVC](porting.md#gvc--vice-city) | Games | Add Vice City configs for 1.0, 1.1, 1.1 Steam and the Japanese version | Medium |

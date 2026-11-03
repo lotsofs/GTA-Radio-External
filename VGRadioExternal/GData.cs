@@ -11,6 +11,8 @@ namespace VGRadioExternal {
 		[JsonProperty(Required = Required.Always)]
 		public string ProcessName;
 		public string ModuleName;
+		// the versions the file is for, any one of which has to match. Null for any version
+		public Signature[] Signatures;
 		[JsonProperty(Required = Required.Always)]
 		public RadioAddress RadioAddress;
 
@@ -20,11 +22,28 @@ namespace VGRadioExternal {
 		public static GData Load(string path) {
 			GData game = ConfigFile.Read<GData>(path);
 			ConfigFile.CheckProcessName(game.ProcessName);
+			// an empty list would match no version, and an empty entry would fail in the poll
+			ConfigFile.Require(game.Signatures == null || game.Signatures.Length > 0, "signatures is empty. Leave it out to use the file with any version.");
+			ConfigFile.Require(game.Signatures == null || !game.Signatures.Contains(null), "signatures has an empty entry.");
 			// the two lists are all that says what the radio's value means
 			ConfigFile.Require(game.RadioAddress.OnValues.Length > 0, "radioAddress.onValues is empty.");
 			ConfigFile.Require(game.RadioAddress.OffValues.Length > 0, "radioAddress.offValues is empty.");
 			return game;
 		}
+	}
+
+	/// <summary>
+	/// A value one version of the game has at a fixed address, relative to the same module as the radio
+	/// </summary>
+	class Signature {
+		[JsonProperty(Required = Required.Always)]
+		[JsonConverter(typeof(HexIntConverter))]
+		public int AddressOffset;
+		[JsonProperty(Required = Required.Always)]
+		public WinApi.Types Type;
+		[JsonProperty(Required = Required.Always)]
+		[JsonConverter(typeof(HexIntConverter))]
+		public int Value;
 	}
 
 	class RadioAddress {

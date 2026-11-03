@@ -2,34 +2,25 @@
 
 Detail for the items in [TODO.md](TODO.md). `Form1` and `ReadMemory` hold features the active code doesn't have yet. See `CLAUDE.md` § Architecture for how the two generations relate.
 
-**Dependencies:** VDT comes before SAV, III, GVC and SRT. WHN needs III or GVC, because San Andreas only has on and off. LEG comes last.
+**Dependencies:** WHN needs III or GVC, because San Andreas only has on and off. LEG comes last.
 
-All addresses below were read on 2026-11-02 from [ReadMemory.cs](../VGRadioExternal/ReadMemory.cs). They're absolute, so each table also gives the `addressOffset` for a config, which subtracts the `0x400000` image base. That offset is confirmed for San Andreas 1.0, where it matches the shipped config, and assumed for the rest.
-
-## VDT — Tell game versions apart
-
-A game config has one `processName` and one offset. `ReadMemory.DetermineGameVersion*` instead reads a known signature at a fixed address for each version, and picks the radio address from that. Nothing in the active code can do this, so a config for the wrong version reads a wrong address and silently mutes or does nothing.
-
-**Evidence:** read 2026-11-02.
-
-**Plan:** use one file per version, as the `gta_sa` and `gta-sa` files already do per executable name, which needs no code. Add an optional signature to `GData` (offset and expected value), so `Game` can report a mismatch through `Status` instead of reading the wrong address. The signatures are in the `DetermineGameVersion*` methods.
-
-**Verify:** a config with a signature for another version reports the mismatch and doesn't touch the player.
-
-**Docs when done:** `CLAUDE.md` § JSON config files, and `readme.txt`.
+All addresses below were read on 2026-11-02 from [ReadMemory.cs](../VGRadioExternal/ReadMemory.cs), where `DetermineGameVersion*` tells versions apart by their signatures. The addresses are absolute, so each table also gives the offsets for a config, which subtract the `0x400000` image base. Every exe checked on 2026-11-03 has that image base and no ASLR in its PE header: a GTA III Steam exe, Vice City 1.0, 1.1 Steam and Japanese, and San Andreas 1.0 US and EU. Signatures go in a config's `signatures`, and each is read as `FourBytes`.
 
 ## SAV — Other San Andreas versions
 
-The two shipped San Andreas configs use the 1.0 offset. The legacy code also handled these, with `FourBytes` values, 2 for on and 7 for off:
+The two shipped San Andreas configs are for 1.0, US or EU, and their signatures say so. The legacy code also handled these, with `FourBytes` values, 2 for on and 7 for off:
 
-| Version | Legacy address | `addressOffset` | Legacy status |
-|---|---|---|---|
-| 1.1 US and EU | `0x8CCFE8` | `0x4CCFE8` | Unconfirmed |
-| 3.0 Steam | `0x93AB68` | `0x53AB68` | Running |
+| Version | Legacy address | `addressOffset` | Signature offset | Legacy status |
+|---|---|---|---|---|
+| 1.1 US | `0x8CCFE8` | `0x4CCFE8` | `0x4252FC` | Unconfirmed |
+| 1.1 EU | `0x8CCFE8` | `0x4CCFE8` | `0x42533C` | Unconfirmed |
+| 3.0 Steam | `0x93AB68` | `0x53AB68` | `0x45EC4A` | Running |
+
+Each signature's value is 38079. None of these signatures has been checked against a real exe.
 
 **Evidence:** read 2026-11-02.
 
-**Plan:** add a config for each, with a signature from [VDT](#vdt--tell-game-versions-apart). Name them by version, and add them to `VGRadioExternal.csproj`.
+**Plan:** add a config for each version, and for each executable name as 1.0 has, with 1.1 taking both its signatures. Name every San Andreas file by version, the two 1.0 ones included, and add the new ones to `VGRadioExternal.csproj`.
 
 **Verify:** on each version, the base check in [LIV](live-checks.md#liv--configs-not-yet-seen-working-live) passes.
 
@@ -39,17 +30,19 @@ The two shipped San Andreas configs use the 1.0 offset. The legacy code also han
 
 The process is `gta3`. The radio value is read as a `Byte`.
 
-| Version | Legacy address | `addressOffset` |
-|---|---|---|
-| 1.0 | `0x8F3967` | `0x4F3967` |
-| 1.1 | `0x8F3A1B` | `0x4F3A1B` |
-| 1.1 Steam | `0x903B5C` | `0x503B5C` |
+| Version | Legacy address | `addressOffset` | Signature offset |
+|---|---|---|---|
+| 1.0 | `0x8F3967` | `0x4F3967` | `0x1C1E70` |
+| 1.1 | `0x8F3A1B` | `0x4F3A1B` | `0x1C2130` |
+| 1.1 Steam | `0x903B5C` | `0x503B5C` | `0x1C6FD0` |
+
+Each signature's value is 1407551829. A GTA III Steam exe on this machine matched none of them when read from the file on 2026-11-03. It has a `.bind` section, which suggests Steam's DRM decrypts its code at run time, so the Steam signature may only match in the running game.
 
 `CheckRadioStatusIII` treats 0 to 9 as radio stations, 10 as emergency vehicles, 13 and 14 as the announcer, and 197 as the pause menu. Other values above 10 mean off.
 
-**Evidence:** read 2026-11-02.
+**Evidence:** read 2026-11-02, and the signatures from the exe on 2026-11-03.
 
-**Plan:** add a config per version, with 0 to 9 in `onValues` until [WHN](#whn--when-options) makes the other groups selectable.
+**Plan:** add a config per version with its signature, and with 0 to 9 in `onValues` until [WHN](#whn--when-options) makes the other groups selectable. Check the Steam signature in the running game first.
 
 **Verify:** on each version, the base check in [LIV](live-checks.md#liv--configs-not-yet-seen-working-live) passes.
 
@@ -59,18 +52,20 @@ The process is `gta3`. The radio value is read as a `Byte`.
 
 The process is `gta-vc`. The radio value is read as `FourBytes`.
 
-| Version | Legacy address | `addressOffset` | Legacy status |
-|---|---|---|---|
-| 1.0 | `0x9839C0` | `0x5839C0` | Running |
-| 1.1 | `0x9839C0` | `0x5839C0` | Unconfirmed |
-| 1.1 Steam | `0x9829C8` | `0x5829C8` | Running |
-| 1.1 Japanese | `0x9809D0` | `0x5809D0` | Running |
+| Version | Legacy address | `addressOffset` | Signature offset | Signature value | Legacy status |
+|---|---|---|---|---|---|
+| 1.0 | `0x9839C0` | `0x5839C0` | `0x267BF0` | 1407551829 | Running |
+| 1.1 | `0x9839C0` | `0x5839C0` | `0x267C40` | 1407551829 | Unconfirmed |
+| 1.1 Steam | `0x9829C8` | `0x5829C8` | `0x6402ED` | 1448235347 | Running |
+| 1.1 Japanese | `0x9809D0` | `0x5809D0` | `0x6CD0A2` | 1793887061 | Running |
+
+The 1.0, 1.1 Steam and Japanese signatures each matched an exe on this machine when read from the file on 2026-11-03. The 1.1 one hasn't been checked.
 
 `CheckRadioStatusVC` treats 0 to 9 as radio stations, 23 as emergency vehicles, 24 as Kaufman, 25 and 26 as the announcer, and 1225 as the pause menu. Other values mean off.
 
-**Evidence:** read 2026-11-02.
+**Evidence:** read 2026-11-02, and the signatures from the exes on 2026-11-03.
 
-**Plan:** add a config per version, with 0 to 9 in `onValues` until [WHN](#whn--when-options) makes the other groups selectable.
+**Plan:** add a config per version with its signature, and with 0 to 9 in `onValues` until [WHN](#whn--when-options) makes the other groups selectable.
 
 **Verify:** on each version, the base check in [LIV](live-checks.md#liv--configs-not-yet-seen-working-live) passes.
 

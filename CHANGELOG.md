@@ -16,13 +16,14 @@ What changed for users of GTA Radio External, per release, newest first. Downloa
 - **Spotify** is now supported. It's muted in the Windows Volume Mixer, so other programs keep playing. Play something in Spotify first: until you do, there's nothing to mute, and its status says so when the radio goes off.
 - **Any other program in the Volume Mixer can be muted the same way.** Set `type` under `setVolume` to `AudioSession` in its JSON file, as `Spotify.json` does.
 - **Any music player with a global mute hotkey can now be used.** Under `setVolume` in its JSON file, set `type` to `KeyPress` and `keys` to the hotkey, such as `Ctrl+Shift+P`. Start with the player unmuted, and pick a key your game doesn't use. If you're holding another Shift, Ctrl or Alt, the key waits until you let go, and the status says so.
+- **Game files can say which version of the game they're for**, with a list of `signatures`. The San Andreas files are now for version 1.0 only. With another version, the game's status says it's not the version the file is for, and the music plays as if the game wasn't running.
 - **A player that can only toggle mute no longer has to start unmuted.** Give its JSON file a `readVolume`, and the program checks the volume before toggling. Only do this if the volume drops to `minVolume` when muted. If it doesn't, the player mutes and never unmutes.
 
 ### Changed
 
 - **The program is now `VGRadioExternal.exe`, and its window is called Radio External**, with a new layout. It shows `V0.3.0 WIP`.
 - **Winamp now means v5.8 and Foobar2000 now means v1.4.8**, instead of v5.666 and v1.3.14.
-- **The game and the music player each have their own status.** It says whether each one is selected and running, whether the music player is still starting, which file is missing, or what went wrong, and the game's status also says whether the radio is on. If the program can't read the radio or the music player's volume, or finds a radio value it doesn't know, it leaves the music as it is and the status says so. If a message is cut off, hover over it to read the rest.
+- **The game and the music player each have their own status.** It says whether each one is selected and running, whether the game is the version its file is for, whether the music player is still starting, which file is missing, or what went wrong, and the game's status also says whether the radio is on. If the program can't read the radio or the music player's volume, or finds a radio value it doesn't know, it leaves the music as it is and the status says so. If a message is cut off, hover over it to read the rest.
 
 ### Fixed
 

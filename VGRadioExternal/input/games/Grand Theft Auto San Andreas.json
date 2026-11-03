@@ -1,6 +1,10 @@
 ﻿{
-	"description": "GTA: San Andreas",
+	"description": "GTA: San Andreas 1.0",
 	"processName": "gta_sa",
+	"signatures": [
+		{ "addressOffset": 0x42457C, "type": "FourBytes", "value": 38079 },
+		{ "addressOffset": 0x4245BC, "type": "FourBytes", "value": 38079 }
+	],
 	"radioAddress": {
 		"module": "",
 		"addressOffset": 0x4CB760,

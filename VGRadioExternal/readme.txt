@@ -17,6 +17,9 @@ minVolume is the minimum volume of the music player. Typically this is 0, but so
 With a hook that toggles mute, the volume object shows whether the music player is already muted: minVolume or below counts as muted. Only use one if the value really drops that low when muted. If it doesn't, the music player will mute and never unmute.
 Type means the kind of value type is stored in the address. Currently supported are Byte, FourBytes & Float. These work the same as they do in Cheat Engine, which you might find handy to use if you wish to add your own music player.
 
+Signatures:
+A game file can have a list of signatures, so it's only used with the version of the game it's for. Each signature has an addressOffset, a type and the value that version has at that address, read from the same module as the radio. If none of them matches, the game's status says it's not the version the file is for, and the music plays as if the game wasn't running. Leave signatures out to use the file with any version.
+
 When you pick a file, the program checks it. If something is missing or misspelt, a message says what, and the file you had picked before stays in use.
 
 It is recommended to look at the standard provided json files for examples.
